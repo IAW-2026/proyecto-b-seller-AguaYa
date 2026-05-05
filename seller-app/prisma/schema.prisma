@@ -1,7 +1,74 @@
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  READY
+  IN_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+model Vendor {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  name        String
+  description String?
+  address     String
+  cuil        String?
+  cuit        String?
+  reputation  Float     @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+  orders      Order[]
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  vendorId    String
+  name        String
+  description String?
+  price       Float
+  stock       Int         @default(0)
+  image       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  vendorId   String
+  buyerId    String
+  status     OrderStatus @default(PENDING)
+  total      Float
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  vendor     Vendor      @relation(fields: [vendorId], references: [id])
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  productId    String
+  productName  String
+  productPrice Float
+  quantity     Int
+
+  order        Order   @relation(fields: [orderId], references: [id])
+  product      Product @relation(fields: [productId], references: [id])
 }
