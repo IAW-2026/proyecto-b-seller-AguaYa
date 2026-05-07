@@ -2,8 +2,8 @@ export { }
 
 declare global {
     interface CustomJwtSessionClaims {
-        metadata?: {
-            role?: 'vendor' | 'admin'
+        public_metadata?: {
+            role?: 'vendor' | 'admin_vendor'
         }
     }
 }

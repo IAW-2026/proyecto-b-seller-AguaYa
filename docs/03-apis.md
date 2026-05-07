@@ -1,279 +1,202 @@
-# 1.3 — Inter-Service API Design
+# 1.3 — Diseño de APIs Inter-Servicios
 
-> **Type B — Delivery Platform**
+> **Tipo B — Plataforma de Delivery**
 
-Document each endpoint that an app exposes to be consumed by another app in the system. This contract must be agreed upon by all team members before starting Stage 2.
-
----
-
-## 1. Seller App — Endpoints exposed
-
-> **Owner:** Orders and vendor data
+Documentar cada endpoint que una app expone para ser consumido por otra app del sistema. Este contrato debe estar acordado por todos los integrantes antes de comenzar la Etapa 2.
 
 ---
 
-### Get Orders Ready for Delivery
+## Buyer App — Endpoints expuestos
 
-| Field | Detail |
+| Caso de Uso | Consultar Reclamos|
 | :---- | :---- |
-| **Use Case** | Get orders with status "ready" to be picked up by delivery |
-| **Endpoint** | `GET /api/orders/status/ready` |
-| **Request** | — |
-| **Response** | `200 OK` — Array of orders with status `ready` |
-| **Communication** | Sync (REST) — consumed by **Delivery App** |
+| **Endpoint** | HTTP GET /api/claims?client_ids=1,2&order_ids=3,4 |
+| **Request***| El endpoint recibe las listas de IDs de clientes y de pedidos a través de parámetros en la URL (query parameters), sin utilizar Body.|
+| **Response** | BuyerApp responde con los clientes que tengan un reclamo activo asociado a los IDs de esos pedidos.|
+| **Comunicación** | SellerApp solicita a → Reclamos (BuyerApp) |
 
----
-
-### Browse Catalogs / Search Product
-
-| Field | Detail |
+| Caso de Uso | Notificar pago confirmado (Al Comprador) |
 | :---- | :---- |
-| **Use Case** | List all available catalogs or search for a specific product |
-| **Endpoint** | `GET /api/catalogs` |
-| **Request** | Query params: `search` *(optional)* |
-| **Response** | `200 OK` — Array of catalogs / products |
-| **Communication** | Sync (REST) — consumed by **Buyer App** |
+| **Endpoint** | HTTP POST /api/buyers/:buyer_id/payment-confirmed |
+| **Request***| El endpoint recibe los datos asociados a un pago exitoso procesado (order_id, buyer_id, transaction_id, monto).|
+| **Response** | BuyerApp responde con la confirmación de recepción para actualizar la UI del cliente. |
+| **Comunicación** | PaymentApp notifica a → Compradores (BuyerApp) |
 
 ---
 
-### Browse Vendors
+## Seller App — Endpoints expuestos
 
-| Field | Detail |
+
+| Caso de Uso | Consultar Pedidos Listos para entregar |
 | :---- | :---- |
-| **Use Case** | List all available vendors |
-| **Endpoint** | `GET /api/vendors` |
-| **Request** | — |
-| **Response** | `200 OK` — Array of vendors |
-| **Communication** | Sync (REST) — consumed by **Buyer App** |
+| **Endpoint** | HTTP GET /api/orders/status/ready |
+| **Request** | El endpoint recibe la petición (de la DeliveryApp) para obtener la lista de pedidos que tengan el estado listo_para_despacho. |
+| **Response** | SellerApp responde con un array de pedidos incluyendo: ID Pedido, Dirección, Nombre Comprador y Cantidad de Bidones. |
+| Comunicación | DeliveryApp solicita a → Pedidos (SellerApp) |
 
----
-
-### Get Order Status
-
-| Field | Detail |
+| Caso de Uso | Visualizar Productos / Buscar Producto |
 | :---- | :---- |
-| **Use Case** | Check the current status of a specific order |
-| **Endpoint** | `GET /api/orders/:orderId/status` |
-| **Request** | Path param: `orderId` |
-| **Response** | `200 OK` — `{ orderId, status }` |
-| **Communication** | Sync (REST) — consumed by **Buyer App** |
+| **Endpoint** | HTTP GET /api/products |
+| **Request** | El endpoint recibe la petición (de la BuyerApp) para obtener la lista de productos activos y precios. |
+| **Response** | SellerApp responde con un JSON de productos, descripción, precio y stock. |
+| Comunicación | BuyerApp solicita a → Productos (SellerApp) |
 
----
-
-### Get Order
-
-| Field | Detail |
+| Caso de Uso | Visualizar Empresas |
 | :---- | :---- |
-| **Use Case** | Retrieve full details of a specific order, including associated invoice data |
-| **Endpoint** | `GET /api/orders/:orderId` |
-| **Request** | Path param: `orderId` |
-| **Response** | `200 OK` — Order object with full details, including `invoice` field |
-| **Communication** | Sync (REST) — consumed by **Buyer App**, **Delivery App** |
+| **Endpoint** | HTTP GET /api/vendors |
+| **Request** | El endpoint recibe la petición (de la BuyerApp) de la lista de empresas activas para la pantalla principal, o el detalle de una en particular. |
+| **Response** | SellerApp responde con un JSON que contiene los datos públicos de los vendedores (nombre, reputación, descripción, dirección). |
+| Comunicación | BuyerApp solicita a → Vendedores (SellerApp) |
 
----
-
-### Get Favorite Vendors
-
-| Field | Detail |
+| Caso de Uso | Consultar Estado Pedido |
 | :---- | :---- |
-| **Use Case** | Retrieve a list of vendors by IDs (used for favorites) |
-| **Endpoint** | `GET /api/vendors?ids=1,2,3` |
-| **Request** | Query param: `ids` — comma-separated vendor IDs |
-| **Response** | `200 OK` — Array of matching vendors |
-| **Communication** | Sync (REST) — consumed by **Buyer App** |
+| **Endpoint** | HTTP GET /api/orders/:order_id/status |
+| **Request** | El endpoint recibe el ID del pedido a consultar. |
+| **Response** | SellerApp responde con el estado actual del pedido (ej. preparando, en_camino, entregado). |
+| Comunicación | BuyerApp solicita a → Pedidos (SellerApp) |
 
----
-
-### Get Seller Data for Review
-
-| Field | Detail |
+| Caso de Uso | Consultar Pedido |
 | :---- | :---- |
-| **Use Case** | Retrieve seller information needed to display a review |
-| **Endpoint** | `GET /api/sellers/:sellerId` |
-| **Request** | Path param: `sellerId` |
-| **Response** | `200 OK` — Seller profile object |
-| **Communication** | Sync (REST) — consumed by **Feedback App** |
+| **Endpoint** | HTTP GET /api/orders/:order_id |
+| **Request** | El endpoint recibe el ID exacto del pedido a consultar a través de la URL. |
+| **Response** | SellerApp responde con un JSON que contiene el detalle completo de ese pedido (productos, montos, estado actual y fechas). |
+| Comunicación | BuyerApp solicita a → Pedidos (SellerApp)|
 
----
-
-### Start Delivery Route
-
-| Field | Detail |
+| Caso de Uso | Consultar favoritos |
 | :---- | :---- |
-| **Use Case** | Notify that a delivery driver has started the route for an order |
-| **Endpoint** | `POST /api/orders/:orderId/start-delivery` |
-| **Request** | Path param: `orderId` |
-| **Response** | `200 OK` — Updated order object |
-| **Communication** | Sync (REST) — consumed by **Delivery App** |
+| **Endpoint** | HTTP GET /api/vendors?ids=1,2,3 |
+| **Request** | El endpoint recibe los IDs de los vendedores guardados en la partición local de la BuyerApp. |
+| **Response** | SellerApp responde con los datos públicos correspondientes a los ids recibidos. |
+| **Comunicacion** | BuyerApp solicita a → Vendedores (SellerApp) |
 
----
-
-### Notify Payment Confirmed (to Seller)
-
-| Field | Detail |
+| Caso de Uso | Consultar datos del Vendedor para la Reseña |
 | :---- | :---- |
-| **Use Case** | Notify the seller that a payment has been confirmed for an order |
-| **Endpoint** | `POST /api/orders/:orderId/payment-confirmed` |
-| **Request** | Path param: `orderId` — Body: `{ paymentId, status }` |
-| **Response** | `200 OK` — Acknowledgement |
-| **Communication** | Sync (REST) — consumed by **Payments App** |
+| **Endpoint** | HTTP GET /api/vendors/:seller_id |
+| **Request** | El endpoint recibe el ID del vendedor para obtener su información básica pública. |
+| **Response** | SellerApp responde con informacion del vendedor. |
+| **Comunicacion** | FeedbackApp solicita a → Vendedores (SellerApp) |
 
----
-
-### Update Order Status
-
-| Field | Detail |
+| Caso de Uso | Indicar Inicio Ruta de Entrega Pedido |
 | :---- | :---- |
-| **Use Case** | Update the status of an existing order (used by Delivery App for both route start and status changes) |
-| **Endpoint** | `PUT /api/orders/:orderId/status` |
-| **Request** | Path param: `orderId` — Body: `{ status }` |
-| **Response** | `200 OK` — Updated order object |
-| **Communication** | Sync (REST) — consumed by **Delivery App** |
+| **Endpoint** | HTTP POST /api/orders/:order_id/delivery-started |
+| **Request** | El endpoint recibe el ID del repartidor asignado, el tiempo estimado de llegada y un token de autenticación de servicio en el Header. |
+| **Response** | SellerApp procesa el inicio de ruta, actualizando el estado del pedido a "en_camino" y descontando el stock físico. |
+| **Comunicacion** | DeliveryApp notifica a → Pedidos (SellerApp) |
 
----
-
-## 2. Buyer App — Endpoints exposed
-
-> **Owner:** Customer data and claims
-
----
-
-### Get Claims
-
-| Field | Detail |
+| Caso de Uso | Notificar pago confirmado (Al Vendedor) |
 | :---- | :---- |
-| **Use Case** | Retrieve claims associated with a specific order |
-| **Endpoint** | `GET /api/claims/:orderId` |
-| **Request** | Path param: `orderId` |
-| **Response** | `200 OK` — Array of claims for the order |
-| **Communication** | Sync (REST) — consumed by **Seller App** |
+| **Endpoint** | HTTP POST /api/orders/:order_id/payment-confirmed |
+| **Request** | El endpoint recibe los datos del pago exitoso (transaction_id, monto) junto con credenciales de servicio (ej. X-Service-Token) para asegurar que la petición viene de PaymentApp. |
+| **Response** | SellerApp procesa los datos y responde con una confirmación de actualización de la orden a pagado. |
+| **Comunicacion** | PaymentApp notifica a → Pedidos (SellerApp) |
 
----
-
-### Notify Payment Confirmed (to Buyer)
-
-| Field | Detail |
+| Caso de Uso | Actualizar Estado de Pedido |
 | :---- | :---- |
-| **Use Case** | Notify the buyer that their payment has been confirmed |
-| **Endpoint** | `POST /api/buyers/:buyerId/payment-confirmed` |
-| **Request** | Path param: `buyerId` — Body: `{ orderId, paymentId, status }` |
-| **Response** | `200 OK` — Acknowledgement |
-| **Communication** | Sync (REST) — consumed by **Payments App** |
+| **Endpoint** | HTTP PUT /api/orders/:order_id/delivery-status |
+| **Request** | El endpoint recibe el nuevo estado del paquete (Ej. "entregado") actualizado por la flota. |
+| **Response** | SellerApp procesa el cambio logístico y envía una confirmación de actualización. |
+| **Comunicacion** | DeliveryApp actualiza en → Pedidos (SellerApp) |
 
----
-
-## 3. Payments App — Endpoints exposed
-
-> **Owner:** Transactions and invoices
-
----
-
-### Validate Payment to Enable Review
-
-| Field | Detail |
+| Caso de Uso | Modificar Estado de Pedido (Incidente) |
 | :---- | :---- |
-| **Use Case** | Check if a payment exists and is confirmed for a given order, to allow the buyer to post a review |
-| **Endpoint** | `GET /api/status/:orderId` |
-| **Request** | Path param: `orderId` |
-| **Response** | `200 OK` — `{ orderId, paymentStatus }` |
-| **Communication** | Sync (REST) — consumed by **Feedback App** |
+| **Endpoint** | HTTP PUT /api/orders/:order_id/incident |
+| **Request** | El endpoint recibe el motivo exacto de la falla logística (Ej: "cliente ausente") reportado por el repartidor. |
+| **Response** | SellerApp procesa el incidente, actualiza el estado del pedido a "fallido" y envía una confirmación. |
+| **Comunicacion** | DeliveryApp actualiza en → Pedidos (SellerApp) |
 
 ---
 
-### Confirm Purchase / Checkout
+## Delivery App — Endpoints expuestos
 
-| Field | Detail |
+
+| Caso de Uso | Consultar Estados de Viajes |
 | :---- | :---- |
-| **Use Case** | Process a purchase and generate a MercadoPago payment link |
-| **Endpoint** | `POST /api/checkout` |
-| **Request** | Body: `{ buyerId, orderId, amount, items[] }` |
-| **Response** | `201 Created` — `{ checkoutUrl, paymentId }` |
-| **Communication** | Sync (REST) — consumed by **Buyer App** |
+| **Endpoint** | HTTP GET /api/roads/:driver_id |
+| **Request** | El endpoint recibe el ID del vendedor que desea monitorear sus envíos. |
+| **Response** | DeliveryApp responde con la ruta de cada vehículo asociado a ese ID. |
+| **Comunicacion** | SellerApp solicita a → Estado de Viajes / Rutas (DeliveryApp) |
 
----
-
-## 4. Delivery App — Endpoints exposed
-
-> **Owner:** Routes and trip assignments
-
----
-
-### Get Trip Statuses by Driver
-
-| Field | Detail |
+| Caso de Uso | Asignar Pedidos Listos |
 | :---- | :---- |
-| **Use Case** | Retrieve the current status of all trips assigned to a specific driver |
-| **Endpoint** | `GET /api/routes/:driverId` |
-| **Request** | Path param: `driverId` |
-| **Response** | `200 OK` — Array of trips with statuses |
-| **Communication** | Sync (REST) — consumed by **Seller App**, **Buyer App** |
+| Endpointd | HTTP PUT /api/ready_orders/:order_id |
+| **Request** | El endpoint recibe el ID del vendedor y los IDs de los pedidos específicos que están listos para entregar. |
+| **Response** | DeliveryApp confirma la recepción de los pedidos asignados y actualiza su estado logístico interno. |
+| **Comunicacion** | SellerApp asigna a → Rutas/Pedidos Listos (DeliveryApp) |
+
+
+
 
 ---
 
-### Assign Ready Order to Driver
+## Payments App — Endpoints expuestos
 
-| Field | Detail |
+| Caso de Uso | Confirmar Compra / Checkout |
 | :---- | :---- |
-| **Use Case** | Assign an order that is ready for pickup to a delivery driver |
-| **Endpoint** | `PUT /api/ready_orders/:orderId` |
-| **Request** | Path param: `orderId` — Body: `{ driverId }` |
-| **Response** | `200 OK` — Updated assignment object |
-| **Communication** | Sync (REST) — consumed by **Seller App** |
+| **Endpoint** | HTTP POST /api/checkout |
+| **Request** | El endpoint recibe el ID del usuario y el monto total del carrito para generar el pago. |
+| **Response** | PaymentApp procesa y responde con el PreferenceID o link de Mercado Pago para abonar. |
+| **Comunicacion** | BuyerApp envía a → Transacciones (PaymentApp) |
 
----
-
-## 5. Feedback App — Endpoints exposed
-
-> **Owner:** Ratings and support system
-
----
-
-### Get Ratings for Seller
-
-| Field | Detail |
+| Caso de Uso | Validar Pago para habilitar Reseña |
 | :---- | :---- |
-| **Use Case** | Retrieve aggregated ratings for a specific seller |
-| **Endpoint** | `GET /api/feedback/ratings/:sellerId` |
-| **Request** | Path param: `sellerId` |
-| **Response** | `200 OK` — `{ sellerId, averageRating, totalReviews }` |
-| **Communication** | Sync (REST) — consumed by **Seller App**, **Buyer App** |
+| **Endpoint** | HTTP GET /api/status/:order_id |
+| **Request** | El endpoint recibe el ID del pedido para verificar en la base de datos si la transacción fue abonada. |
+| **Response** | PaymentApp responde con el estado actual de ese pago (ej. "approved", "pending"). |
+| **Comunicacion** | FeedbackApp consulta a → Transacciones (PaymentApp) |
 
----
-
-### Get Reviews for Seller
-
-| Field | Detail |
+| Caso de Uso | Consultar Factura |
 | :---- | :---- |
-| **Use Case** | List all visible reviews for a specific seller |
-| **Endpoint** | `GET /api/feedback/reviews/:sellerId` |
-| **Request** | Path param: `sellerId` |
-| **Response** | `200 OK` — Array of review objects |
-| **Communication** | Sync (REST) — consumed by **Buyer App** |
+| **Endpoint** | HTTP GET /api/payments/bills?order_id=123 |
+| **Request** | El endpoint recibe el ID del pedido mediante parámetros en la URL (query parameters) para consultar su recibo fiscal. |
+| **Response** | PaymentApp responde con un JSON con los datos de facturación (monto, IVA, fecha) asociados a ese pedido. |
+| **Comunicacion** | SellerApp o BuyerApp solicitan a → Facturas (PaymentApp) |
 
 ---
 
-### Get FAQs
+## Feedback App — Endpoints expuestos *(si aplica)*
 
-| Field | Detail |
+
+| Caso de Uso | Validar Pago para habilitar Reseña |
 | :---- | :---- |
-| **Use Case** | Retrieve the list of frequently asked questions |
-| **Endpoint** | `GET /api/feedback/faqs` |
-| **Request** | — |
-| **Response** | `200 OK` — Array of FAQ entries |
-| **Communication** | Sync (REST) — consumed by **Buyer App** |
+| **Endpoint** | HTTP GET /api/payments/status/:order_id |
+| **Request***| FeedbackApp envía el ID del pedido para verificar si el pago está aprobado |
+| **Response** | PaymentApp responde con el estado del pago (approved, pending, etc.). |
+| **Comunicación** | FeedbackApp → Transacciones(PaymentApp) |
 
----
-
-### Post / Soft-Delete Review
-
-| Field | Detail |
+| Caso de Uso | Consultar datos del Vendedor para la Reseña |
 | :---- | :---- |
-| **Use Case** | Create a new review or soft-delete an existing one (owned by the buyer) |
-| **Endpoint** | `POST /api/feedback/reviews` |
-| **Request** | Body: `{ buyerId, sellerId, orderId, rating, comment, deleted?: true }` |
-| **Response** | `201 Created` — Review object / `200 OK` — Soft-deleted review |
-| **Communication** | Sync (REST) — consumed by **Buyer App** |
+| **Endpoint** | HTTP GET /api/seller/vendors/:seller_id |
+| **Request***| FeedbackApp solicita información básica del vendedor usando su ID. |
+| **Response** | SellerApp responde con el nombre comercial y rubro del vendedor. |
+| **Comunicación** | Consultar datos del Vendedor para la Reseña → Vendedores (SellerApp). |
+
+| Caso de Uso | Postear/Eliminar Reseña(Propia) |
+| :---- | :---- |
+| **Endpoint** | HTTP POST /api/feedback/reviews |
+| **Request***| BuyerApp envía el ID del pedido, puntuación y texto. |
+| **Response** | FeedbackApp confirma el guardado y lo vincula al historial de SellerApp. |
+| **Comunicación** | Postear/Eliminar Reseña → Pedido (SellerApp). |
+
 
 ---
+<br><br>
 
-<!-- Add sections for each additional integration identified -->
+## Aclaraciones:
+
+**Los estados posibles para un pedido son:**
+
+**-listo_para_despacho:** El pedido ya fue preparado físicamente en el local del vendedor y está a la espera de que el sistema logístico (DeliveryApp) lo asigne a un chofer.
+
+**-en_camino:** El repartidor ya tiene el pedido en su vehículo y ha iniciado la ruta hacia el domicilio del comprador.
+
+**-entregado:** El pedido llegó a manos del cliente y la transacción logística finalizó con éxito.
+
+**-fallido:** Ocurrió un incidente reportado por el chofer (ej. cliente ausente, dirección incorrecta) que impidió la entrega exitosa del pedido.
+
+**-pendiente_pago:** El cliente ya confirmó el carrito y generó el pedido, pero la transacción aún no fue procesada o aprobada por la PaymentApp.
+
+**-pagado:** La PaymentApp procesó y aprobó el cobro exitosamente, y ya notificó al sistema del vendedor que la orden está saldada.
+
+**-preparando:** El vendedor ya recibió la orden (y la confirmación de pago), y se encuentra físicamente armando o empaquetando los bidones en su depósito antes de avisarle a la logística.
+
+<!-- Agregar secciones por cada integración adicional identificada -->

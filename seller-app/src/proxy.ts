@@ -1,31 +1,48 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
-const isAdminRoute = createRouteMatcher(['/admin(.*)'])
-const isVendorRoute = createRouteMatcher(['/dashboard(.*)'])
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)'])
+
+const isProtectedApiRoute = createRouteMatcher([
+    '/api/orders/(.*)/delivery-started',
+    '/api/orders/(.*)/payment-confirmed',
+    '/api/orders/(.*)/delivery-status',
+    '/api/orders/(.*)/incident'
+])
 
 export default clerkMiddleware(async (auth, req) => {
-    const { userId, sessionClaims } = await auth()
-    const role = sessionClaims?.metadata?.role
+    if (req.nextUrl.pathname.startsWith('/api')) {
+        const serviceToken = req.headers.get('X-Service-Token')
+        const expectedToken = process.env.SERVICE_TOKEN
 
-    if (isAdminRoute(req)) {
-        if (!userId || role !== 'admin') {
-            return NextResponse.redirect(new URL('/', req.url))
+        if (isProtectedApiRoute(req)) {
+            if (!serviceToken || serviceToken !== expectedToken) {
+                return NextResponse.json(
+                    { error: 'Unauthorized: Invalid or missing X-Service-Token' },
+                    { status: 401 }
+                )
+            }
         }
+
+        return NextResponse.next()
     }
 
-    if (isVendorRoute(req)) {
-        if (!userId || role !== 'vendor') {
-            return NextResponse.redirect(new URL('/', req.url))
-        }
+    if (isPublicRoute(req)) {
+        return NextResponse.next()
     }
+
+    const { userId } = await auth()
+
+    if (!userId) {
+        return NextResponse.redirect(new URL('/sign-in', req.url))
+    }
+
+    return NextResponse.next()
 })
 
 export const config = {
     matcher: [
-        // Ignorar rutas de archivos
         '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-        // También ignorar rutas de API
-        '/(api|trpc)(.*)',
+        '/api(.*)',
     ],
 }
