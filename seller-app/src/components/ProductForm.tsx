@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createProduct, deleteProduct, updateProduct } from '@/app/actions/product'
 import Button from './ui/Button'
+import { validateProductInput } from '../lib/validation'
 
 interface ProductFormProps {
   mode?: 'create' | 'edit'
@@ -40,21 +41,15 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
     setError('')
     setLoading(true)
 
-    if (!form.name || !form.price) {
-      setError('El nombre y precio son obligatorios')
-      setLoading(false)
-      return
-    }
-
-    const payload = {
-      name: form.name,
-      description: form.description || undefined,
-      price: Number(form.price),
-      stock: Number(form.stock || 0),
-      image: form.image || undefined,
-    }
-
     try {
+      const payload = validateProductInput({
+        name: form.name,
+        description: form.description,
+        price: form.price,
+        stock: form.stock,
+        image: form.image,
+      })
+
       if (mode === 'edit') {
         if (!productId) {
           throw new Error('Falta el identificador del producto')
@@ -65,6 +60,7 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
         await createProduct(payload)
       }
 
+      setLoading(false)
       router.push('/dashboard/products')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar producto')
@@ -83,6 +79,7 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
 
     try {
       await deleteProduct(productId)
+      setDeleting(false)
       router.push('/dashboard/products')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al eliminar producto')

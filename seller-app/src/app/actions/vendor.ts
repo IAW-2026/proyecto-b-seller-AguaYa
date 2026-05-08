@@ -1,7 +1,13 @@
+/**
+ * This file contains server actions related to vendor management. It includes a function to create or update the vendor profile for the authenticated user. The function checks if the user is authenticated and then uses Prisma to either create a new vendor record or update the existing one based on the user's ID.
+ */
+
+
 'use server'
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
+import { validateVendorInput } from '../../lib/validation'
 
 export async function createOrUpdateVendor(data: {
   name: string
@@ -16,23 +22,25 @@ export async function createOrUpdateVendor(data: {
     throw new Error('No autenticado')
   }
 
+  const input = validateVendorInput(data)
+
   try {
     const vendor = await prisma.vendor.upsert({
       where: { userId },
       create: {
         userId,
-        name: data.name,
-        address: data.address,
-        description: data.description,
-        cuil: data.cuil,
-        cuit: data.cuit,
+        name: input.name,
+        address: input.address,
+        description: input.description,
+        cuil: input.cuil,
+        cuit: input.cuit,
       },
       update: {
-        name: data.name,
-        address: data.address,
-        description: data.description,
-        cuil: data.cuil,
-        cuit: data.cuit,
+        name: input.name,
+        address: input.address,
+        description: input.description,
+        cuil: input.cuil,
+        cuit: input.cuit,
       },
     })
 

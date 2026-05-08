@@ -17,7 +17,7 @@ export default async function ProductsPage() {
       <div>
         <h1>Products</h1>
         <p>No existe un vendedor asociado a esta cuenta. Registra tu negocio primero.</p>
-        <Link href="/dashboard/setup-vendor">Registrar negocio</Link>
+        <Link href="/setup-vendor">Registrar negocio</Link>
       </div>
     )
   }

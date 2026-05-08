@@ -1,9 +1,11 @@
+
 'use client'
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createOrUpdateVendor } from '@/app/actions/vendor'
 import Button from '@/components/ui/Button'
+import { validateVendorInput } from '../lib/validation'
 
 interface VendorFormProps {
   initialData?: {
@@ -43,14 +45,11 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
     setLoading(true)
 
     try {
-      if (!formData.name || !formData.address) {
-        setError('El nombre y dirección son obligatorios')
-        setLoading(false)
-        return
-      }
+      const payload = validateVendorInput(formData)
 
-      await createOrUpdateVendor(formData)
+      await createOrUpdateVendor(payload)
       setError('')
+      setLoading(false)
       if (redirectTo) {
         router.push(redirectTo)
       }

@@ -1,3 +1,7 @@
+/**
+ * This is the page where vendors can set up their store for the first time. It checks if the user is authenticated and if they already have a vendor profile. If not, it renders a form to create a new vendor profile.
+ */
+
 import React from 'react'
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'

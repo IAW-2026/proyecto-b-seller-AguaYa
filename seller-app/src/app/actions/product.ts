@@ -1,7 +1,13 @@
+/**
+ * This file contains server actions related to product management. It includes functions to create, update, and delete products for the authenticated vendor. Each function first checks if the user is authenticated and has an associated vendor profile before performing the respective database operations using Prisma.
+ */
+
+
 'use server'
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
+import { validateProductInput } from '../../lib/validation'
 
 async function getAuthenticatedVendor() {
   const { userId } = await auth()
@@ -27,15 +33,16 @@ export async function createProduct(data: {
   image?: string
 }) {
   const vendor = await getAuthenticatedVendor()
+  const input = validateProductInput(data)
 
   const product = await prisma.product.create({
     data: {
       vendorId: vendor.id,
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      stock: data.stock,
-      image: data.image,
+      name: input.name,
+      description: input.description,
+      price: input.price,
+      stock: input.stock,
+      image: input.image,
     },
   })
 
@@ -51,6 +58,7 @@ export async function updateProduct(data: {
   image?: string
 }) {
   const vendor = await getAuthenticatedVendor()
+  const input = validateProductInput(data)
 
   const product = await prisma.product.findFirst({
     where: {
@@ -66,11 +74,11 @@ export async function updateProduct(data: {
   const updatedProduct = await prisma.product.update({
     where: { id: data.id },
     data: {
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      stock: data.stock,
-      image: data.image,
+      name: input.name,
+      description: input.description,
+      price: input.price,
+      stock: input.stock,
+      image: input.image,
     },
   })
 
