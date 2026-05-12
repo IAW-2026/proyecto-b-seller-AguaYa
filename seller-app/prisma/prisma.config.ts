@@ -1,17 +1,15 @@
-import "dotenv/config";
-import { defineConfig } from "prisma/config";
+import dotenv from "dotenv";
+import path from "path";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL no está definida en el .env")
-}
+// Cargar variables de entorno desde .env en la carpeta raíz
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-export default defineConfig({
-  schema: "prisma/schema.prisma",
-  migrations: {
-    seed: "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
-    path: "prisma/migrations",
-  },
+export default {
+  schema: path.resolve(__dirname, "schema.prisma"),
   datasource: {
     url: process.env.DATABASE_URL,
   },
-});
+  migrations: {
+    path: path.resolve(__dirname, "migrations"),
+  },
+};

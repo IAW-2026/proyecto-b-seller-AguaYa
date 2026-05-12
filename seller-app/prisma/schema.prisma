@@ -23,6 +23,7 @@ model Vendor {
   name        String
   description String?
   address     String
+  image       String?
   cuil        String?
   cuit        String?
   reputation  Float     @default(0)
@@ -50,6 +51,7 @@ model Product {
 
 model Order {
   id         String      @id @default(cuid())
+  externalId String     @unique
   vendorId   String
   buyerId    String
   status     OrderStatus @default(PENDING)

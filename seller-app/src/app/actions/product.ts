@@ -1,5 +1,7 @@
 /**
- * This file contains server actions related to product management. It includes functions to create, update, and delete products for the authenticated vendor. Each function first checks if the user is authenticated and has an associated vendor profile before performing the respective database operations using Prisma.
+ * This file contains server actions related to product management. 
+ * It includes functions to create, update, and delete products for the authenticated vendor. 
+ * Each function first checks if the user is authenticated and has an associated vendor profile before performing the respective database operations using Prisma.
  */
 
 

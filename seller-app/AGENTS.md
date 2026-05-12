@@ -124,19 +124,20 @@ La comunicación entre apps es exclusivamente mediante **HTTP REST**. No hay dup
 
 ### SellerApp expone
 
-| Método | Endpoint | Consumidor | Descripción |
-|--------|----------|-----------|-------------|
-| GET | `/api/orders/status/ready` | DeliveryApp | Lista pedidos en estado `listo_para_despacho`. |
-| GET | `/api/products` | BuyerApp | Lista productos activos con precio y stock. |
-| GET | `/api/vendors` | BuyerApp / FeedbackApp | Lista empresas activas con datos públicos. |
-| GET | `/api/vendors/:vendor_id` | BuyerApp / FeedbackApp | Detalle de un vendedor específico. |
-| GET | `/api/vendors?ids=1,2,3` | BuyerApp | Datos públicos de vendedores por IDs (favoritos). |
-| GET | `/api/orders/:order_id` | BuyerApp | Detalle completo de un pedido. |
-| GET | `/api/orders/:order_id/status` | BuyerApp | Estado actual de un pedido. |
-| POST | `/api/orders/:order_id/delivery-started` | DeliveryApp | Marca el pedido como `en_camino`, descuenta stock. |
-| POST | `/api/orders/:order_id/payment-confirmed` | PaymentsApp | Marca el pedido como `pagado`. Requiere `X-Service-Token`. |
-| PUT | `/api/orders/:order_id/delivery-status` | DeliveryApp | Actualiza el estado logístico del pedido (ej. `entregado`). |
-| PUT | `/api/orders/:order_id/incident` | DeliveryApp | Registra un incidente y cambia el estado a `fallido`. |
+| Método | Endpoint | Consumidor | Descripción | Estado |
+|--------|----------|-----------|-------------|--------|
+| GET | `/api/orders/status/ready` | DeliveryApp | Lista pedidos en estado `listo_para_despacho`. | 🔄 TODO |
+| GET | `/api/products` | BuyerApp | Lista productos activos con precio y stock. | 🔄 TODO |
+| GET | `/api/vendors` | BuyerApp / FeedbackApp | Lista empresas activas con datos públicos. | ✅ IMPLEMENTADO |
+| GET | `/api/vendors/:vendor_id` | BuyerApp / FeedbackApp | Detalle de un vendedor específico. | ✅ IMPLEMENTADO |
+| GET | `/api/vendors?ids=1,2,3` | BuyerApp | Datos públicos de vendedores por IDs (favoritos). | ✅ IMPLEMENTADO |
+| GET | `/api/orders/:order_id` | BuyerApp | Detalle completo de un pedido. | 🔄 TODO |
+| GET | `/api/orders/:order_id/status` | BuyerApp | Estado actual de un pedido. | 🔄 TODO |
+| POST | `/api/orders` | BuyerApp | Recibe pedidos entrantes desde BuyerApp. | ✅ IMPLEMENTADO |
+| POST | `/api/orders/:order_id/delivery-started` | DeliveryApp | Marca el pedido como `en_camino`, descuenta stock. | 🔄 TODO |
+| POST | `/api/orders/:order_id/payment-confirmed` | PaymentsApp | Marca el pedido como `pagado`. Requiere `X-Service-Token`. | 🔄 TODO |
+| PUT | `/api/orders/:order_id/delivery-status` | DeliveryApp | Actualiza el estado logístico del pedido (ej. `entregado`). | 🔄 TODO |
+| PUT | `/api/orders/:order_id/incident` | DeliveryApp | Registra un incidente y cambia el estado a `fallido`. | 🔄 TODO |
 
 ### DeliveryApp expone
 

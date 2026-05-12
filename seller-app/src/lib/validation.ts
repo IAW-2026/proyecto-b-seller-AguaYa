@@ -14,6 +14,14 @@ export interface VendorInput {
   cuit?: string
 }
 
+export interface CreateOrderInput {
+  externalId: string
+  vendorId: string
+  buyerId: string
+  items: Array<{ productId: string; quantity: number }>
+  total: number
+}
+
 type ProductDraft = {
   name: string
   description?: string
@@ -97,4 +105,85 @@ export function validateVendorInput(data: VendorDraft): VendorInput {
     cuil,
     cuit,
   }
+}
+
+export function validateCreateOrderInput(data: unknown): CreateOrderInput {
+  if (!data || typeof data !== 'object') {
+    throw new Error('El payload debe ser un objeto JSON válido')
+  }
+
+  const d = data as Record<string, unknown>
+
+  // Validar externalId
+  if (typeof d.externalId !== 'string' || !d.externalId.trim()) {
+    throw new Error('externalId es requerido y debe ser un string no vacío')
+  }
+
+  // Validar vendorId
+  if (typeof d.vendorId !== 'string' || !d.vendorId.trim()) {
+    throw new Error('vendorId es requerido y debe ser un string no vacío')
+  }
+
+  // Validar buyerId
+  if (typeof d.buyerId !== 'string' || !d.buyerId.trim()) {
+    throw new Error('buyerId es requerido y debe ser un string no vacío')
+  }
+
+  // Validar items
+  if (!Array.isArray(d.items) || d.items.length === 0) {
+    throw new Error('items es requerido y debe ser un array no vacío')
+  }
+
+  for (const item of d.items) {
+    if (typeof item !== 'object' || item === null) {
+      throw new Error('Cada item debe ser un objeto')
+    }
+    const it = item as Record<string, unknown>
+    if (typeof it.productId !== 'string' || !it.productId.trim()) {
+      throw new Error('Cada item debe tener productId string no vacío')
+    }
+    const qty = it.quantity
+    if (typeof qty !== 'number' || !Number.isInteger(qty) || qty < 1) {
+      throw new Error('quantity debe ser un número entero >= 1')
+    }
+  }
+
+  // Validar total
+  if (typeof d.total !== 'number' || !Number.isFinite(d.total) || d.total <= 0) {
+    throw new Error('total es requerido y debe ser un número positivo')
+  }
+
+  return {
+    externalId: d.externalId.trim(),
+    vendorId: d.vendorId.trim(),
+    buyerId: d.buyerId.trim(),
+    items: d.items.map((item: any) => ({
+      productId: item.productId.trim(),
+      quantity: item.quantity as number,
+    })),
+    total: d.total,
+  }
+}
+
+/**
+ * Valida e parsea un string de IDs de vendedor separados por comas.
+ * Ej: "vendor-1,vendor-2,vendor-3" → ["vendor-1", "vendor-2", "vendor-3"]
+ */
+export function validateVendorIds(idsString: string | null | undefined): string[] {
+  if (!idsString || typeof idsString !== 'string') {
+    throw new Error("Parámetro 'ids' es requerido y debe ser un string")
+  }
+
+  const trimmed = idsString.trim()
+  if (!trimmed) {
+    throw new Error("Parámetro 'ids' no puede estar vacío. Usar: ?ids=id1,id2,id3")
+  }
+
+  const ids = trimmed.split(',').map((id) => id.trim()).filter((id) => id.length > 0)
+
+  if (ids.length === 0) {
+    throw new Error("Parámetro 'ids' debe contener al menos un ID válido. Usar: ?ids=id1,id2,id3")
+  }
+
+  return ids
 }

@@ -75,6 +75,7 @@ async function main() {
     console.log('🛒 Creando órdenes...')
     await prisma.order.create({
         data: {
+            externalId: 'seed_order_001',
             vendorId: vendor1.id,
             buyerId: 'buyer_seed_001',
             status: OrderStatus.DELIVERED,
@@ -100,6 +101,7 @@ async function main() {
 
     await prisma.order.create({
         data: {
+            externalId: 'seed_order_002',
             vendorId: vendor1.id,
             buyerId: 'buyer_seed_002',
             status: OrderStatus.READY,
@@ -119,6 +121,7 @@ async function main() {
 
     await prisma.order.create({
         data: {
+            externalId: 'seed_order_003',
             vendorId: vendor2.id,
             buyerId: 'buyer_seed_001',
             status: OrderStatus.PENDING,
