@@ -187,3 +187,53 @@ export function validateVendorIds(idsString: string | null | undefined): string[
 
   return ids
 }
+
+/**
+ * Valida e parsea parámetros de filtro para productos
+ * vendorId: String de IDs separados por comas (opcional)
+ * minPrice: Número mínimo de precio (opcional)
+ * maxPrice: Número máximo de precio (opcional)
+ */
+export interface ProductFilterParams {
+  vendorIds?: string[]
+  minPrice?: number
+  maxPrice?: number
+}
+
+export function validateProductFilters(params: Record<string, string | null>): ProductFilterParams {
+  const result: ProductFilterParams = {}
+
+  // Validar vendorId (opcional)
+  if (params.vendorId) {
+    try {
+      result.vendorIds = validateVendorIds(params.vendorId)
+    } catch (error) {
+      throw new Error('Parámetro vendorId inválido: ' + (error instanceof Error ? error.message : 'error desconocido'))
+    }
+  }
+
+  // Validar minPrice (opcional)
+  if (params.minPrice) {
+    const minPrice = parseFloat(params.minPrice)
+    if (!Number.isFinite(minPrice) || minPrice < 0) {
+      throw new Error('minPrice debe ser un número >= 0')
+    }
+    result.minPrice = minPrice
+  }
+
+  // Validar maxPrice (opcional)
+  if (params.maxPrice) {
+    const maxPrice = parseFloat(params.maxPrice)
+    if (!Number.isFinite(maxPrice) || maxPrice < 0) {
+      throw new Error('maxPrice debe ser un número >= 0')
+    }
+    result.maxPrice = maxPrice
+  }
+
+  // Validar lógica: minPrice <= maxPrice
+  if (result.minPrice !== undefined && result.maxPrice !== undefined && result.minPrice > result.maxPrice) {
+    throw new Error('minPrice no puede ser mayor que maxPrice')
+  }
+
+  return result
+}

@@ -66,6 +66,7 @@ export async function updateProduct(data: {
     where: {
       id: data.id,
       vendorId: vendor.id,
+      deletedAt: null, // Solo permite editar productos no eliminados
     },
   })
 
@@ -94,13 +95,7 @@ export async function deleteProduct(productId: string) {
     where: {
       id: productId,
       vendorId: vendor.id,
-    },
-    include: {
-      _count: {
-        select: {
-          orderItems: true,
-        },
-      },
+      deletedAt: null, // Solo permite eliminar productos no ya eliminados
     },
   })
 
@@ -108,11 +103,14 @@ export async function deleteProduct(productId: string) {
     throw new Error('No se encontró el producto para este vendedor')
   }
 
-  if (product._count.orderItems > 0) {
-    throw new Error('No puedes eliminar este producto porque ya está asociado a órdenes')
-  }
+  // Soft delete: marcar como eliminado en lugar de borrar de BD
+  // Esto preserva el histórico completo de órdenes asociadas
+  const deletedProduct = await prisma.product.update({
+    where: { id: productId },
+    data: {
+      deletedAt: new Date(),
+    },
+  })
 
-  await prisma.product.delete({ where: { id: productId } })
-
-  return { success: true }
+  return { success: true, product: deletedProduct }
 }

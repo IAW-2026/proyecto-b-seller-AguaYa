@@ -9,7 +9,12 @@ export default async function ProductsPage() {
 
   const vendor = await prisma.vendor.findUnique({
     where: { userId },
-    include: { products: { orderBy: { createdAt: 'desc' } } },
+    include: { 
+      products: { 
+        where: { deletedAt: null }, // Solo mostrar productos no eliminados
+        orderBy: { createdAt: 'desc' } 
+      } 
+    },
   })
 
   if (!vendor) {

@@ -79,7 +79,9 @@ export async function GET(
       {
         success: true,
         vendor: toPublicVendor(vendor),
+        
       },
+      
       { status: 200 }
     )
   } catch (error) {

@@ -44,6 +44,7 @@ model Product {
   image       String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?   // Soft delete: producto marcado como eliminado, pero datos preservados
 
   vendor      Vendor      @relation(fields: [vendorId], references: [id])
   orderItems  OrderItem[]
@@ -72,5 +73,6 @@ model OrderItem {
   quantity     Int
 
   order        Order   @relation(fields: [orderId], references: [id])
-  product      Product @relation(fields: [productId], references: [id])
+  product      Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // onDelete: Cascade es seguro porque productName y productPrice ya están guardados en OrderItem
 }

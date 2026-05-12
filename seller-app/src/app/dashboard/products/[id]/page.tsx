@@ -4,7 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import ProductForm from '@/components/ProductForm'
 
-export default async function ProductDetail({ params }: { params: { id: string } }) {
+export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth()
 
   if (!userId) {
@@ -17,10 +17,13 @@ export default async function ProductDetail({ params }: { params: { id: string }
     redirect('/dashboard/setup-vendor')
   }
 
+  const { id } = await params // Await params como se requiere en Next.js 15+
+
   const product = await prisma.product.findFirst({
     where: {
-      id: params.id,
+      id,
       vendorId: vendor.id,
+      deletedAt: null, // Solo permitir editar productos no eliminados
     },
   })
 

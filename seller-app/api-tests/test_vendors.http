@@ -1,0 +1,30 @@
+### Variables
+@baseUrl = http://localhost:3000
+@apiKey = buyer-secret-key-12345
+
+@vendorId = cmp21khrp0000tglit0bxxqq3
+@vendorId2 = cmp21j4xu0001zwli69agxgle
+### =====================
+### TESTS DE VENDEDORES
+### =====================
+
+### Test 1: GET todos los vendedores
+GET {{baseUrl}}/api/vendors
+X-API-Key: {{apiKey}}
+
+### Test 2: GET vendedores por IDs específicos
+GET {{baseUrl}}/api/vendors?ids={{vendorId}},{{vendorId2}}
+X-API-Key: {{apiKey}}
+
+### Test 3: GET un vendedor específico
+GET {{baseUrl}}/api/vendors/{{vendorId}}
+X-API-Key: {{apiKey}}
+
+### Test 4: GET vendedor que no existe (404)
+GET {{baseUrl}}/api/vendors/inexistente
+X-API-Key: {{apiKey}}
+
+
+
+
+

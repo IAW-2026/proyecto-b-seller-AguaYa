@@ -94,10 +94,13 @@ export async function POST(request: Request) {
       )
     }
 
-    // 6. Obtener todos los productos solicitados
+    // 6. Obtener todos los productos solicitados (solo no eliminados)
     const productIds = input.items.map((item) => item.productId)
     const products = await prisma.product.findMany({
-      where: { id: { in: productIds } },
+      where: { 
+        id: { in: productIds },
+        deletedAt: null, // Excluir productos soft-deleted
+      },
     })
 
     // Validar que todos los productos existen y pertenecen al vendor

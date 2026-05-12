@@ -93,7 +93,7 @@ export default async function OrdersList() {
                   Orden {order.externalId || order.id.slice(0, 8)}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  {new Date(order.createdAt).toLocaleDateString('es-ES', {
+                  {new Date(order.createdAt).toLocaleString('es-ES', {
                     dateStyle: 'long',
                     timeStyle: 'short',
                   })}

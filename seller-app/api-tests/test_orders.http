@@ -1,0 +1,102 @@
+### Variables
+@baseUrl = http://localhost:3000
+@apiKey = buyer-secret-key-12345
+
+@vendorId = cmp21khrp0000tglit0bxxqq3
+@productId = cmp2rw7020001i8lienqogqky
+
+@vendorId2 = cmp21j4xu0001zwli69agxgle
+
+### =====================
+### TESTS DE ÓRDENES
+### =====================
+
+### Test 5: POST crear orden exitosa
+POST {{baseUrl}}/api/orders
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "externalId": "buyer-order-{{$timestamp}}",
+  "vendorId": "{{vendorId}}",
+  "buyerId": "buyer-xyz",
+  "items": [
+    {"productId": "{{productId}}", "quantity": 2}
+  ],
+  "total": 642.00
+}
+
+### Test 6: POST sin API Key (401)
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+
+{
+  "externalId": "test"
+}
+
+### Test 7: POST con API Key incorrecta (401)
+POST {{baseUrl}}/api/orders
+X-API-Key: INVALIDA
+Content-Type: application/json
+
+{
+  "externalId": "test"
+}
+
+### Test 8: POST JSON inválido (400)
+POST {{baseUrl}}/api/orders
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{invalid json}
+
+### Test 9: POST falta externalId (400)
+POST {{baseUrl}}/api/orders
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "vendorId": "{{vendorId}}",
+  "buyerId": "buyer-xyz",
+  "items": [],
+  "total": 100
+}
+
+### Test 10: POST items vacío (400)
+POST {{baseUrl}}/api/orders
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "externalId": "test-empty-items",
+  "vendorId": "{{vendorId}}",
+  "buyerId": "buyer-xyz",
+  "items": [],
+  "total": 0
+}
+
+### Test 11: POST vendor no existe (400)
+POST {{baseUrl}}/api/orders
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "externalId": "test-invalid-vendor",
+  "vendorId": "vendor-inexistente",
+  "buyerId": "buyer-xyz",
+  "items": [{"productId": "prod-1", "quantity": 1}],
+  "total": 50.00
+}
+
+### Test 12: POST idempotencia (misma orden dos veces)
+POST {{baseUrl}}/api/orders
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "externalId": "buyer-order-idempotent",
+  "vendorId": "{{vendorId}}",
+  "buyerId": "buyer-xyz",
+  "items": [{"productId": "prod-1", "quantity": 1}],
+  "total": 50.00
+}

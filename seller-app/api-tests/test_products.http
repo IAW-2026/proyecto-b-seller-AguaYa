@@ -1,0 +1,83 @@
+### Variables
+@baseUrl = http://localhost:3000
+@apiKey = buyer-secret-key-12345
+
+@vendorId = cmp21khrp0000tglit0bxxqq3
+@prodictId = cmp2rw7020001i8lienqogqky
+
+@vendorId2 = cmp21j4xu0001zwli69agxgle
+
+### =====================
+### TESTS DE PRODUCTOS
+### =====================
+
+### Test 1: GET todos los productos
+GET {{baseUrl}}/api/products
+X-API-Key: {{apiKey}}
+
+### Test 2: GET productos de un vendedor específico
+GET {{baseUrl}}/api/products?vendorId={{vendorId}}
+X-API-Key: {{apiKey}}
+
+### Test 3: GET productos de múltiples vendedores
+GET {{baseUrl}}/api/products?vendorId={{vendorId}},{{vendorId2}}
+X-API-Key: {{apiKey}}
+
+### Test 4: GET productos con rango de precio
+GET {{baseUrl}}/api/products?minPrice=10&maxPrice=100
+X-API-Key: {{apiKey}}
+
+### Test 5: GET productos con filtros combinados (vendedor + precio)
+GET {{baseUrl}}/api/products?vendorId={{vendorId}}&minPrice=20&maxPrice=80
+X-API-Key: {{apiKey}}
+
+### Test 6: GET productos con solo minPrice
+GET {{baseUrl}}/api/products?minPrice=50
+X-API-Key: {{apiKey}}
+
+### Test 7: GET productos con solo maxPrice
+GET {{baseUrl}}/api/products?maxPrice=50
+X-API-Key: {{apiKey}}
+
+### Test 8: GET sin API Key (401)
+GET {{baseUrl}}/api/products
+
+### Test 9: GET con API Key incorrecta (401)
+GET {{baseUrl}}/api/products
+X-API-Key: INVALIDA
+
+### Test 10: GET con minPrice inválido (400)
+GET {{baseUrl}}/api/products?minPrice=abc
+X-API-Key: {{apiKey}}
+
+### Test 11: GET con maxPrice inválido (400)
+GET {{baseUrl}}/api/products?maxPrice=xyz
+X-API-Key: {{apiKey}}
+
+### Test 12: GET con minPrice > maxPrice (400)
+GET {{baseUrl}}/api/products?minPrice=100&maxPrice=10
+X-API-Key: {{apiKey}}
+
+### Test 13: GET con vendorId inválido/vacío (400)
+GET {{baseUrl}}/api/products?vendorId=
+X-API-Key: {{apiKey}}
+
+### Test 14: GET con vendorId que no existe (200, lista vacía)
+GET {{baseUrl}}/api/products?vendorId=vendor-inexistente
+X-API-Key: {{apiKey}}
+
+### Test 15: GET con múltiples vendedores donde algunos no existen (200, solo los existentes)
+GET {{baseUrl}}/api/products?vendorId=ven-1,vendor-inexistente,ven-2
+X-API-Key: {{apiKey}}
+
+### Test 16: GET con precio negativo (400)
+GET {{baseUrl}}/api/products?minPrice=-10
+X-API-Key: {{apiKey}}
+
+### Test 17: GET con precio = 0 (200, válido)
+GET {{baseUrl}}/api/products?minPrice=0&maxPrice=0
+X-API-Key: {{apiKey}}
+
+### Test 18: GET con parámetros combinados más complejos
+GET {{baseUrl}}/api/products?vendorId=ven-1,ven-2&minPrice=15.50&maxPrice=99.99
+X-API-Key: {{apiKey}}
