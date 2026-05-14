@@ -2,6 +2,7 @@
  * Componente para mostrar el listado de órdenes del vendedor
  */
 
+import ConfirmOrderDialog from '@/components/orders/ConfirmOrderDialog'
 import { getVendorOrders } from '@/app/actions/order'
 import { OrderStatus } from '@prisma/client'
 import type { Order, OrderItem } from '@prisma/client'
@@ -15,7 +16,7 @@ type OrderWithItems = Order & {
 
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon: any }> = {
   PENDING: {
-    label: 'Pendiente',
+    label: 'Pendiente de confirmar',
     color: 'bg-yellow-100 text-yellow-800',
     icon: Clock,
   },
@@ -25,7 +26,7 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; icon: an
     icon: CheckCircle,
   },
   READY: {
-    label: 'Lista',
+    label: 'Lista para entregar',
     color: 'bg-green-100 text-green-800',
     icon: Package,
   },
@@ -78,8 +79,9 @@ export default async function OrdersList() {
   return (
     <div className="space-y-4">
       {orders.map((order) => {
-          const config = statusConfig[order.status]
+        const config = statusConfig[order.status]
         const StatusIcon = config.icon
+        const canConfirm = order.status === 'PENDING'
 
         return (
           <div
@@ -106,6 +108,12 @@ export default async function OrdersList() {
                 <span className="text-sm font-medium">{config.label}</span>
               </div>
             </div>
+
+            {canConfirm ? (
+              <div className="mb-4 flex justify-end">
+                <ConfirmOrderDialog orderId={order.id} orderLabel={order.externalId || order.id.slice(0, 8)} />
+              </div>
+            ) : null}
 
             {/* Order Details */}
             <div className="grid grid-cols-2 gap-4 mb-4 text-sm">

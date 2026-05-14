@@ -7,6 +7,8 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
+import { revalidatePath } from 'next/cache'
+import { OrderStatus } from '@prisma/client'
 
 async function getAuthenticatedVendor() {
   const { userId } = await auth()
@@ -22,6 +24,29 @@ async function getAuthenticatedVendor() {
   }
 
   return vendor
+}
+
+const ORDER_REVALIDATE_PATHS = ['/dashboard/orders', '/dashboard/overview']
+
+const allowedStatusTransitions: Record<OrderStatus, OrderStatus[]> = {
+  PENDING: ['CONFIRMED', 'READY', 'CANCELLED'],
+  CONFIRMED: ['READY', 'CANCELLED'],
+  READY: ['IN_DELIVERY', 'CANCELLED'],
+  IN_DELIVERY: ['DELIVERED', 'CANCELLED'],
+  DELIVERED: [],
+  CANCELLED: [],
+}
+
+function assertValidStatusTransition(currentStatus: OrderStatus, nextStatus: OrderStatus) {
+  if (currentStatus === nextStatus) {
+    return
+  }
+
+  const validNextStatuses = allowedStatusTransitions[currentStatus] ?? []
+
+  if (!validNextStatuses.includes(nextStatus)) {
+    throw new Error(`No se puede cambiar una orden ${currentStatus} a ${nextStatus}`)
+  }
 }
 
 export async function getVendorOrders() {
@@ -42,7 +67,7 @@ export async function getVendorOrders() {
   return orders
 }
 
-export async function updateOrderStatus(orderId: string, status: string) {
+export async function updateOrderStatus(orderId: string, status: OrderStatus) {
   const vendor = await getAuthenticatedVendor()
 
   const order = await prisma.order.findFirst({
@@ -56,10 +81,25 @@ export async function updateOrderStatus(orderId: string, status: string) {
     throw new Error('No se encontró la orden para este vendedor')
   }
 
+  assertValidStatusTransition(order.status, status)
+
+  if (order.status === status) {
+    return prisma.order.findUnique({
+      where: { id: order.id },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    })
+  }
+
   const updatedOrder = await prisma.order.update({
     where: { id: orderId },
     data: {
-      status: status as any,
+      status,
     },
     include: {
       items: {
@@ -70,5 +110,11 @@ export async function updateOrderStatus(orderId: string, status: string) {
     },
   })
 
+  ORDER_REVALIDATE_PATHS.forEach((path) => revalidatePath(path))
+
   return updatedOrder
+}
+
+export async function confirmOrderForDelivery(orderId: string) {
+  return updateOrderStatus(orderId, 'READY')
 }

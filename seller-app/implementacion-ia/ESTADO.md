@@ -298,6 +298,53 @@ curl -H "X-API-Key: buyer-secret-key-12345" \
 
 Confirmar:
 - ✅ Incluye: id, name, description, reputation, address, image
+
+---
+
+## ✅ Feature 3: Confirmación de Órdenes desde el Dashboard
+
+**Fecha Implementación:** Mayo 14, 2026  
+**Estado:** ✅ COMPLETADO - Listo para uso
+
+### 1. Flujo de Confirmación Restaurado
+- ✅ Las órdenes con estado `PENDING` muestran un botón para confirmar.
+- ✅ Al confirmar, la orden pasa a `READY` y queda lista para entrega.
+- ✅ El cambio respeta la validación de vendedor autenticado.
+
+**Ubicaciones:**
+- [src/app/actions/order.ts](../src/app/actions/order.ts)
+- [src/components/OrdersList.tsx](../src/components/OrdersList.tsx)
+- [src/components/orders/ConfirmOrderDialog.tsx](../src/components/orders/ConfirmOrderDialog.tsx)
+
+### 2. Modal de Confirmación
+- ✅ Modal cliente con confirmación explícita antes de ejecutar la transición.
+- ✅ Cierre por botón cancelar o clic fuera del diálogo.
+- ✅ Texto de contexto para evitar cambios accidentales.
+
+### 3. Revalidación de Vista
+- ✅ La acción revalida `/dashboard/orders` y `/dashboard/overview`.
+- ✅ La orden desaparece de la lista pendiente tras confirmarse.
+
+### 4. Ajustes de UX
+- ✅ Se mejoraron etiquetas de estado:
+  - `PENDING` → `Pendiente de confirmar`
+  - `READY` → `Lista para entregar`
+
+### 5. Lo que sigue pendiente
+- ⏳ Estado de carga más visible durante la confirmación.
+- ⏳ Feedback tipo toast o alert visual al completar la acción.
+- ⏳ Filtrado por estado en la pantalla de órdenes.
+
+---
+
+## 📊 Resumen Actualizado
+
+| Feature | Estado |
+|---------|--------|
+| Recepción de pedidos (`POST /api/orders`) | ✅ Completo |
+| Endpoints públicos de vendedores | ✅ Completo |
+| Confirmación de órdenes desde dashboard | ✅ Completo |
+
 - ✅ Excluye: userId, cuil, cuit, createdAt, updatedAt
 
 ---
