@@ -57,7 +57,7 @@ export default function ConfirmOrderDialog({ orderId, orderLabel }: ConfirmOrder
               Vas a confirmar la orden {orderLabel} y dejarla lista para entrega.
             </p>
             <p className="mt-2 text-sm text-gray-600">
-              Esta acción moverá la orden de <strong>Pendiente</strong> a <strong>Lista para entregar</strong>.
+              Esta acción moverá la orden de <strong>Pagada</strong> a <strong>Lista para entregar</strong>.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">

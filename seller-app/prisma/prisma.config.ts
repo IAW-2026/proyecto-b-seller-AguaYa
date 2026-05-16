@@ -11,5 +11,6 @@ export default {
   },
   migrations: {
     path: path.resolve(__dirname, "migrations"),
+    seed: "npx tsx prisma/seed.ts",
   },
 };

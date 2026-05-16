@@ -5,6 +5,7 @@ Bienvenido a la documentación e implementación del sistema para recibir pedido
 ## 📁 Contenido de esta carpeta
 
 - **IMPLEMENTACION_PEDIDOS.md** — Documentación completa con decisiones, justificaciones y especificación técnica.
+- **IMPLEMENTACION_UX_NEXTJS.md** — Documentación de la mejora de UX y performance en Next.js: fonts, loading UI, caché y shell visual.
 - **.env.example** — Variables de entorno requeridas.
 - **tests-manual.sh** — Script de pruebas con curl para validar el endpoint.
 

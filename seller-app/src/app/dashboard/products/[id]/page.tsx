@@ -1,31 +1,19 @@
 import React from 'react'
-import { auth } from '@clerk/nextjs/server'
 import { redirect, notFound } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
 import ProductForm from '@/components/ProductForm'
+import { getVendorContext } from '@/lib/vendor-context'
+import { getCachedProductById } from '@/lib/cache'
 
 export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { userId } = await auth()
-
-  if (!userId) {
-    redirect('/sign-in')
-  }
-
-  const vendor = await prisma.vendor.findUnique({ where: { userId } })
+  const { vendor } = await getVendorContext()
 
   if (!vendor) {
-    redirect('/dashboard/setup-vendor')
+    redirect('/setup-vendor')
   }
 
-  const { id } = await params // Await params como se requiere en Next.js 15+
+  const { id } = await params
 
-  const product = await prisma.product.findFirst({
-    where: {
-      id,
-      vendorId: vendor.id,
-      deletedAt: null, // Solo permitir editar productos no eliminados
-    },
-  })
+  const product = await getCachedProductById(id, vendor.id)
 
   if (!product) {
     notFound()

@@ -67,7 +67,7 @@ El sistema está compuesto por **cinco aplicaciones independientes**, cada una c
 |---------|----------------|
 | Vendedor | `id_vendor` (PK), `id_usuario` (FK), nombre, reputación, cuil, cuit, descripción, dirección |
 | Producto | `id_producto` (PK), `id_vendor` (FK), nombre, precio, stock, imagen, descripción |
-| Pedido | `id_pedido` (PK), `id_vendor` (FK), `id_buyer`, snapshot_producto_nombre, snapshot_producto_precio, estado, fecha, monto |
+| Pedido | `id_pedido` (PK), `id_vendor` (FK), `id_buyer`, snapshot_producto_nombre, snapshot_producto_precio, estado, fecha, monto, dirección |
 | Admin_Vendor | `id_admin` (PK), `id_usuario` (FK), nombre |
 
 ### DeliveryApp
@@ -97,17 +97,12 @@ El sistema está compuesto por **cinco aplicaciones independientes**, cada una c
 
 ## Estados posibles de un Pedido
 
-Los estados son gestionados por **SellerApp** (fuente de verdad). Las demás apps los actualizan vía API.
+Los estados son gestionados por **SellerApp** (fuente de verdad). PaymentsApp crea órdenes en estado `PAID` y el vendedor las transiciona a `READY`.
 
-| Estado | Descripción |
-|--------|-------------|
-| `pendiente_pago` | El comprador generó el pedido pero el pago no fue aprobado aún. |
-| `pagado` | PaymentsApp confirmó el cobro exitosamente. |
-| `preparando` | El vendedor está armando el pedido físicamente. |
-| `listo_para_despacho` | El pedido está listo y esperando asignación logística. |
-| `en_camino` | El repartidor inició la ruta hacia el domicilio del comprador. |
-| `entregado` | El pedido llegó al cliente exitosamente. |
-| `fallido` | Un incidente impidió la entrega (ej: cliente ausente, dirección incorrecta). |
+| Estado (enum) | Descripción | Quién lo setea |
+|---------------|-------------|----------------|
+| `PAID` | PaymentsApp confirmó el cobro. El vendedor ve la orden y prepara el pedido. | PaymentsApp via `POST /api/orders` |
+| `READY` | El vendedor preparó el pedido y está listo para que DeliveryApp lo retire. | Vendedor via dashboard |
 
 ---
 
@@ -126,18 +121,15 @@ La comunicación entre apps es exclusivamente mediante **HTTP REST**. No hay dup
 
 | Método | Endpoint | Consumidor | Descripción | Estado |
 |--------|----------|-----------|-------------|--------|
-| GET | `/api/orders/status/ready` | DeliveryApp | Lista pedidos en estado `listo_para_despacho`. | 🔄 TODO |
+| GET | `/api/orders/status/ready` | DeliveryApp | Lista pedidos en estado `READY`. | 🔄 TODO |
 | GET | `/api/products` | BuyerApp | Lista productos activos con precio y stock. | 🔄 TODO |
 | GET | `/api/vendors` | BuyerApp / FeedbackApp | Lista empresas activas con datos públicos. | ✅ IMPLEMENTADO |
 | GET | `/api/vendors/:vendor_id` | BuyerApp / FeedbackApp | Detalle de un vendedor específico. | ✅ IMPLEMENTADO |
 | GET | `/api/vendors?ids=1,2,3` | BuyerApp | Datos públicos de vendedores por IDs (favoritos). | ✅ IMPLEMENTADO |
 | GET | `/api/orders/:order_id` | BuyerApp | Detalle completo de un pedido. | 🔄 TODO |
 | GET | `/api/orders/:order_id/status` | BuyerApp | Estado actual de un pedido. | 🔄 TODO |
-| POST | `/api/orders` | BuyerApp | Recibe pedidos entrantes desde BuyerApp. | ✅ IMPLEMENTADO |
-| POST | `/api/orders/:order_id/delivery-started` | DeliveryApp | Marca el pedido como `en_camino`, descuenta stock. | 🔄 TODO |
-| POST | `/api/orders/:order_id/payment-confirmed` | PaymentsApp | Marca el pedido como `pagado`. Requiere `X-Service-Token`. | 🔄 TODO |
-| PUT | `/api/orders/:order_id/delivery-status` | DeliveryApp | Actualiza el estado logístico del pedido (ej. `entregado`). | 🔄 TODO |
-| PUT | `/api/orders/:order_id/incident` | DeliveryApp | Registra un incidente y cambia el estado a `fallido`. | 🔄 TODO |
+| POST | `/api/orders` | PaymentsApp | Recibe pedidos pagados desde PaymentsApp. Auth: `PAYMENTS_API_KEY`. | ✅ IMPLEMENTADO |
+| POST | `/api/orders/:order_id/status/ready` | DeliveryApp | Marca una orden READY como entregada al delivery. | 🔄 TODO |
 
 ### DeliveryApp expone
 
@@ -176,17 +168,17 @@ La comunicación entre apps es exclusivamente mediante **HTTP REST**. No hay dup
 
 1. **Buyer** explora el catálogo de vendedores y productos (consulta a SellerApp).
 2. **Buyer** agrega al carrito y confirma la compra → BuyerApp inicia checkout en PaymentsApp.
-3. **PaymentsApp** procesa el pago (Mercado Pago) y notifica a SellerApp y BuyerApp.
-4. **Vendor** prepara el pedido y lo marca como `listo_para_despacho` → asigna a DeliveryApp.
-5. **DeliveryApp** asigna un chofer, inicia ruta → notifica a SellerApp (`en_camino`).
-6. **Driver** entrega el pedido → DeliveryApp actualiza estado a `entregado` en SellerApp.
+3. **PaymentsApp** procesa el pago (Mercado Pago) y envía la orden a SellerApp via `POST /api/orders` (status `PAID`).
+4. **Vendor** ve la orden en dashboard, la prepara y la marca como `READY`.
+5. **DeliveryApp** consulta `GET /api/orders/status/ready` y retira los pedidos listos.
+6. **Driver** entrega el pedido (gestión logística propia de DeliveryApp).
 7. **Buyer** puede emitir una reseña en FeedbackApp (requiere validación de pago aprobado en PaymentsApp).
 
 ---
 
 ## Convenciones generales
 
-- **Autenticación entre servicios:** Las llamadas entre apps que modifican estado sensible deben incluir un `X-Service-Token` en el header para validar que la petición proviene de una app del sistema (no de un usuario final).
+- **Autenticación entre servicios:** Los endpoints que modifican estado sensible usan `X-API-Key` para autenticar a la app consumidora (ej: `PAYMENTS_API_KEY` para PaymentsApp).
 - **No usar body en GETs:** Los endpoints GET pasan filtros por query parameters, nunca por body.
 - **Snapshots en pedidos:** La tabla `Pedido` en SellerApp guarda `snapshot_producto_nombre` y `snapshot_producto_precio` para preservar el precio histórico al momento de la compra.
 - **Comunicación asincrónica:** No existe mensajería de eventos (queues). Toda la comunicación es HTTP REST sincrónica entre apps.

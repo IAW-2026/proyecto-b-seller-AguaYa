@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { validateApiKey } from '@/lib/auth'
 import { validateProductFilters } from '@/lib/validation'
 import { toPublicProducts } from '@/lib/products'
+import type { Prisma } from '@prisma/client'
 import type { ProductsListResponse, ErrorResponse } from '@/lib/products'
 
 /**
@@ -63,7 +64,7 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     // 4. Construir condiciones WHERE dinámicamente
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       deletedAt: null, // Excluir productos soft-deleted
     }
 
@@ -99,7 +100,12 @@ export async function GET(request: Request): Promise<Response> {
         success: true,
         products: toPublicProducts(products),
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=300, stale-while-revalidate=3600',
+        },
+      }
     )
   } catch (error) {
     console.error('Error en GET /api/products:', error)

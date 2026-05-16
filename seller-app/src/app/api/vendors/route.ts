@@ -69,7 +69,12 @@ export async function GET(request: Request): Promise<Response> {
             success: true,
             vendors: toPublicVendors(vendors),
           },
-          { status: 200 }
+          {
+            status: 200,
+            headers: {
+              'Cache-Control': 'public, max-age=600, stale-while-revalidate=86400',
+            },
+          }
         )
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Validación de IDs fallida'
@@ -92,7 +97,12 @@ export async function GET(request: Request): Promise<Response> {
         success: true,
         vendors: toPublicVendors(allVendors),
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=600, stale-while-revalidate=86400',
+        },
+      }
     )
   } catch (error) {
     console.error('Error en GET /api/vendors:', error)

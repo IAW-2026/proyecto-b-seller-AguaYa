@@ -1,103 +1,83 @@
 import React from 'react'
-import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/prisma'
+import { getVendorContext } from '@/lib/vendor-context'
+import { getCachedOverview } from '@/lib/cache'
 
 export default async function OverviewPage() {
-  const { userId } = await auth()
+  const { vendor } = await getVendorContext()
 
-  if (!userId) {
+  if (!vendor) {
     return null
   }
 
-  const vendor = await prisma.vendor.findUnique({
-    where: { userId },
-    include: {
-      _count: {
-        select: {
-          products: true,
-          orders: true,
-        },
-      },
-      products: {
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-      },
-      orders: {
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-      },
-    },
-  })
+  const overview = await getCachedOverview(vendor.id)
 
-  if (!vendor) {
+  if (!overview) {
     return (
-      <div>
-        <h1>Overview</h1>
-        <p>No existe un vendedor asociado a esta cuenta todavía.</p>
-        <p>Cuando registres el perfil del vendedor, acá vas a ver sus métricas, productos y órdenes.</p>
+      <div className="max-w-2xl space-y-3">
+        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700">Overview</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">No existe un vendedor asociado a esta cuenta todavía.</h1>
+        <p className="text-slate-600">Cuando registres el perfil del vendedor, acá vas a ver sus métricas, productos y órdenes.</p>
       </div>
     )
   }
 
   return (
-    <div>
-      <h1>Overview</h1>
-      <p>Panel del vendedor: métricas y actividad asociadas a tu cuenta.</p>
+    <div className="space-y-6">
 
-      <div style={{ marginTop: 16, padding: 16, border: '1px solid #e5e7eb', borderRadius: 12 }}>
-        <strong>{vendor.name}</strong>
-        <div style={{ marginTop: 8 }}>{vendor.address}</div>
-        {vendor.description ? <div style={{ marginTop: 4 }}>{vendor.description}</div> : null}
-        <div style={{ marginTop: 4 }}>Reputación: {vendor.reputation}</div>
-      </div>
+      <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
+        <strong className="text-lg text-slate-950">{overview.name}</strong>
+        <div className="mt-3 text-sm text-slate-600">{overview.address}</div>
+        {overview.description ? <div className="mt-2 text-sm text-slate-600">{overview.description}</div> : null}
+        <div className="mt-2 text-sm text-slate-600">Reputación: {overview.reputation}</div>
+      </section>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginTop: 24 }}>
-        <div style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 12 }}>
-          <strong>Productos</strong>
-          <div style={{ fontSize: 28, marginTop: 8 }}>{vendor._count.products}</div>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
+          <strong className="text-sm uppercase tracking-wide text-slate-500">Productos</strong>
+          <div className="mt-3 text-3xl font-semibold text-slate-950">{overview._count.products}</div>
         </div>
-        <div style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 12 }}>
-          <strong>Órdenes</strong>
-          <div style={{ fontSize: 28, marginTop: 8 }}>{vendor._count.orders}</div>
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
+          <strong className="text-sm uppercase tracking-wide text-slate-500">Órdenes</strong>
+          <div className="mt-3 text-3xl font-semibold text-slate-950">{overview._count.orders}</div>
         </div>
-        <div style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 12 }}>
-          <strong>Estado</strong>
-          <div style={{ fontSize: 20, marginTop: 8 }}>Activo</div>
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
+          <strong className="text-sm uppercase tracking-wide text-slate-500">Estado</strong>
+          <div className="mt-3 text-2xl font-semibold text-emerald-600">Activo</div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginTop: 24 }}>
-        <section style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 12 }}>
-          <h2 style={{ marginTop: 0 }}>Productos recientes</h2>
-          {vendor.products.length > 0 ? (
-            <ul style={{ paddingLeft: 16, margin: 0 }}>
-              {vendor.products.map((product) => (
-                <li key={product.id} style={{ marginBottom: 12 }}>
-                  <strong>{product.name}</strong>
-                  <div>Precio: ${product.price}</div>
-                  <div>Stock: {product.stock}</div>
+      <div className="grid gap-6 xl:grid-cols-2">
+        <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
+          <h2 className="text-xl font-semibold text-slate-950">Productos recientes</h2>
+          {overview.products.length > 0 ? (
+            <ul className="mt-5 space-y-4">
+              {overview.products.map((product) => (
+                <li key={product.id} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
+                  <strong className="block text-slate-950">{product.name}</strong>
+                  <div className="mt-2 text-sm text-slate-600">Precio: ${product.price}</div>
+                  <div className="text-sm text-slate-600">Stock: {product.stock}</div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No hay productos cargados.</p>
+            <p className="mt-4 text-slate-600">No hay productos cargados.</p>
           )}
         </section>
 
-        <section style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 12 }}>
-          <h2 style={{ marginTop: 0 }}>Órdenes recientes</h2>
-          {vendor.orders.length > 0 ? (
-            <ul style={{ paddingLeft: 16, margin: 0 }}>
-              {vendor.orders.map((order) => (
-                <li key={order.id} style={{ marginBottom: 12 }}>
-                  <strong>Orden {order.id.slice(0, 8)}</strong>
-                  <div>Estado: {order.status}</div>
-                  <div>Total: ${order.total}</div>
+        <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
+          <h2 className="text-xl font-semibold text-slate-950">Órdenes recientes</h2>
+          {overview.orders.length > 0 ? (
+            <ul className="mt-5 space-y-4">
+              {overview.orders.map((order) => (
+                <li key={order.id} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
+                  <strong className="block text-slate-950">Orden {order.id.slice(0, 8)}</strong>
+                  <div className="mt-2 text-sm text-slate-600">Estado: {order.status}</div>
+                  <div className="text-sm text-slate-600">Total: ${order.total}</div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No hay órdenes cargadas.</p>
+            <p className="mt-4 text-slate-600">No hay órdenes cargadas.</p>
           )}
         </section>
       </div>

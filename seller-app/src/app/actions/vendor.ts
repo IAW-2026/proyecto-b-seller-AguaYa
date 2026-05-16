@@ -7,6 +7,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { validateVendorInput } from '../../lib/validation'
 
 export async function createOrUpdateVendor(data: {
@@ -43,6 +44,12 @@ export async function createOrUpdateVendor(data: {
         cuit: input.cuit,
       },
     })
+
+    revalidatePath('/dashboard/overview')
+    revalidatePath('/dashboard/products')
+    revalidateTag('vendor', 'max')
+    revalidateTag('overview', 'max')
+    revalidateTag('products', 'max')
 
     return { success: true, vendor }
   } catch (error) {

@@ -20,6 +20,7 @@ export interface CreateOrderInput {
   buyerId: string
   items: Array<{ productId: string; quantity: number }>
   total: number
+  address: string
 }
 
 type ProductDraft = {
@@ -129,6 +130,11 @@ export function validateCreateOrderInput(data: unknown): CreateOrderInput {
     throw new Error('buyerId es requerido y debe ser un string no vacío')
   }
 
+  // Validar address
+  if (typeof d.address !== 'string' || !d.address.trim()) {
+    throw new Error('address es requerido y debe ser un string no vacío')
+  }
+
   // Validar items
   if (!Array.isArray(d.items) || d.items.length === 0) {
     throw new Error('items es requerido y debe ser un array no vacío')
@@ -157,6 +163,7 @@ export function validateCreateOrderInput(data: unknown): CreateOrderInput {
     externalId: d.externalId.trim(),
     vendorId: d.vendorId.trim(),
     buyerId: d.buyerId.trim(),
+    address: d.address.trim(),
     items: d.items.map((item: any) => ({
       productId: item.productId.trim(),
       quantity: item.quantity as number,

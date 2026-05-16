@@ -9,12 +9,8 @@ datasource db {
 
 
 enum OrderStatus {
-  PENDING
-  CONFIRMED
+  PAID
   READY
-  IN_DELIVERY
-  DELIVERED
-  CANCELLED
 }
 
 model Vendor {
@@ -55,8 +51,9 @@ model Order {
   externalId String     @unique
   vendorId   String
   buyerId    String
-  status     OrderStatus @default(PENDING)
+  status     OrderStatus @default(PAID)
   total      Float
+  address    String?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
@@ -75,4 +72,26 @@ model OrderItem {
   order        Order   @relation(fields: [orderId], references: [id])
   product      Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   // onDelete: Cascade es seguro porque productName y productPrice ya están guardados en OrderItem
+}
+
+enum OutboxStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model Outbox {
+  id        String       @id @default(cuid())
+  orderId   String
+  target    String       // 'delivery' | 'buyer'
+  method    String       // 'PUT' | 'PATCH'
+  url       String
+  body      String       // JSON string del payload enviado
+  status    OutboxStatus @default(PENDING)
+  retries   Int          @default(0)
+  lastError String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([status])
 }

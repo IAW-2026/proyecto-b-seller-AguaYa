@@ -1,10 +1,26 @@
 import { ClerkProvider } from '@clerk/nextjs'
+import { Geist, Geist_Mono } from 'next/font/google'
 import type { Metadata } from 'next'
 import './globals.css'
 
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
-  title: 'Seller App',
-  description: 'Plataforma de vendedores',
+  title: {
+    default: 'AguaYa Seller',
+    template: '%s | AguaYa Seller',
+  },
+  description: 'Panel para gestionar productos, pedidos y vendedores de AguaYa.',
 }
 
 export default function RootLayout({
@@ -14,13 +30,9 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="es">
-        <body>{children}</body>
+      <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
+        <body className="bg-background text-foreground antialiased">{children}</body>
       </html>
     </ClerkProvider>
   )
 }
-
-/* Children es la página que Next.js va a renderizar dentro del layout */
-
-/* El componente de Clerk envuelve toda la app y se encarga de la autenticación */

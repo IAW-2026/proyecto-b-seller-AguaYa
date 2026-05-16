@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
-import OrdersList from '@/components/OrdersList'
+import OrdersList from '@/components/orders/OrdersList'
+import AutoRefresh from '@/lib/AutoRefresh'
 import { Package } from 'lucide-react'
 
 export const metadata = {
@@ -24,13 +25,15 @@ export default function OrdersPage() {
       {/* Orders List with Suspense */}
       <Suspense
         fallback={
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Cargando órdenes...</p>
+          <div className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-8 text-center shadow-sm backdrop-blur">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-slate-900" />
+            <p className="mt-4 text-slate-600">Cargando órdenes...</p>
           </div>
         }
       >
-        <OrdersList />
+        <AutoRefresh>
+          <OrdersList />
+        </AutoRefresh>
       </Suspense>
     </div>
   )

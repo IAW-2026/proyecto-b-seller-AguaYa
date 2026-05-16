@@ -20,3 +20,10 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter })
 if (process.env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = prisma
 }
+
+// Optional Prisma query logging (enable by setting DEBUG_PRISMA_QUERIES=true)
+if (process.env.DEBUG_PRISMA_QUERIES === 'true') {
+    ;(prisma as any).$on('query', (e: any) => {
+        console.debug('[prisma] query', { sql: e.query, params: e.params, duration: e.duration })
+    })
+}

@@ -1,9 +1,10 @@
 /**
  * POST /api/orders
- * Endpoint para recibir pedidos desde la Buyer App.
+ * Endpoint para recibir pedidos desde PaymentsApp.
+ * Las órdenes llegan pre-pagadas (status PAID) con dirección de entrega.
  * 
  * Características:
- * - Autenticación via API key en header X-API-Key
+ * - Autenticación via PAYMENTS_API_KEY en header X-API-Key
  * - Idempotencia mediante externalId único
  * - Validación rigurosa de payload, stock y totales
  * - Transacción atómica Prisma para integridad
@@ -11,11 +12,12 @@
  */
 
 import { NextResponse } from 'next/server'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { validateApiKey } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { validateCreateOrderInput } from '@/lib/validation'
 
-const TOTAL_TOLERANCE = 0.01 // Tolerancia por redondeo de decimales
+const TOTAL_TOLERANCE = 1 // Tolerancia por redondeo de decimales
 
 /**
  * Calcula el total basado en productos y cantidades.
@@ -33,8 +35,8 @@ function calculateTotal(items: { productId: string; quantity: number }[], produc
 
 export async function POST(request: Request) {
   try {
-    // 1. Validar autenticación
-    if (!validateApiKey(request, process.env.BUYER_API_KEY)) {
+    // 1. Validar autenticación (PaymentsApp)
+    if (!validateApiKey(request, process.env.PAYMENTS_API_KEY)) {
       return NextResponse.json(
         { error: 'X-API-Key inválida o faltante' },
         { status: 401 }
@@ -61,7 +63,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: message }, { status: 400 })
     }
 
-    // 4. Búsqueda rápida: ¿la orden ya existe?
+      // 4. Búsqueda rápida: ¿la orden ya existe? (idempotencia)
     const existingOrder = await prisma.order.findUnique({
       where: { externalId: input.externalId },
       include: { items: true },
@@ -155,7 +157,8 @@ export async function POST(request: Request) {
             externalId: input.externalId,
             vendorId: input.vendorId,
             buyerId: input.buyerId,
-            status: 'PENDING',
+            status: 'PAID',
+            address: input.address,
             total: computedTotal,
             items: {
               create: input.items.map((item) => {
@@ -183,7 +186,14 @@ export async function POST(request: Request) {
         return newOrder
       })
 
-      // 10. Respuesta exitosa
+      // 10. Invalidar caché de órdenes, overview y stock del vendedor
+      revalidatePath('/dashboard/orders')
+      revalidatePath('/dashboard/overview')
+      revalidateTag('orders', 'max')
+      revalidateTag('overview', 'max')
+      revalidateTag('products', 'max')
+
+      // 11. Respuesta exitosa
       console.log(
         `[Order Created] externalId=${input.externalId}, orderId=${order.id}, vendorId=${input.vendorId}`
       )

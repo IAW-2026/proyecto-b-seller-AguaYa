@@ -1,10 +1,11 @@
 export default async function Home() {
     return (
-        <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24 }}>
-            <div style={{ textAlign: 'center' }}>
-                <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 12 }}>AguaYa Seller</h1>
-                <p style={{ marginBottom: 20, color: '#64748b' }}>Accedé al panel para gestionar ventas, productos y pedidos.</p>
-                <a href="/sign-in" style={{ display: 'inline-block', padding: '12px 18px', borderRadius: 12, background: '#2563eb', color: 'white', textDecoration: 'none' }}>
+        <main className="grid min-h-screen place-items-center px-6 py-12">
+            <div className="max-w-xl rounded-[2rem] border border-white/70 bg-white/80 px-8 py-10 text-center shadow-[0_20px_80px_-30px_rgba(15,23,42,0.35)] backdrop-blur">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700">AguaYa Seller</p>
+                <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">Gestioná tu negocio con menos fricción</h1>
+                <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">Accedé al panel para gestionar ventas, productos y pedidos con una interfaz más clara y rápida de leer.</p>
+                <a className="mt-8 inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800" href="/sign-in">
                     Iniciar sesión
                 </a>
             </div>

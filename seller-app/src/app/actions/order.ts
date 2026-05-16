@@ -1,26 +1,30 @@
 /**
- * This file contains server actions related to order management.
- * It includes functions to fetch orders for the authenticated vendor.
+ * order.ts — Server actions de gestión de órdenes del vendedor.
+ *
+ * Funciones:
+ *   getVendorOrders()          → Retorna todas las órdenes del vendedor autenticado (cacheadas)
+ *   updateOrderStatus()        → Cambia el estado de una orden (con validación de transición)
+ *   confirmOrderForDelivery()  → Marca como READY + notifica a DeliveryApp y BuyerApp
+ *
+ * Las notificaciones externas usan un patrón Outbox: si el servicio destino está caído,
+ * se encola el intento para reintentar automáticamente cada 60s.
  */
 
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { auth } from '@clerk/nextjs/server'
-import { revalidatePath } from 'next/cache'
+import { getVendorContext } from '@/lib/vendor-context'
+import { getCachedVendorOrders } from '@/lib/cache'
+import { notifyExternalService } from '@/lib/external-api'
+import { measure } from '@/lib/perf'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { OrderStatus } from '@prisma/client'
 
 async function getAuthenticatedVendor() {
-  const { userId } = await auth()
-
-  if (!userId) {
-    throw new Error('No autenticado')
-  }
-
-  const vendor = await prisma.vendor.findUnique({ where: { userId } })
+  const { vendor } = await getVendorContext()
 
   if (!vendor) {
-    throw new Error('No existe un vendedor asociado a esta cuenta')
+    throw new Error('No autenticado')
   }
 
   return vendor
@@ -29,19 +33,11 @@ async function getAuthenticatedVendor() {
 const ORDER_REVALIDATE_PATHS = ['/dashboard/orders', '/dashboard/overview']
 
 const allowedStatusTransitions: Record<OrderStatus, OrderStatus[]> = {
-  PENDING: ['CONFIRMED', 'READY', 'CANCELLED'],
-  CONFIRMED: ['READY', 'CANCELLED'],
-  READY: ['IN_DELIVERY', 'CANCELLED'],
-  IN_DELIVERY: ['DELIVERED', 'CANCELLED'],
-  DELIVERED: [],
-  CANCELLED: [],
+  PAID: ['READY'],
+  READY: [],
 }
 
 function assertValidStatusTransition(currentStatus: OrderStatus, nextStatus: OrderStatus) {
-  if (currentStatus === nextStatus) {
-    return
-  }
-
   const validNextStatuses = allowedStatusTransitions[currentStatus] ?? []
 
   if (!validNextStatuses.includes(nextStatus)) {
@@ -51,31 +47,20 @@ function assertValidStatusTransition(currentStatus: OrderStatus, nextStatus: Ord
 
 export async function getVendorOrders() {
   const vendor = await getAuthenticatedVendor()
-
-  const orders = await prisma.order.findMany({
-    where: { vendorId: vendor.id },
-    include: {
-      items: {
-        include: {
-          product: true,
-        },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
-
-  return orders
+  return getCachedVendorOrders(vendor.id)
 }
 
 export async function updateOrderStatus(orderId: string, status: OrderStatus) {
   const vendor = await getAuthenticatedVendor()
 
-  const order = await prisma.order.findFirst({
-    where: {
-      id: orderId,
-      vendorId: vendor.id,
-    },
-  })
+  const order = await measure(`prisma.order.findFirst id=${orderId}`, async () =>
+    prisma.order.findFirst({
+      where: {
+        id: orderId,
+        vendorId: vendor.id,
+      },
+    })
+  )
 
   if (!order) {
     throw new Error('No se encontró la orden para este vendedor')
@@ -83,9 +68,12 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
 
   assertValidStatusTransition(order.status, status)
 
-  if (order.status === status) {
-    return prisma.order.findUnique({
-      where: { id: order.id },
+  const updatedOrder = await measure(`prisma.order.update id=${orderId}`, async () =>
+    prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status,
+      },
       include: {
         items: {
           include: {
@@ -94,27 +82,50 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
         },
       },
     })
-  }
-
-  const updatedOrder = await prisma.order.update({
-    where: { id: orderId },
-    data: {
-      status,
-    },
-    include: {
-      items: {
-        include: {
-          product: true,
-        },
-      },
-    },
-  })
+  )
 
   ORDER_REVALIDATE_PATHS.forEach((path) => revalidatePath(path))
+  revalidateTag('orders', 'max')
+  revalidateTag('overview', 'max')
 
   return updatedOrder
 }
 
+/**
+ * Marca una orden como READY (lista para entregar) y notifica a los servicios externos.
+ *
+ * Flujo:
+ *   1. Actualiza el estado de la orden local a READY
+ *   2. Notifica a DeliveryApp (PUT /api/ready_orders/:id)
+ *   3. Notifica a BuyerApp (PATCH /api/orders/:id/status)
+ *   4. Si alguna notificación falla, se encola en Outbox para reintentar después
+ *
+ * Las notificaciones son fire-and-forget: un error externo no bloquea la confirmación local.
+ */
 export async function confirmOrderForDelivery(orderId: string) {
-  return updateOrderStatus(orderId, 'READY')
+  const vendor = await getAuthenticatedVendor()
+
+  // 1. Actualizar estado local
+  const updatedOrder = await updateOrderStatus(orderId, 'READY')
+
+  // 2. Notificar servicios externos (no bloqueante)
+  const body = {
+    orderId,
+    vendorId: vendor.id,
+    status: 'READY',
+    timestamp: new Date().toISOString(),
+  }
+
+  await Promise.allSettled([
+    notifyExternalService('delivery', `/api/ready_orders/${orderId}`, 'PUT', body, {
+      enqueueOnFailure: true,
+      orderId,
+    }),
+    notifyExternalService('buyer', `/api/orders/${orderId}/status`, 'PATCH', body, {
+      enqueueOnFailure: true,
+      orderId,
+    }),
+  ])
+
+  return updatedOrder
 }

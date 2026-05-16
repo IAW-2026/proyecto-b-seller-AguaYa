@@ -78,8 +78,9 @@ async function main() {
             externalId: 'seed_order_001',
             vendorId: vendor1.id,
             buyerId: 'buyer_seed_001',
-            status: OrderStatus.DELIVERED,
+            status: OrderStatus.READY,
             total: 7300,
+            address: 'Av.ellan 512, Punta Alta',
             items: {
                 create: [
                     {
@@ -106,6 +107,7 @@ async function main() {
             buyerId: 'buyer_seed_002',
             status: OrderStatus.READY,
             total: 5000,
+            address: 'Av.ellan 512, Punta Alta',
             items: {
                 create: [
                     {
@@ -124,8 +126,9 @@ async function main() {
             externalId: 'seed_order_003',
             vendorId: vendor2.id,
             buyerId: 'buyer_seed_001',
-            status: OrderStatus.PENDING,
+            status: OrderStatus.PAID,
             total: 3200,
+            address: 'Av. San Martín 567, Bahía Blanca',
             items: {
                 create: [
                     {
