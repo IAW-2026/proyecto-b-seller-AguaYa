@@ -58,6 +58,9 @@ export const getCachedVendorByUserId = unstable_cache(
           address: true,
           reputation: true,
           description: true,
+          image: true,
+          cuil: true,
+          cuit: true,
         },
       })
     )

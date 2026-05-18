@@ -1,8 +1,9 @@
 import React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import LogoutButton from '../LogoutButton'
 
-export default function DashboardSidebar() {
+export default function DashboardSidebar({ vendorName, vendorImage }: { vendorName: string; vendorImage?: string | null }) {
   return (
     <aside className="hidden w-72 shrink-0 border-r border-slate-200/80 bg-white/75 px-4 py-6 backdrop-blur xl:block">
       <div className="mb-6 rounded-2xl bg-slate-900 px-4 py-5 text-white shadow-sm">
@@ -14,14 +15,34 @@ export default function DashboardSidebar() {
       <nav aria-label="Navegación principal">
         <ul className="space-y-1 text-sm font-medium">
           <li><Link className="block rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/overview">Overview</Link></li>
-          <li><Link className="block rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/sales">Sales</Link></li>
           <li><Link className="block rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/products">Products</Link></li>
           <li><Link className="block rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/orders">Orders</Link></li>
-          <li><Link className="block rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/settings">Settings</Link></li>
         </ul>
       </nav>
 
       <div className="my-6 h-px bg-slate-200" />
+
+      <Link
+        href="/dashboard/settings"
+        className="flex items-center gap-3 rounded-xl px-3 py-2 transition hover:bg-slate-100"
+      >
+        {vendorImage ? (
+          <Image
+            src={vendorImage}
+            alt={vendorName}
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-300 text-sm font-semibold text-white">
+            {vendorName.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <span className="text-sm font-medium text-slate-700">{vendorName}</span>
+      </Link>
+
+      <div className="my-4 h-px bg-slate-200" />
       <LogoutButton />
     </aside>
   )

@@ -1,21 +1,28 @@
 /**
- * This file contains server actions related to vendor management. It includes a function to create or update the vendor profile for the authenticated user. The function checks if the user is authenticated and then uses Prisma to either create a new vendor record or update the existing one based on the user's ID.
+ * vendor.ts — Server actions para gestión del perfil del vendedor.
+ *
+ * Funciones:
+ *   createOrUpdateVendor() → Crea o actualiza el perfil del vendedor autenticado
  */
-
 
 'use server'
 
-import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
+import { validateVendorInput } from '@/lib/validation'
 import { revalidatePath, revalidateTag } from 'next/cache'
-import { validateVendorInput } from '../../lib/validation'
 
+/**
+ * Crea o actualiza el perfil del vendedor para el usuario autenticado.
+ * Usa upsert keyeado por userId (único).
+ */
 export async function createOrUpdateVendor(data: {
   name: string
   address: string
   description?: string
   cuil?: string
   cuit?: string
+  image?: string
 }) {
   const { userId } = await auth()
 
@@ -25,35 +32,32 @@ export async function createOrUpdateVendor(data: {
 
   const input = validateVendorInput(data)
 
-  try {
-    const vendor = await prisma.vendor.upsert({
-      where: { userId },
-      create: {
-        userId,
-        name: input.name,
-        address: input.address,
-        description: input.description,
-        cuil: input.cuil,
-        cuit: input.cuit,
-      },
-      update: {
-        name: input.name,
-        address: input.address,
-        description: input.description,
-        cuil: input.cuil,
-        cuit: input.cuit,
-      },
-    })
+  const vendor = await prisma.vendor.upsert({
+    where: { userId },
+    update: {
+      name: input.name,
+      address: input.address,
+      description: input.description,
+      cuil: input.cuil,
+      cuit: input.cuit,
+      image: input.image,
+    },
+    create: {
+      userId,
+      name: input.name,
+      address: input.address,
+      description: input.description,
+      cuil: input.cuil,
+      cuit: input.cuit,
+      image: input.image,
+    },
+  })
 
-    revalidatePath('/dashboard/overview')
-    revalidatePath('/dashboard/products')
-    revalidateTag('vendor', 'max')
-    revalidateTag('overview', 'max')
-    revalidateTag('products', 'max')
+  revalidatePath('/dashboard/overview')
+  revalidatePath('/dashboard/products')
+  revalidateTag('vendor', 'max')
+  revalidateTag('overview', 'max')
+  revalidateTag('products', 'max')
 
-    return { success: true, vendor }
-  } catch (error) {
-    console.error('Error al guardar vendedor:', error)
-    throw new Error('Error al guardar los datos del vendedor')
-  }
+  return vendor
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { getVendorContext } from '@/lib/vendor-context'
 import { getCachedVendorProducts } from '@/lib/cache'
@@ -37,10 +38,21 @@ export default async function ProductsPage() {
           {productsVendor.products.map((p) => (
             <li key={p.id} className="rounded-[1.5rem] border border-slate-200/80 bg-white/80 p-5 shadow-sm">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <strong className="text-lg text-slate-950">{p.name}</strong>
-                  <div className="mt-2 text-sm text-slate-600">Precio: ${p.price}</div>
-                  <div className="text-sm text-slate-600">Stock: {p.stock}</div>
+                <div className="flex items-center gap-4">
+                  {p.image ? (
+                    <Image
+                      src={p.image}
+                      alt={p.name}
+                      width={64}
+                      height={64}
+                      className="rounded-lg object-cover"
+                    />
+                  ) : null}
+                  <div>
+                    <strong className="text-lg text-slate-950">{p.name}</strong>
+                    <div className="mt-2 text-sm text-slate-600">Precio: ${p.price}</div>
+                    <div className="text-sm text-slate-600">Stock: {p.stock}</div>
+                  </div>
                 </div>
                 <div>
                   <Link className="inline-flex rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-950" href={`/dashboard/products/${p.id}`}>Editar</Link>

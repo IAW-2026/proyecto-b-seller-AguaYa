@@ -16,7 +16,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex min-h-screen bg-transparent text-slate-900">
-      <DashboardSidebar />
+      <DashboardSidebar vendorName={vendor.name} vendorImage={vendor.image} />
       <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
     </div>
   )

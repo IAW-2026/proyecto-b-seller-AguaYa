@@ -3,7 +3,7 @@
 @apiKey = aguaya-payments-secret-key-123
 
 @vendorId = cmp8s3pnr0000isliqogt68m6
-@productId = cmp8s45vo0001isli54nt98ah
+@productId = cmp8yb6ub0006pslik7nb0t0c
 
 @vendorId2 = cmp21j4xu0001zwli69agxgle
 
@@ -24,7 +24,7 @@ Content-Type: application/json
   "items": [
     {"productId": "{{productId}}", "quantity": 2}
   ],
-  "total": 8000
+  "total": 6000
 }
 
 ### Test 6: POST sin API Key (401)

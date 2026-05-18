@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createProduct, deleteProduct, updateProduct } from '@/app/actions/product'
 import Button from './ui/Button'
+import ImageUpload from './ui/ImageUpload'
 import { validateProductInput } from '../lib/validation'
 
 interface ProductFormProps {
@@ -113,8 +114,12 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
       </div>
 
       <div>
-        <label style={labelStyle}>Imagen (URL)</label>
-        <input name="image" value={form.image} onChange={handleChange} style={inputStyle} />
+        <ImageUpload
+          value={form.image}
+          onChange={(url) => setForm((p) => ({ ...p, image: url }))}
+          folder="products"
+          label="Imagen del producto"
+        />
       </div>
 
       <div>

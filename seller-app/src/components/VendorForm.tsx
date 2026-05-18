@@ -1,10 +1,10 @@
-
 'use client'
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createOrUpdateVendor } from '@/app/actions/vendor'
 import Button from '@/components/ui/Button'
+import ImageUpload from '@/components/ui/ImageUpload'
 import { validateVendorInput } from '../lib/validation'
 
 interface VendorFormProps {
@@ -14,6 +14,7 @@ interface VendorFormProps {
     description?: string
     cuil?: string
     cuit?: string
+    image?: string
   }
   redirectTo?: string
 }
@@ -26,6 +27,7 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
     description: initialData?.description || '',
     cuil: initialData?.cuil || '',
     cuit: initialData?.cuit || '',
+    image: initialData?.image || '',
   })
 
   const [error, setError] = useState('')
@@ -138,6 +140,15 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
             style={inputStyle}
           />
         </div>
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <ImageUpload
+          value={formData.image}
+          onChange={(url) => setFormData((prev) => ({ ...prev, image: url }))}
+          folder="avatars"
+          label="Logo o foto del negocio"
+        />
       </div>
 
       <div style={{ marginTop: 16 }}>

@@ -10,6 +10,9 @@ export type VendorContext = {
     address: string
     reputation: number
     description?: string | null
+    image?: string | null
+    cuil?: string | null
+    cuit?: string | null
   } | null
 }
 

@@ -12,6 +12,7 @@ export interface VendorInput {
   description?: string
   cuil?: string
   cuit?: string
+  image?: string
 }
 
 export interface CreateOrderInput {
@@ -105,6 +106,7 @@ export function validateVendorInput(data: VendorDraft): VendorInput {
     description: normalizeText(data.description),
     cuil,
     cuit,
+    image: normalizeText(data.image),
   }
 }
 
