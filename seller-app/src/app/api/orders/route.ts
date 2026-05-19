@@ -186,7 +186,7 @@ export async function POST(request: Request) {
         return newOrder
       })
 
-      // 10. Invalidar caché de órdenes, overview y stock del vendedor
+      // 10. Invalidar cache
       revalidatePath('/dashboard/orders')
       revalidatePath('/dashboard/overview')
       revalidateTag('orders', 'max')

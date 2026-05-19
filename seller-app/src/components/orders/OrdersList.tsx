@@ -1,15 +1,12 @@
 /**
  * OrdersList.tsx — Listado de órdenes del vendedor con tabs.
  *
- * Renderiza las órdenes agrupadas por estado (PAID / READY) dentro del
- * componente interactivo OrdersTabs, que permite alternar entre vistas
- * mediante tabs en la URL (?tab=confirm | ?tab=ready).
- *
- * Este componente es server-side: obtiene las órdenes cacheadas y las pasa
- * al cliente para la interacción con tabs.
+ * Es un server component que obtiene órdenes cacheadas y las pasa
+ * a OrdersTabs para la interacción con tabs.
  */
 
-import { getVendorOrders } from '@/app/actions/order'
+import { auth } from '@clerk/nextjs/server'
+import { getVendorByUserId, getVendorOrders as getCachedVendorOrders } from '@/lib/queries'
 import OrdersTabs from '@/components/orders/OrdersTabs'
 import { Package } from 'lucide-react'
 import type { Order, OrderItem } from '@prisma/client'
@@ -21,11 +18,29 @@ type OrderWithItems = Order & {
 }
 
 export default async function OrdersList() {
+  const { userId } = await auth()
+  if (!userId) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+        <p className="font-semibold">Error: No autenticado</p>
+      </div>
+    )
+  }
+
+  const vendor = await getVendorByUserId(userId)
+  if (!vendor) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+        <p className="font-semibold">Error: No autenticado</p>
+      </div>
+    )
+  }
+
   let orders: OrderWithItems[] = []
   let error: string | null = null
 
   try {
-    const result = await getVendorOrders()
+    const result = await getCachedVendorOrders(vendor.id)
     orders = result as OrderWithItems[]
   } catch (err) {
     error = err instanceof Error ? err.message : 'Error al cargar órdenes'

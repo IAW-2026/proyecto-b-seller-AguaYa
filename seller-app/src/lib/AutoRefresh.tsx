@@ -3,11 +3,10 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface AutoRefreshProps {
-  children: React.ReactNode
   interval?: number
 }
 
-export default function AutoRefresh({ children, interval = 5000 }: AutoRefreshProps) {
+export default function AutoRefresh({ interval = 5000 }: AutoRefreshProps) {
   const router = useRouter()
 
   useEffect(() => {
@@ -15,5 +14,5 @@ export default function AutoRefresh({ children, interval = 5000 }: AutoRefreshPr
     return () => clearInterval(id)
   }, [router, interval])
 
-  return <>{children}</>
+  return null
 }

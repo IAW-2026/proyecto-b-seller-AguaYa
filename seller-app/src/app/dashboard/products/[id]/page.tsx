@@ -1,19 +1,17 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { redirect, notFound } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
+import { getVendorByUserId, getProductById } from '@/lib/queries'
 import ProductForm from '@/components/ProductForm'
-import { getVendorContext } from '@/lib/vendor-context'
-import { getCachedProductById } from '@/lib/cache'
 
-export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { vendor } = await getVendorContext()
+async function ProductDetailContent({ id }: { id: string }) {
+  const { userId } = await auth()
+  if (!userId) redirect('/sign-in')
 
-  if (!vendor) {
-    redirect('/setup-vendor')
-  }
+  const vendor = await getVendorByUserId(userId)
+  if (!vendor) redirect('/setup-vendor')
 
-  const { id } = await params
-
-  const product = await getCachedProductById(id, vendor.id)
+  const product = await getProductById(id, vendor.id)
 
   if (!product) {
     notFound()
@@ -38,5 +36,15 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
         />
       </div>
     </div>
+  )
+}
+
+export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+
+  return (
+    <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando producto...</div>}>
+      <ProductDetailContent id={id} />
+    </Suspense>
   )
 }

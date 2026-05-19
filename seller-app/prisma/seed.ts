@@ -1,12 +1,8 @@
 import { PrismaClient, OrderStatus } from '@prisma/client'
-import { Pool } from 'pg'
-import { PrismaPg } from '@prisma/adapter-pg'
-import * as dotenv from 'dotenv'
+import { PrismaNeon } from '@prisma/adapter-neon'
+import type { PoolConfig } from '@neondatabase/serverless'
 
-dotenv.config()
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
-const adapter = new PrismaPg(pool)
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL } satisfies PoolConfig)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {

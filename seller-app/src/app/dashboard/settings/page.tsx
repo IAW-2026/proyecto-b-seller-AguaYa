@@ -5,13 +5,15 @@
  * Incluye subida de avatar, nombre, dirección, CUIL/CUIT y descripción.
  */
 
-import React from 'react'
-import { getVendorContext } from '@/lib/vendor-context'
+import React, { Suspense } from 'react'
+import { auth } from '@clerk/nextjs/server'
+import { getVendorByUserId } from '@/lib/queries'
 import VendorForm from '@/components/VendorForm'
 import { Settings } from 'lucide-react'
 
-export default async function SettingsPage() {
-  const { vendor } = await getVendorContext()
+async function SettingsContent() {
+  const { userId } = await auth()
+  const vendor = userId ? await getVendorByUserId(userId) : null
 
   return (
     <div className="space-y-6">
@@ -40,5 +42,13 @@ export default async function SettingsPage() {
         <p className="text-gray-500">No hay un vendedor asociado a esta cuenta.</p>
       )}
     </div>
+  )
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando...</div>}>
+      <SettingsContent />
+    </Suspense>
   )
 }

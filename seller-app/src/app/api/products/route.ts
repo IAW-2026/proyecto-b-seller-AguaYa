@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { validateApiKey } from '@/lib/auth'
+
 import { validateProductFilters } from '@/lib/validation'
 import { toPublicProducts } from '@/lib/products'
 import type { Prisma } from '@prisma/client'

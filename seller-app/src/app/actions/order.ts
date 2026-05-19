@@ -2,7 +2,7 @@
  * order.ts — Server actions de gestión de órdenes del vendedor.
  *
  * Funciones:
- *   getVendorOrders()          → Retorna todas las órdenes del vendedor autenticado (cacheadas)
+ *   getVendorOrders()          → Retorna todas las órdenes del vendedor autenticado
  *   updateOrderStatus()        → Cambia el estado de una orden (con validación de transición)
  *   confirmOrderForDelivery()  → Marca como READY + notifica a DeliveryApp y BuyerApp
  *
@@ -12,25 +12,24 @@
 
 'use server'
 
+import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
-import { getVendorContext } from '@/lib/vendor-context'
-import { getCachedVendorOrders } from '@/lib/cache'
-import { notifyExternalService } from '@/lib/external-api'
-import { measure } from '@/lib/perf'
 import { revalidatePath, revalidateTag } from 'next/cache'
+import { getVendorOrders as getCachedVendorOrders } from '@/lib/queries'
+import { notifyExternalService } from '@/lib/external-api'
 import { OrderStatus } from '@prisma/client'
 
 async function getAuthenticatedVendor() {
-  const { vendor } = await getVendorContext()
+  const { userId } = await auth()
 
-  if (!vendor) {
-    throw new Error('No autenticado')
-  }
+  if (!userId) throw new Error('No autenticado')
+
+  const vendor = await prisma.vendor.findUnique({ where: { userId } })
+
+  if (!vendor) throw new Error('No autenticado')
 
   return vendor
 }
-
-const ORDER_REVALIDATE_PATHS = ['/dashboard/orders', '/dashboard/overview']
 
 const allowedStatusTransitions: Record<OrderStatus, OrderStatus[]> = {
   PAID: ['READY'],
@@ -53,14 +52,12 @@ export async function getVendorOrders() {
 export async function updateOrderStatus(orderId: string, status: OrderStatus) {
   const vendor = await getAuthenticatedVendor()
 
-  const order = await measure(`prisma.order.findFirst id=${orderId}`, async () =>
-    prisma.order.findFirst({
-      where: {
-        id: orderId,
-        vendorId: vendor.id,
-      },
-    })
-  )
+  const order = await prisma.order.findFirst({
+    where: {
+      id: orderId,
+      vendorId: vendor.id,
+    },
+  })
 
   if (!order) {
     throw new Error('No se encontró la orden para este vendedor')
@@ -68,23 +65,22 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
 
   assertValidStatusTransition(order.status, status)
 
-  const updatedOrder = await measure(`prisma.order.update id=${orderId}`, async () =>
-    prisma.order.update({
-      where: { id: orderId },
-      data: {
-        status,
-      },
-      include: {
-        items: {
-          include: {
-            product: true,
-          },
+  const updatedOrder = await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      status,
+    },
+    include: {
+      items: {
+        include: {
+          product: true,
         },
       },
-    })
-  )
+    },
+  })
 
-  ORDER_REVALIDATE_PATHS.forEach((path) => revalidatePath(path))
+  revalidatePath('/dashboard/orders')
+  revalidatePath('/dashboard/overview')
   revalidateTag('orders', 'max')
   revalidateTag('overview', 'max')
 

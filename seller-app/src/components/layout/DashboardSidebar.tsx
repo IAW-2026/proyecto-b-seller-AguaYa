@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import LogoutButton from '../LogoutButton'
 
@@ -27,7 +26,8 @@ export default function DashboardSidebar({ vendorName, vendorImage }: { vendorNa
         className="flex items-center gap-3 rounded-xl px-3 py-2 transition hover:bg-slate-100"
       >
         {vendorImage ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={vendorImage}
             alt={vendorName}
             width={40}

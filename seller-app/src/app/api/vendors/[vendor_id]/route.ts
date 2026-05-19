@@ -12,6 +12,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { validateApiKey } from '@/lib/auth'
+
 import { toPublicVendor } from '@/lib/vendors'
 import type { VendorDetailResponse, ErrorResponse } from '@/lib/vendors'
 

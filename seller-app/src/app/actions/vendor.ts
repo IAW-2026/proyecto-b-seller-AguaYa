@@ -9,8 +9,8 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
-import { validateVendorInput } from '@/lib/validation'
 import { revalidatePath, revalidateTag } from 'next/cache'
+import { validateVendorInput } from '@/lib/validation'
 
 /**
  * Crea o actualiza el perfil del vendedor para el usuario autenticado.

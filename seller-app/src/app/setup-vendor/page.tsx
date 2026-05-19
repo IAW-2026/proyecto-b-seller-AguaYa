@@ -1,23 +1,17 @@
-/**
- * This is the page where vendors can set up their store for the first time. It checks if the user is authenticated and if they already have a vendor profile. If not, it renders a form to create a new vendor profile.
- */
-
-import React from 'react'
+import React, { Suspense } from 'react'
 import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/prisma'
+import { getVendorByUserId } from '@/lib/queries'
 import { redirect } from 'next/navigation'
 import VendorForm from '@/components/VendorForm'
 
-export default async function SetupVendorPage() {
+async function SetupVendorContent() {
   const { userId } = await auth()
 
   if (!userId) {
     redirect('/sign-in')
   }
 
-  const vendor = await prisma.vendor.findUnique({
-    where: { userId },
-  })
+  const vendor = await getVendorByUserId(userId)
 
   if (vendor) {
     redirect('/dashboard/overview')
@@ -35,5 +29,13 @@ export default async function SetupVendorPage() {
         <VendorForm redirectTo="/dashboard/overview" />
       </div>
     </div>
+  )
+}
+
+export default function SetupVendorPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-slate-500">Cargando...</div>}>
+      <SetupVendorContent />
+    </Suspense>
   )
 }

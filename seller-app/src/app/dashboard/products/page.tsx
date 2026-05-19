@@ -1,14 +1,16 @@
-import React from 'react'
-import Image from 'next/image'
+import React, { Suspense } from 'react'
 import Link from 'next/link'
-import { getVendorContext } from '@/lib/vendor-context'
-import { getCachedVendorProducts } from '@/lib/cache'
+import { auth } from '@clerk/nextjs/server'
+import { getVendorByUserId, getVendorProducts } from '@/lib/queries'
 
-export default async function ProductsPage() {
-  const { vendor } = await getVendorContext()
+async function ProductsContent() {
+  const { userId } = await auth()
+  if (!userId) return null
+
+  const vendor = await getVendorByUserId(userId)
   if (!vendor) return null
 
-  const productsVendor = await getCachedVendorProducts(vendor.id)
+  const productsVendor = await getVendorProducts(vendor.id)
 
   if (!productsVendor) {
     return (
@@ -40,7 +42,8 @@ export default async function ProductsPage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   {p.image ? (
-                    <Image
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
                       src={p.image}
                       alt={p.name}
                       width={64}
@@ -63,5 +66,13 @@ export default async function ProductsPage() {
         </ul>
       )}
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando productos...</div>}>
+      <ProductsContent />
+    </Suspense>
   )
 }

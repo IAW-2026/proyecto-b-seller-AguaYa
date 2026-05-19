@@ -1,15 +1,15 @@
-import React from 'react'
-import { getVendorContext } from '@/lib/vendor-context'
-import { getCachedOverview } from '@/lib/cache'
+import React, { Suspense } from 'react'
+import { auth } from '@clerk/nextjs/server'
+import { getVendorOverview } from '@/lib/queries'
 
-export default async function OverviewPage() {
-  const { vendor } = await getVendorContext()
+async function OverviewContent() {
+  const { userId } = await auth()
 
-  if (!vendor) {
+  if (!userId) {
     return null
   }
 
-  const overview = await getCachedOverview(vendor.id)
+  const overview = await getVendorOverview(userId)
 
   if (!overview) {
     return (
@@ -23,7 +23,6 @@ export default async function OverviewPage() {
 
   return (
     <div className="space-y-6">
-
       <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
         <strong className="text-lg text-slate-950">{overview.name}</strong>
         <div className="mt-3 text-sm text-slate-600">{overview.address}</div>
@@ -82,5 +81,13 @@ export default async function OverviewPage() {
         </section>
       </div>
     </div>
+  )
+}
+
+export default function OverviewPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando...</div>}>
+      <OverviewContent />
+    </Suspense>
   )
 }
