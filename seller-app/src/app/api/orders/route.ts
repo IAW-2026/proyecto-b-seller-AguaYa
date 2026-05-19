@@ -17,7 +17,7 @@ import { validateApiKey } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { validateCreateOrderInput } from '@/lib/validation'
 
-const TOTAL_TOLERANCE = 1 // Tolerancia por redondeo de decimales
+const TOTAL_TOLERANCE = 0.1 // Tolerancia por redondeo de decimales
 
 /**
  * Calcula el total basado en productos y cantidades.

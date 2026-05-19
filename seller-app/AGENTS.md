@@ -89,7 +89,7 @@ El sistema está compuesto por **cinco aplicaciones independientes**, cada una c
 ### FeedbackApp
 | Entidad | Atributos clave |
 |---------|----------------|
-| Valoración | `id_valoracion` (PK), `id_pedido` (FK), estrellas, descripción, foto, fecha |
+| Valoración | `id_valoracion` (PK), `id_pedido` (FK), estrellas, descripción, fecha |
 | FAQ | `id_faq` (PK), pregunta, respuesta, categoría |
 | Admin_Feedback | `id_admin` (PK), `id_usuario` (FK), nombre |
 

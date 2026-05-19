@@ -1,6 +1,15 @@
 import React, { Suspense } from 'react'
 import { auth } from '@clerk/nextjs/server'
-import { getVendorOverview } from '@/lib/queries'
+import { getVendorOverview, getVendorReviews } from '@/lib/queries'
+import type { Review } from '@/lib/queries'
+
+function ReviewStars({ rating }: { rating: number }) {
+  return (
+    <span className="text-amber-400" aria-label={`${rating} de 5 estrellas`}>
+      {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
+    </span>
+  )
+}
 
 async function OverviewContent() {
   const { userId } = await auth()
@@ -9,7 +18,10 @@ async function OverviewContent() {
     return null
   }
 
-  const overview = await getVendorOverview(userId)
+  const [overview, reviews] = await Promise.all([
+    getVendorOverview(userId),
+    getVendorReviews(userId),
+  ])
 
   if (!overview) {
     return (
@@ -47,19 +59,31 @@ async function OverviewContent() {
 
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
-          <h2 className="text-xl font-semibold text-slate-950">Productos recientes</h2>
-          {overview.products.length > 0 ? (
+          <h2 className="text-xl font-semibold text-slate-950">Reseñas recientes</h2>
+          {reviews.length > 0 ? (
             <ul className="mt-5 space-y-4">
-              {overview.products.map((product) => (
-                <li key={product.id} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
-                  <strong className="block text-slate-950">{product.name}</strong>
-                  <div className="mt-2 text-sm text-slate-600">Precio: ${product.price}</div>
-                  <div className="text-sm text-slate-600">Stock: {product.stock}</div>
+              {reviews.map((review) => (
+                <li key={review.orderId} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-slate-950">Orden {review.orderId.slice(0, 8)}</strong>
+                    <ReviewStars rating={review.rating} />
+                  </div>
+                  <div className="mt-2 text-sm text-slate-600">
+                    {review.buyerName ? <span>Comprador: {review.buyerName}</span> : null}
+                  </div>
+                  {review.products.length > 0 ? (
+                    <div className="mt-1 text-sm text-slate-600">
+                      Producto: {review.products.join(', ')}
+                    </div>
+                  ) : null}
+                  {review.description ? (
+                    <p className="mt-2 text-sm text-slate-700 italic">&ldquo;{review.description}&rdquo;</p>
+                  ) : null}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-4 text-slate-600">No hay productos cargados.</p>
+            <p className="mt-4 text-slate-600">No hay reseñas todavía.</p>
           )}
         </section>
 

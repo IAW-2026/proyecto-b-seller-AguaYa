@@ -2,8 +2,8 @@
 @baseUrl = http://localhost:3000
 @apiKey = aguaya-payments-secret-key-123
 
-@vendorId = cmp8s3pnr0000isliqogt68m6
-@productId = cmp8yb6ub0006pslik7nb0t0c
+@vendorId = cmpc2gjz90000ikli1cg4gmsj
+@productId = cmpc2lgbk0002ikliyzwtlixv
 
 @vendorId2 = cmp21j4xu0001zwli69agxgle
 
@@ -19,12 +19,12 @@ Content-Type: application/json
 {
   "externalId": "buyer-order-{{$timestamp}}",
   "vendorId": "{{vendorId}}",
-  "buyerId": "Don Comprador3",
-  "address": "avenida siempre viva 123 depto 81",
+  "buyerId": "Don Comprador 3",
+  "address": "avenida siempre viva 123 depto 12",
   "items": [
     {"productId": "{{productId}}", "quantity": 2}
   ],
-  "total": 6000
+  "total": 2000
 }
 
 ### Test 6: POST sin API Key (401)

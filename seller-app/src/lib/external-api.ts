@@ -32,6 +32,7 @@ interface NotifyOptions {
 const SERVICE_MAP = {
   delivery: { urlEnv: 'DELIVERY_APP_URL', keyEnv: 'DELIVERY_API_KEY' },
   buyer: { urlEnv: 'BUYER_APP_URL', keyEnv: 'BUYER_SERVICE_KEY' },
+  feedback: { urlEnv: 'FEEDBACK_APP_URL', keyEnv: 'FEEDBACK_API_KEY' },
 } as const
 
 /**
@@ -48,7 +49,7 @@ export function getServiceConfig(service: ExternalService): ServiceConfig | null
 /**
  * Realiza un HTTP call a un servicio externo con autenticación automática.
  *
- * @param service  - Nombre del servicio ('delivery' | 'buyer')
+ * @param service  - Nombre del servicio ('delivery' | 'buyer' | 'feedback')
  * @param path     - Ruta del endpoint (ej: '/api/ready_orders/123')
  * @param method   - Método HTTP (PUT, PATCH, POST, etc.)
  * @param body     - Payload a enviar (objeto, se serializa a JSON)

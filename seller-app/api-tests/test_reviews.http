@@ -1,0 +1,62 @@
+### Variables
+@baseUrl = http://localhost:3000
+@apiKey = buyer-secret-key-12345
+
+@vendorId = cmp21khrp0000tglit0bxxqq3
+
+### =====================
+### TESTS DE RESEÑAS (FeedbackApp)
+### =====================
+### Estos tests documentan el contrato que FeedbackApp debe implementar.
+### SellerApp consume GET /api/reviews?vendor_id=<id> desde FeedbackApp.
+### Configurar FEEDBACK_APP_URL en .env para activar la integración.
+
+### Test 1: GET reseñas de un vendedor (happy path)
+GET {{baseUrl}}/api/reviews?vendor_id={{vendorId}}
+X-API-Key: {{apiKey}}
+
+### Test 2: GET reseñas de un vendedor sin reseñas (200, array vacío)
+GET {{baseUrl}}/api/reviews?vendor_id=vendor-sin-resenas
+X-API-Key: {{apiKey}}
+
+### Test 3: GET reseñas de un vendedor que no existe (200, array vacío)
+GET {{baseUrl}}/api/reviews?vendor_id=vendor-inexistente
+X-API-Key: {{apiKey}}
+
+### Test 4: GET sin API Key (401)
+GET {{baseUrl}}/api/reviews?vendor_id={{vendorId}}
+
+### Test 5: GET con API Key incorrecta (401)
+GET {{baseUrl}}/api/reviews?vendor_id={{vendorId}}
+X-API-Key: INVALIDA
+
+### Test 6: GET sin vendor_id (400)
+GET {{baseUrl}}/api/reviews
+X-API-Key: {{apiKey}}
+
+### =====================
+### FORMATO DE RESPUESTA ESPERADO
+### =====================
+### GET /api/reviews?vendor_id=<vendorId>
+###
+### Response 200:
+### {
+###   "reviews": [
+###     {
+###       "orderId": "clx...",
+###       "buyerName": "Juan Pérez",
+###       "rating": 4,
+###       "description": "Muy buen servicio, llegó rápido",
+###       "createdAt": "2024-01-15T10:30:00Z"
+###     }
+###   ]
+### }
+###
+### Response 200 (sin reseñas):
+### { "reviews": [] }
+###
+### Response 401 (sin API Key o inválida):
+### { "error": "Unauthorized" }
+###
+### Response 400 (falta vendor_id):
+### { "error": "vendor_id is required" }
