@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function getVendorByUserId(userId: string) {
   'use cache'
-  cacheLife({ revalidate: 60 })
+  cacheLife({ revalidate: 300, stale: 600 })
   cacheTag('vendor')
   return prisma.vendor.findUnique({
     where: { userId },
@@ -22,7 +22,7 @@ export async function getVendorByUserId(userId: string) {
 
 export async function getVendorOverview(userId: string) {
   'use cache'
-  cacheLife({ revalidate: 15 })
+  cacheLife({ revalidate: 15, stale: 300 })
   cacheTag('overview')
   return prisma.vendor.findUnique({
     where: { userId },
@@ -36,7 +36,7 @@ export async function getVendorOverview(userId: string) {
 
 export async function getVendorProducts(vendorId: string) {
   'use cache'
-  cacheLife({ revalidate: 10 })
+  cacheLife({ revalidate: 300, stale: 600 })
   cacheTag('products')
   return prisma.vendor.findUnique({
     where: { id: vendorId },
@@ -51,7 +51,7 @@ export async function getVendorProducts(vendorId: string) {
 
 export async function getVendorOrders(vendorId: string) {
   'use cache'
-  cacheLife({ revalidate: 10 })
+  cacheLife({ revalidate: 10, stale: 60 })
   cacheTag('orders')
   return prisma.order.findMany({
     where: { vendorId },
@@ -64,7 +64,7 @@ export async function getVendorOrders(vendorId: string) {
 
 export async function getProductById(productId: string, vendorId: string) {
   'use cache'
-  cacheLife({ revalidate: 10 })
+  cacheLife({ revalidate: 300, stale: 600 })
   cacheTag('products')
   return prisma.product.findFirst({
     where: { id: productId, vendorId, deletedAt: null },
