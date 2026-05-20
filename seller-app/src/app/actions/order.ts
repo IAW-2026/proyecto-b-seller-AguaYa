@@ -6,8 +6,8 @@
  *   updateOrderStatus()        → Cambia el estado de una orden (con validación de transición)
  *   confirmOrderForDelivery()  → Marca como READY + notifica a DeliveryApp y BuyerApp
  *
- * Las notificaciones externas usan un patrón Outbox: si el servicio destino está caído,
- * se encola el intento para reintentar automáticamente cada 60s.
+ * Las notificaciones externas son fire-and-forget: si el servicio destino está caído,
+ * el error solo se loguea y no bloquea la confirmación local.
  */
 
 'use server'
@@ -94,7 +94,6 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
  *   1. Actualiza el estado de la orden local a READY
  *   2. Notifica a DeliveryApp (PUT /api/ready_orders/:id)
  *   3. Notifica a BuyerApp (PATCH /api/orders/:id/status)
- *   4. Si alguna notificación falla, se encola en Outbox para reintentar después
  *
  * Las notificaciones son fire-and-forget: un error externo no bloquea la confirmación local.
  */
@@ -113,14 +112,8 @@ export async function confirmOrderForDelivery(orderId: string) {
   }
 
   await Promise.allSettled([
-    notifyExternalService('delivery', `/api/ready_orders/${orderId}`, 'PUT', body, {
-      enqueueOnFailure: true,
-      orderId,
-    }),
-    notifyExternalService('buyer', `/api/orders/${orderId}/status`, 'PATCH', body, {
-      enqueueOnFailure: true,
-      orderId,
-    }),
+    notifyExternalService('delivery', `/api/ready_orders/${orderId}`, 'PUT', body),
+    notifyExternalService('buyer', `/api/orders/${orderId}/status`, 'PATCH', body),
   ])
 
   return updatedOrder

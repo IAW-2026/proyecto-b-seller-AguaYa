@@ -2,19 +2,17 @@
  * external-api.ts — Cliente HTTP genérico para comunicación con servicios externos.
  *
  * Propósito:
- *   Centralizar las llamadas HTTP a otras apps del ecosistema (DeliveryApp, BuyerApp, etc.)
- *   con manejo automático de autenticación y fallback opcional a Outbox para reintentos.
+ *   Centralizar las llamadas HTTP a otras apps del ecosistema (DeliveryApp, BuyerApp, FeedbackApp)
+ *   con manejo automático de autenticación.
  *
  * Funciones:
  *   getServiceConfig()      → Obtiene URL y API key desde env vars según el nombre del servicio
- *   notifyExternalService() → Realiza un HTTP call con auth + fallback a Outbox
+ *   notifyExternalService() → Realiza un HTTP call con auth (fire & forget, no reintenta)
  *
  * Uso:
- *   notifyExternalService('delivery', '/api/ready_orders/123', 'PUT', { ... }, { enqueueOnFailure: true, orderId: '123' })
+ *   notifyExternalService('delivery', '/api/ready_orders/123', 'PUT', { ... })
  *   notifyExternalService('buyer', '/api/orders/123/status', 'PATCH', { ... })
  */
-
-import { enqueueNotification } from '@/lib/outbox'
 
 export type ExternalService = keyof typeof SERVICE_MAP
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -22,11 +20,6 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 export interface ServiceConfig {
   baseUrl: string
   apiKey: string
-}
-
-interface NotifyOptions {
-  enqueueOnFailure?: boolean
-  orderId?: string
 }
 
 const SERVICE_MAP = {
@@ -53,17 +46,15 @@ export function getServiceConfig(service: ExternalService): ServiceConfig | null
  * @param path     - Ruta del endpoint (ej: '/api/ready_orders/123')
  * @param method   - Método HTTP (PUT, PATCH, POST, etc.)
  * @param body     - Payload a enviar (objeto, se serializa a JSON)
- * @param options  - Opcional: enqueueOnFailure para encolar en Outbox si falla
  *
  * Si la URL no está configurada, skipea silenciosamente.
- * Si falla y enqueueOnFailure está activo, persiste en Outbox para reintento.
+ * Si falla, solo loguea el error — no reintenta.
  */
 export async function notifyExternalService(
   service: ExternalService,
   path: string,
   method: HttpMethod,
   body: Record<string, unknown>,
-  options?: NotifyOptions,
 ) {
   const config = getServiceConfig(service)
   if (!config) {
@@ -86,9 +77,5 @@ export async function notifyExternalService(
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Error desconocido'
     console.warn(`[external-api] Falló ${method} ${url}: ${errorMsg}`)
-
-    if (options?.enqueueOnFailure && options?.orderId) {
-      await enqueueNotification(options.orderId, service, method, url, JSON.stringify(body))
-    }
   }
 }
