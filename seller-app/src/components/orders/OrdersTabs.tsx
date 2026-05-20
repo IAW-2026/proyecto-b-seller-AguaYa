@@ -1,6 +1,6 @@
 'use client'
 
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
 import ConfirmOrderDialog from '@/components/orders/ConfirmOrderDialog'
 import { Package, CheckCircle } from 'lucide-react'
 import type { Order, OrderItem, OrderStatus } from '@prisma/client'
@@ -110,15 +110,7 @@ export default function OrdersTabs({
   paidOrders: OrderWithItems[]
   readyOrders: OrderWithItems[]
 }) {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const activeTab: TabId = (searchParams.get('tab') as TabId) || 'confirm'
-
-  const setTab = (tab: TabId) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('tab', tab)
-    router.replace(`/dashboard/orders?${params.toString()}`, { scroll: false })
-  }
+  const [activeTab, setActiveTab] = useState<TabId>('confirm')
 
   const currentOrders = activeTab === 'confirm' ? paidOrders : readyOrders
   const showConfirmButton = activeTab === 'confirm'
@@ -133,7 +125,7 @@ export default function OrdersTabs({
             <button
               key={tab.id}
               type="button"
-              onClick={() => setTab(tab.id)}
+              onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-white text-gray-900 shadow-sm'
