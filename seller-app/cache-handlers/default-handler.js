@@ -4,33 +4,43 @@
  * Reemplaza el handler default en memoria para que el cache de 'use cache'
  * sea compartido entre todas las instancias serverless de Vercel.
  *
- * Env vars requeridas:
+ * Env vars requeridas (inyectadas por Vercel al instalar KV Storage):
  *   CACHE_STORAGE_KV_REST_API_URL
  *   CACHE_STORAGE_KV_REST_API_TOKEN
  *
- * Estas variables las inyecta Vercel automáticamente al instalar el add-on KV Storage.
  * Para desarrollo local, agregarlas a .env con los mismos nombres.
  */
 
 const { Redis } = require('@upstash/redis')
 
-const kv = new Redis({
-  url: process.env.CACHE_STORAGE_KV_REST_API_URL,
-  token: process.env.CACHE_STORAGE_KV_REST_API_TOKEN,
-})
+let kv = null
+
+function getRedis() {
+  if (kv) return kv
+
+  const url = process.env.CACHE_STORAGE_KV_REST_API_URL
+  const token = process.env.CACHE_STORAGE_KV_REST_API_TOKEN
+
+  if (!url || !token) {
+    console.log('[cache] Redis no configurado — usar handler default en memoria')
+    return null
+  }
+
+  kv = new Redis({ url, token })
+  console.log('[cache] Redis conectado a', url.replace(/\/\/.*@/, '//***@'))
+  return kv
+}
 
 // Cache local de timestamps de tags para getExpiration()
-// Se refresca via refreshTags() antes de cada request
 let localTagTimestamps = null
 
 module.exports = {
-  /**
-   * Recupera una entrada de cache desde Upstash.
-   * Si no existe o expiró según revalidate, retorna undefined (cache miss).
-   */
   async get(cacheKey, softTags) {
+    const redis = getRedis()
+    if (!redis) return undefined
+
     try {
-      const stored = await kv.get(cacheKey)
+      const stored = await redis.get(cacheKey)
       if (stored == null) {
         console.log(`[cache] MISS ${cacheKey}`)
         return undefined
@@ -39,7 +49,6 @@ module.exports = {
       const data = typeof stored === 'string' ? JSON.parse(stored) : stored
       console.log(`[cache] HIT  ${cacheKey} (tags: ${(data.tags || []).join(',') || 'none'})`)
 
-      // Reconstruir el ReadableStream desde el buffer base64
       const buffer = Buffer.from(data.value, 'base64')
 
       return {
@@ -61,11 +70,10 @@ module.exports = {
     }
   },
 
-  /**
-   * Almacena una entrada en Upstash con TTL = expire.
-   * Lee el ReadableStream, lo serializa a base64, y lo guarda como JSON.
-   */
   async set(cacheKey, pendingEntry) {
+    const redis = getRedis()
+    if (!redis) return
+
     try {
       const entry = await pendingEntry
       console.log(`[cache] SET  ${cacheKey} (ttl: ${entry.expire}s, tags: ${(entry.tags || []).join(',') || 'none'})`)
@@ -81,8 +89,7 @@ module.exports = {
 
       const raw = Buffer.concat(chunks.map((c) => Buffer.from(c))).toString('base64')
 
-      // Usar entry.expire como TTL de Redis (segundos)
-      await kv.setex(
+      await redis.setex(
         cacheKey,
         entry.expire || 86400,
         JSON.stringify({
@@ -95,48 +102,43 @@ module.exports = {
         }),
       )
     } catch (err) {
-      console.error('[cache-handler] Error en set():', err)
+      console.error('[cache] Error en set():', err)
     }
   },
 
-  /**
-   * Sincroniza los timestamps de invalidación de tags desde Upstash.
-   * Se llama antes de cada request para coordinar revalidateTag() entre instancias.
-   */
   async refreshTags() {
+    const redis = getRedis()
+    if (!redis) return
+
     try {
-      const tagKeys = await kv.smembers('revalidated-tags')
+      const tagKeys = await redis.smembers('revalidated-tags')
       if (!tagKeys || tagKeys.length === 0) return
 
       const entries = await Promise.all(
         tagKeys.map(async (tag) => {
-          const ts = await kv.get(`tag:${tag}`)
+          const ts = await redis.get(`tag:${tag}`)
           return [tag, ts ? Number(ts) : 0]
         }),
       )
 
       localTagTimestamps = new Map(entries)
+      console.log(`[cache] refreshTags: ${tagKeys.length} tags sincronizados`)
     } catch (err) {
-      console.error('[cache-handler] Error en refreshTags():', err)
+      console.error('[cache] Error en refreshTags():', err)
       localTagTimestamps = new Map()
     }
   },
 
-  /**
-   * Retorna el timestamp de revalidación más reciente entre los tags dados.
-   * 0 = ningún tag fue revalidado nunca.
-   */
   async getExpiration(tags) {
     if (!localTagTimestamps || tags.length === 0) return 0
     const timestamps = tags.map((tag) => localTagTimestamps.get(tag) || 0)
     return Math.max(...timestamps, 0)
   },
 
-  /**
-   * Marca tags como invalidados con el timestamp actual.
-   * Se llama cuando se ejecuta revalidateTag() en una server action.
-   */
   async updateTags(tags, durations) {
+    const redis = getRedis()
+    if (!redis) return
+
     try {
       const now = Date.now()
       console.log(`[cache] TAG invalidate ${tags.join(', ')}`)
@@ -144,16 +146,16 @@ module.exports = {
       if (!localTagTimestamps) localTagTimestamps = new Map()
 
       if (tags.length > 0) {
-        await kv.sadd('revalidated-tags', ...tags)
+        await redis.sadd('revalidated-tags', ...tags)
         await Promise.all(
           tags.map((tag) => {
             localTagTimestamps.set(tag, now)
-            return kv.set(`tag:${tag}`, String(now))
+            return redis.set(`tag:${tag}`, String(now))
           }),
         )
       }
     } catch (err) {
-      console.error('[cache-handler] Error en updateTags():', err)
+      console.error('[cache] Error en updateTags():', err)
     }
   },
 }
