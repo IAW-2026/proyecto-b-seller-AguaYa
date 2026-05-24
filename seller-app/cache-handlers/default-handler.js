@@ -31,9 +31,13 @@ module.exports = {
   async get(cacheKey, softTags) {
     try {
       const stored = await kv.get(cacheKey)
-      if (stored == null) return undefined
+      if (stored == null) {
+        console.log(`[cache] MISS ${cacheKey}`)
+        return undefined
+      }
 
       const data = typeof stored === 'string' ? JSON.parse(stored) : stored
+      console.log(`[cache] HIT  ${cacheKey} (tags: ${(data.tags || []).join(',') || 'none'})`)
 
       // Reconstruir el ReadableStream desde el buffer base64
       const buffer = Buffer.from(data.value, 'base64')
@@ -52,7 +56,7 @@ module.exports = {
         revalidate: data.revalidate,
       }
     } catch (err) {
-      console.error('[cache-handler] Error en get():', err)
+      console.error('[cache] Error en get():', err)
       return undefined
     }
   },
@@ -64,6 +68,8 @@ module.exports = {
   async set(cacheKey, pendingEntry) {
     try {
       const entry = await pendingEntry
+      console.log(`[cache] SET  ${cacheKey} (ttl: ${entry.expire}s, tags: ${(entry.tags || []).join(',') || 'none'})`)
+
       const reader = entry.value.getReader()
       const chunks = []
 
@@ -133,6 +139,7 @@ module.exports = {
   async updateTags(tags, durations) {
     try {
       const now = Date.now()
+      console.log(`[cache] TAG invalidate ${tags.join(', ')}`)
 
       if (!localTagTimestamps) localTagTimestamps = new Map()
 
