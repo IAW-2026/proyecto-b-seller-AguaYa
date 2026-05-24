@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from 'next/server'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { validateApiKey } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { validateCreateOrderInput } from '@/lib/validation'
@@ -189,9 +189,6 @@ export async function POST(request: Request) {
       // 10. Invalidar cache
       revalidatePath('/dashboard/orders')
       revalidatePath('/dashboard/overview')
-      revalidateTag('orders', 'max')
-      revalidateTag('overview', 'max')
-      revalidateTag('products', 'max')
 
       // 11. Respuesta exitosa
       console.log(
