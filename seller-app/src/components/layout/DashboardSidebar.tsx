@@ -1,8 +1,19 @@
 import React from 'react'
 import Link from 'next/link'
+import { Package, ShoppingCart, LayoutDashboard, Users } from 'lucide-react'
 import LogoutButton from '../LogoutButton'
 
-export default function DashboardSidebar({ vendorName, vendorImage }: { vendorName: string; vendorImage?: string | null }) {
+export default function DashboardSidebar({
+  vendorName,
+  vendorImage,
+  roles,
+}: {
+  vendorName: string
+  vendorImage?: string | null
+  roles?: string[]
+}) {
+  const isAdmin = roles?.includes('admin_seller')
+
   return (
     <aside className="hidden w-72 shrink-0 border-r border-slate-200/80 bg-white/75 px-4 py-6 backdrop-blur xl:block">
       <div className="mb-6 rounded-2xl bg-slate-900 px-4 py-5 text-white shadow-sm">
@@ -13,9 +24,32 @@ export default function DashboardSidebar({ vendorName, vendorImage }: { vendorNa
 
       <nav aria-label="Navegación principal">
         <ul className="space-y-1 text-sm font-medium">
-          <li><Link className="block rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/overview">Overview</Link></li>
-          <li><Link className="block rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/products">Products</Link></li>
-          <li><Link className="block rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/orders">Orders</Link></li>
+          {isAdmin && (
+            <li>
+              <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/admin/vendors">
+                <Users className="h-4 w-4" />
+                Vendedores
+              </Link>
+            </li>
+          )}
+          <li>
+            <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/overview">
+              <LayoutDashboard className="h-4 w-4" />
+              Overview
+            </Link>
+          </li>
+          <li>
+            <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/products">
+              <Package className="h-4 w-4" />
+              Products
+            </Link>
+          </li>
+          <li>
+            <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/orders">
+              <ShoppingCart className="h-4 w-4" />
+              Orders
+            </Link>
+          </li>
         </ul>
       </nav>
 

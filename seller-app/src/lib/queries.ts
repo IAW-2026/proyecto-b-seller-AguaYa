@@ -100,3 +100,16 @@ export async function getVendorReviews(userId: string): Promise<Review[]> {
     return []
   }
 }
+
+export async function listAllVendors() {
+  return prisma.vendor.findMany({
+    where: { deletedAt: null },
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function getVendorById(vendorId: string) {
+  return prisma.vendor.findFirst({
+    where: { id: vendorId, deletedAt: null },
+  })
+}
