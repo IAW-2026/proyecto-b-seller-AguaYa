@@ -36,8 +36,6 @@ export async function POST(req: Request) {
 
   if (evt.type === 'user.created') {
     const { id, public_metadata } = evt.data
-    console.log(`[webhook] user.created: ${id}, metadata:`, public_metadata)
-
     const metadata = public_metadata as Record<string, unknown> | undefined
     const roles: string[] = Array.isArray(metadata?.roles) ? metadata.roles : []
 
@@ -50,13 +48,9 @@ export async function POST(req: Request) {
             roles: [...roles, 'seller'],
           },
         })
-        console.log(`[webhook] assigned role seller to user ${id}`)
-      } catch (error) {
-        console.error(`[webhook] failed to update user ${id}:`, error)
+      } catch {
         return new Response('Failed to update user', { status: 500 })
       }
-    } else {
-      console.log(`[webhook] user ${id} already has seller role`)
     }
   }
 
