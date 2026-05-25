@@ -9,7 +9,7 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { validateVendorInput } from '@/lib/validation'
 
 /**
@@ -55,9 +55,6 @@ export async function createOrUpdateVendor(data: {
 
   revalidatePath('/dashboard/overview')
   revalidatePath('/dashboard/products')
-  revalidateTag('vendor', 'max')
-  revalidateTag('overview', 'max')
-  revalidateTag('products', 'max')
 
   return vendor
 }

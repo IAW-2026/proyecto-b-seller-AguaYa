@@ -9,7 +9,7 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { validateProductInput } from '../../lib/validation'
 
 async function getAuthenticatedVendor() {
@@ -47,8 +47,6 @@ export async function createProduct(data: {
 
   revalidatePath('/dashboard/products')
   revalidatePath('/dashboard/overview')
-  revalidateTag('products', 'max')
-  revalidateTag('overview', 'max')
 
   return { success: true, product }
 }
@@ -89,8 +87,6 @@ export async function updateProduct(data: {
 
   revalidatePath('/dashboard/products')
   revalidatePath('/dashboard/overview')
-  revalidateTag('products', 'max')
-  revalidateTag('overview', 'max')
 
   return { success: true, product: updatedProduct }
 }
@@ -121,8 +117,6 @@ export async function deleteProduct(productId: string) {
 
   revalidatePath('/dashboard/products')
   revalidatePath('/dashboard/overview')
-  revalidateTag('products', 'max')
-  revalidateTag('overview', 'max')
 
   return { success: true, product: deletedProduct }
 }

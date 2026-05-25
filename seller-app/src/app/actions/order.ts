@@ -14,7 +14,7 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { getVendorOrders as getCachedVendorOrders } from '@/lib/queries'
 import { notifyExternalService } from '@/lib/external-api'
 import { OrderStatus } from '@prisma/client'
@@ -81,8 +81,6 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
 
   revalidatePath('/dashboard/orders')
   revalidatePath('/dashboard/overview')
-  revalidateTag('orders', 'max')
-  revalidateTag('overview', 'max')
 
   return updatedOrder
 }
