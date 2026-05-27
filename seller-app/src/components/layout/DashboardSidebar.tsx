@@ -32,12 +32,14 @@ export default function DashboardSidebar({
               </Link>
             </li>
           )}
-          <li>
-            <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/overview">
-              <LayoutDashboard className="h-4 w-4" />
-              Overview
-            </Link>
-          </li>
+          {!isAdmin && (
+            <li>
+              <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/overview">
+                <LayoutDashboard className="h-4 w-4" />
+                Overview
+              </Link>
+            </li>
+          )}
           <li>
             <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/products">
               <Package className="h-4 w-4" />
