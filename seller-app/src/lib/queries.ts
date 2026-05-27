@@ -50,12 +50,35 @@ export async function getVendorProducts(vendorId: string) {
 
 export async function getVendorOrders(vendorId: string) {
   return prisma.order.findMany({
-    where: { vendorId },
+    where: { vendorId, deletedAt: null },
     include: {
       items: { include: { product: true } },
     },
     orderBy: { createdAt: 'desc' },
   })
+}
+
+export async function getVendorOrdersByStatus(
+  vendorId: string,
+  status: 'PAID' | 'READY',
+  page: number = 1
+) {
+  const limit = 10
+  const skip = (page - 1) * limit
+  const where = { vendorId, status, deletedAt: null }
+
+  const [items, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: { items: { include: { product: true } } },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.order.count({ where }),
+  ])
+
+  return { items: items as any[], total, pageCount: Math.ceil(total / limit) }
 }
 
 export async function getProductById(productId: string, vendorId: string) {
@@ -112,4 +135,43 @@ export async function getVendorById(vendorId: string) {
   return prisma.vendor.findFirst({
     where: { id: vendorId, deletedAt: null },
   })
+}
+
+export async function listAllProductsPaginated(page: number = 1) {
+  const limit = 10
+  const skip = (page - 1) * limit
+
+  const [items, total] = await Promise.all([
+    prisma.product.findMany({
+      where: { deletedAt: null },
+      include: { vendor: { select: { name: true, id: true } } },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.product.count({ where: { deletedAt: null } }),
+  ])
+
+  return { items, total, pageCount: Math.ceil(total / limit) }
+}
+
+export async function listAllOrdersPaginated(page: number = 1) {
+  const limit = 10
+  const skip = (page - 1) * limit
+
+  const [items, total] = await Promise.all([
+    prisma.order.findMany({
+      where: { deletedAt: null },
+      include: {
+        vendor: { select: { name: true, id: true } },
+        items: { include: { product: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.order.count({ where: { deletedAt: null } }),
+  ])
+
+  return { items, total, pageCount: Math.ceil(total / limit) }
 }

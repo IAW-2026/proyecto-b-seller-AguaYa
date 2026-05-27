@@ -25,12 +25,26 @@ export default function DashboardSidebar({
       <nav aria-label="Navegación principal">
         <ul className="space-y-1 text-sm font-medium">
           {isAdmin && (
-            <li>
-              <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/admin/vendors">
-                <Users className="h-4 w-4" />
-                Vendedores
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/admin/vendors">
+                  <Users className="h-4 w-4" />
+                  Vendedores
+                </Link>
+              </li>
+              <li>
+                <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/admin/products">
+                  <Package className="h-4 w-4" />
+                  Productos
+                </Link>
+              </li>
+              <li>
+                <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/admin/orders">
+                  <ShoppingCart className="h-4 w-4" />
+                  Órdenes
+                </Link>
+              </li>
+            </>
           )}
           {!isAdmin && (
             <li>

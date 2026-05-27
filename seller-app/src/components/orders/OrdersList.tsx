@@ -1,23 +1,15 @@
-/**
- * OrdersList.tsx — Listado de órdenes del vendedor con tabs.
- *
- * Es un server component que obtiene órdenes cacheadas y las pasa
- * a OrdersTabs para la interacción con tabs.
- */
-
 import { auth } from '@clerk/nextjs/server'
-import { getVendorByUserId, getVendorOrders as getCachedVendorOrders } from '@/lib/queries'
+import { getVendorByUserId, getVendorOrdersByStatus } from '@/lib/queries'
 import OrdersTabs from '@/components/orders/OrdersTabs'
 import { Package } from 'lucide-react'
-import type { Order, OrderItem } from '@prisma/client'
 
-type OrderWithItems = Order & {
-  items: (OrderItem & {
-    product: any
-  })[]
-}
-
-export default async function OrdersList() {
+export default async function OrdersList({
+  paidPage = 1,
+  readyPage = 1,
+}: {
+  paidPage?: number
+  readyPage?: number
+}) {
   const { userId } = await auth()
   if (!userId) {
     return (
@@ -36,12 +28,17 @@ export default async function OrdersList() {
     )
   }
 
-  let orders: OrderWithItems[] = []
+  let paidResult: Awaited<ReturnType<typeof getVendorOrdersByStatus>> | null = null
+  let readyResult: Awaited<ReturnType<typeof getVendorOrdersByStatus>> | null = null
   let error: string | null = null
 
   try {
-    const result = await getCachedVendorOrders(vendor.id)
-    orders = result as OrderWithItems[]
+    const [pr, rr] = await Promise.all([
+      getVendorOrdersByStatus(vendor.id, 'PAID', paidPage),
+      getVendorOrdersByStatus(vendor.id, 'READY', readyPage),
+    ])
+    paidResult = pr
+    readyResult = rr
   } catch (err) {
     error = err instanceof Error ? err.message : 'Error al cargar órdenes'
   }
@@ -54,10 +51,7 @@ export default async function OrdersList() {
     )
   }
 
-  const paidOrders = orders.filter((o) => o.status === 'PAID')
-  const readyOrders = orders.filter((o) => o.status === 'READY')
-
-  if (orders.length === 0) {
+  if (!paidResult || !readyResult) {
     return (
       <div className="p-8 text-center text-gray-500 bg-white rounded-lg border border-gray-200">
         <Package className="mx-auto mb-4 h-12 w-12 text-gray-400" />
@@ -67,5 +61,14 @@ export default async function OrdersList() {
     )
   }
 
-  return <OrdersTabs paidOrders={paidOrders} readyOrders={readyOrders} />
+  return (
+    <OrdersTabs
+      paidOrders={paidResult.items as any[]}
+      paidPage={paidPage}
+      paidPageCount={paidResult.pageCount}
+      readyOrders={readyResult.items as any[]}
+      readyPage={readyPage}
+      readyPageCount={readyResult.pageCount}
+    />
+  )
 }

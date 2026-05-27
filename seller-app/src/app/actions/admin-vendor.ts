@@ -133,6 +133,20 @@ export async function updateOrderStatusAsAdmin(orderId: string, status: 'PAID' |
     data: { status },
   })
 
+  revalidatePath('/dashboard/admin/orders')
+  revalidatePath('/dashboard/admin/vendors')
+  return order
+}
+
+export async function deleteOrderAsAdmin(orderId: string) {
+  await requireAdmin()
+
+  const order = await prisma.order.update({
+    where: { id: orderId },
+    data: { deletedAt: new Date() },
+  })
+
+  revalidatePath('/dashboard/admin/orders')
   revalidatePath('/dashboard/admin/vendors')
   return order
 }
@@ -151,6 +165,7 @@ export async function createProductAsAdmin(
 
   const product = await prisma.product.create({ data: { ...data, vendorId } })
 
+  revalidatePath('/dashboard/admin/products')
   revalidatePath('/dashboard/admin/vendors')
   return product
 }
@@ -173,6 +188,7 @@ export async function updateProductAsAdmin(
     data,
   })
 
+  revalidatePath('/dashboard/admin/products')
   revalidatePath('/dashboard/admin/vendors')
   return product
 }
@@ -185,6 +201,7 @@ export async function deleteProductAsAdmin(vendorId: string, productId: string) 
     data: { deletedAt: new Date() },
   })
 
+  revalidatePath('/dashboard/admin/products')
   revalidatePath('/dashboard/admin/vendors')
   return product
 }

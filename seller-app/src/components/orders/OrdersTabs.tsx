@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import ConfirmOrderDialog from '@/components/orders/ConfirmOrderDialog'
+import Pagination from '@/components/Pagination'
 import { Package, CheckCircle } from 'lucide-react'
 import type { Order, OrderItem, OrderStatus } from '@prisma/client'
 
@@ -11,27 +13,14 @@ type OrderWithItems = Order & {
 
 type TabId = 'confirm' | 'ready'
 
-interface TabDef {
-  id: TabId
-  label: string
-}
-
-const TABS: TabDef[] = [
+const TABS: { id: TabId; label: string }[] = [
   { id: 'confirm', label: 'Para confirmar' },
   { id: 'ready', label: 'Listas para entregar' },
 ]
 
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon: any }> = {
-  PAID: {
-    label: 'Pagada',
-    color: 'bg-green-100 text-green-800',
-    icon: CheckCircle,
-  },
-  READY: {
-    label: 'Lista para entregar',
-    color: 'bg-blue-100 text-blue-800',
-    icon: Package,
-  },
+  PAID: { label: 'Pagada', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+  READY: { label: 'Lista para entregar', color: 'bg-blue-100 text-blue-800', icon: Package },
 }
 
 function OrderCard({ order, showConfirmButton }: { order: OrderWithItems; showConfirmButton: boolean }) {
@@ -52,7 +41,6 @@ function OrderCard({ order, showConfirmButton }: { order: OrderWithItems; showCo
             })}
           </p>
         </div>
-
         <div className={`px-3 py-1 rounded-full flex items-center gap-2 ${config.color}`}>
           <StatusIcon className="h-4 w-4" />
           <span className="text-sm font-medium">{config.label}</span>
@@ -105,21 +93,39 @@ function OrderCard({ order, showConfirmButton }: { order: OrderWithItems; showCo
 
 export default function OrdersTabs({
   paidOrders,
+  paidPage,
+  paidPageCount,
   readyOrders,
+  readyPage,
+  readyPageCount,
 }: {
   paidOrders: OrderWithItems[]
+  paidPage: number
+  paidPageCount: number
   readyOrders: OrderWithItems[]
+  readyPage: number
+  readyPageCount: number
 }) {
   const [activeTab, setActiveTab] = useState<TabId>('confirm')
+  const router = useRouter()
+  const pathname = usePathname()
 
   const currentOrders = activeTab === 'confirm' ? paidOrders : readyOrders
   const showConfirmButton = activeTab === 'confirm'
+
+  const currentPage = activeTab === 'confirm' ? paidPage : readyPage
+  const currentPageCount = activeTab === 'confirm' ? paidPageCount : readyPageCount
+
+  function handlePageChange(page: number) {
+    const param = activeTab === 'confirm' ? 'paid_page' : 'ready_page'
+    router.push(`${pathname}?${param}=${page}`)
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
         {TABS.map((tab) => {
-          const count = tab.id === 'confirm' ? paidOrders.length : readyOrders.length
+          const count = tab.id === 'confirm' ? paidPageCount > 1 ? `${(paidPage - 1) * 10 + 1}-${Math.min(paidPage * 10, paidOrders.length)}` : paidOrders.length : readyPageCount > 1 ? `${(readyPage - 1) * 10 + 1}-${Math.min(readyPage * 10, readyOrders.length)}` : readyOrders.length
           const isActive = activeTab === tab.id
           return (
             <button
@@ -158,6 +164,8 @@ export default function OrdersTabs({
           ))}
         </div>
       )}
+
+      <Pagination page={currentPage} pageCount={currentPageCount} onPageChange={handlePageChange} />
     </div>
   )
 }
