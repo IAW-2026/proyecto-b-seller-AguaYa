@@ -1,6 +1,14 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 
 export async function getAuthRoles(): Promise<string[]> {
-  const { sessionClaims } = await auth()
-  return (sessionClaims?.public_metadata?.roles as string[]) || []
+  const { userId } = await auth()
+  if (!userId) return []
+
+  try {
+    const client = await clerkClient()
+    const user = await client.users.getUser(userId)
+    return (user.publicMetadata.roles as string[]) || []
+  } catch {
+    return []
+  }
 }

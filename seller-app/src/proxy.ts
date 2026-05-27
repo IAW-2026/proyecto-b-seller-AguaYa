@@ -12,10 +12,17 @@ export default clerkMiddleware(async (auth, req) => {
         return NextResponse.next()
     }
 
-    const { userId } = await auth()
+    const { userId, sessionClaims } = await auth()
 
     if (!userId) {
         return NextResponse.redirect(new URL('/sign-in', req.url))
+    }
+
+    if (req.nextUrl.pathname.startsWith('/dashboard/admin')) {
+        const roles = (sessionClaims?.public_metadata?.roles as string[]) || []
+        if (!roles.includes('admin_seller')) {
+            return NextResponse.redirect(new URL('/dashboard/overview', req.url))
+        }
     }
 
     return NextResponse.next()
