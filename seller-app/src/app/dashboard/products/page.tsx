@@ -1,14 +1,34 @@
 import React, { Suspense } from 'react'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
-import { getVendorByUserId, getVendorProducts } from '@/lib/queries'
+import { getVendorByUserId, getVendorProducts, listAllProductsPaginated } from '@/lib/queries'
+import { getAuthRoles } from '@/lib/auth-utils'
+import AdminProductsTable from '@/components/admin/AdminProductsTable'
 
-async function ProductsContent() {
+async function ProductsContent(props: { searchParams: Promise<{ page?: string }> }) {
   const { userId } = await auth()
   if (!userId) return null
 
+  const roles = await getAuthRoles()
+  const isAdmin = roles.includes('admin_seller')
+  const searchParams = await props.searchParams
+
+  if (isAdmin) {
+    const page = parseInt(searchParams.page || '1', 10)
+    const result = await listAllProductsPaginated(page)
+    return (
+      <div>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-slate-900">Productos</h1>
+        </div>
+        <AdminProductsTable products={result.items as any[]} page={page} pageCount={result.pageCount} />
+      </div>
+    )
+  }
+
   const vendor = await getVendorByUserId(userId)
-  if (!vendor) return null
+  if (!vendor) redirect('/setup-vendor')
 
   const productsVendor = await getVendorProducts(vendor.id)
 
@@ -69,10 +89,10 @@ async function ProductsContent() {
   )
 }
 
-export default function ProductsPage() {
+export default async function ProductsPage(props: { searchParams: Promise<{ page?: string }> }) {
   return (
     <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando productos...</div>}>
-      <ProductsContent />
+      <ProductsContent searchParams={props.searchParams} />
     </Suspense>
   )
 }

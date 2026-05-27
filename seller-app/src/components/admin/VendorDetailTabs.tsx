@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteProductAsAdmin, updateOrderStatusAsAdmin } from '@/app/actions/admin-vendor'
+import Pagination from '@/components/Pagination'
 
 type Vendor = {
   id: string
@@ -50,6 +51,8 @@ type Review = {
   products: string[]
 }
 
+const PAGE_SIZE = 10
+
 export default function VendorDetailTabs({
   vendor,
   products,
@@ -84,7 +87,7 @@ export default function VendorDetailTabs({
             activeTab === 'products' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
           }`}
         >
-          Products
+          Products ({products.length})
         </button>
         <button
           onClick={() => setActiveTab('orders')}
@@ -92,14 +95,12 @@ export default function VendorDetailTabs({
             activeTab === 'orders' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
           }`}
         >
-          Orders
+          Orders ({orders.length})
         </button>
       </div>
 
       {activeTab === 'overview' && <OverviewTab vendor={vendor} reviews={reviews} />}
-      {activeTab === 'products' && (
-        <ProductsTab vendorId={vendor.id} products={products} router={router} />
-      )}
+      {activeTab === 'products' && <ProductsTab vendorId={vendor.id} products={products} />}
       {activeTab === 'orders' && <OrdersTab orders={orders} />}
     </div>
   )
@@ -170,15 +171,12 @@ function OverviewTab({ vendor, reviews }: { vendor: Vendor; reviews: Review[] })
   )
 }
 
-function ProductsTab({
-  vendorId,
-  products,
-  router,
-}: {
-  vendorId: string
-  products: Product[]
-  router: ReturnType<typeof useRouter>
-}) {
+function ProductsTab({ vendorId, products }: { vendorId: string; products: Product[] }) {
+  const [page, setPage] = useState(1)
+  const router = useRouter()
+  const totalPages = Math.ceil(products.length / PAGE_SIZE)
+  const visible = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
   const handleDelete = async (productId: string) => {
     if (!window.confirm('¿Eliminar este producto?')) return
     await deleteProductAsAdmin(vendorId, productId)
@@ -189,12 +187,6 @@ function ProductsTab({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-slate-900">Productos ({products.length})</h3>
-        <a
-          href={`/dashboard/products/new`}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
-        >
-          Nuevo producto
-        </a>
       </div>
 
       {products.length === 0 ? (
@@ -211,7 +203,7 @@ function ProductsTab({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {products.map((product) => (
+              {visible.map((product) => (
                 <tr key={product.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-900">{product.name}</td>
                   <td className="px-4 py-3 text-slate-700">${product.price.toFixed(2)}</td>
@@ -230,13 +222,18 @@ function ProductsTab({
           </table>
         </div>
       )}
+
+      <Pagination page={page} pageCount={totalPages} onPageChange={setPage} />
     </div>
   )
 }
 
 function OrdersTab({ orders }: { orders: Order[] }) {
+  const [page, setPage] = useState(1)
   const [updating, setUpdating] = useState<string | null>(null)
   const router = useRouter()
+  const totalPages = Math.ceil(orders.length / PAGE_SIZE)
+  const visible = orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const handleConfirm = async (orderId: string) => {
     setUpdating(orderId)
@@ -245,8 +242,8 @@ function OrdersTab({ orders }: { orders: Order[] }) {
     router.refresh()
   }
 
-  const paidOrders = orders.filter((o) => o.status === 'PAID')
-  const readyOrders = orders.filter((o) => o.status === 'READY')
+  const paidOrders = visible.filter((o) => o.status === 'PAID')
+  const readyOrders = visible.filter((o) => o.status === 'READY')
 
   return (
     <div className="space-y-8">
@@ -326,6 +323,8 @@ function OrdersTab({ orders }: { orders: Order[] }) {
           </div>
         )}
       </section>
+
+      <Pagination page={page} pageCount={totalPages} onPageChange={setPage} />
     </div>
   )
 }

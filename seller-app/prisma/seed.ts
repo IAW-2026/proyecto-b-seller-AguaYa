@@ -1,151 +1,139 @@
-import { PrismaClient, OrderStatus } from '@prisma/client'
+import 'dotenv/config'
+import { PrismaClient } from '@prisma/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
-import type { PoolConfig } from '@neondatabase/serverless'
 
-const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL } satisfies PoolConfig)
-const prisma = new PrismaClient({ adapter })
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) {
+  throw new Error('DATABASE_URL no está definida')
+}
+
+const prisma = new PrismaClient({ adapter: new PrismaNeon({ connectionString }) })
+
+const VENDOR_NAMES = [
+  'Distribuidora Norte', 'Agua del Valle', 'Crystal Aqua',
+  'PureWater SRL', 'AquaVida SA', 'FuenteClara',
+  'Río de Agua', 'Manantial Azul', 'Oasis Distribuciones',
+  'HydroPoint',
+]
+
+const PRODUCT_NAMES = [
+  'Bidón 20L Premium', 'Bidón 12L', 'Bidón 10L',
+  'Pack x6 Agua 2L', 'Pack x12 Agua 500ml',
+  'Bidón 8L', 'Bidón 6L', 'Pack x3 Agua 1.5L',
+  'Agua Alcalina 1L', 'Bidón 25L',
+  'Pack x4 Agua 2L', 'Bidón 15L', 'Agua Mineral 1L',
+  'Pack x6 Agua 1L', 'Bidón 30L',
+  'Agua Saborizada 1.5L', 'Bidón 5L', 'Pack x12 Agua 1L',
+  'Agua Con Gas 1L', 'Bidón 18L',
+]
+
+const BUYER_NAMES = Array.from({ length: 30 }, (_, i) => `buyer-seed-${i + 1}`)
 
 async function main() {
-    console.log('🧹 Limpiando base de datos...')
-    await prisma.orderItem.deleteMany()
-    await prisma.order.deleteMany()
-    await prisma.product.deleteMany()
-    await prisma.vendor.deleteMany()
+  console.log('=== Limpiando datos de seed anteriores ===')
 
-    console.log('🏪 Creando vendedores...')
-    const vendor1 = await prisma.vendor.create({
+  await prisma.orderItem.deleteMany({ where: { order: { externalId: { startsWith: 'ext-seed-' } } } })
+  await prisma.order.deleteMany({ where: { externalId: { startsWith: 'ext-seed-' } } })
+  await prisma.product.deleteMany({ where: { name: { startsWith: '[Seed]' } } })
+  await prisma.vendor.deleteMany({ where: { userId: { startsWith: 'seed-' } } })
+
+  console.log('=== Creando 10 vendors ===')
+
+  const vendors = await Promise.all(
+    VENDOR_NAMES.map((name, i) =>
+      prisma.vendor.create({
         data: {
-            userId: 'user_seed_001',
-            name: 'Agua Pura SA',
-            description: 'Distribuidora de agua mineral y bidones',
-            address: 'Av.ellan 512, Punta Alta',
-            cuil: '20-12345678-9',
-            cuit: '30-12345678-9',
-            reputation: 4.5,
+          userId: `seed-vendor-${i + 1}`,
+          name,
+          address: `Av. Siempre Viva ${i + 1}00, Córdoba`,
+          description: `Distribuidora de agua de mesa ${name}`,
+          reputation: Math.round((3 + Math.random() * 2) * 10) / 10,
         },
-    })
+      })
+    )
+  )
+  console.log(`  Creados ${vendors.length} vendors`)
 
-    const vendor2 = await prisma.vendor.create({
-        data: {
-            userId: 'user_seed_002',
-            name: 'Bidones del Sur',
-            description: 'Agua de manantial directo a tu puerta',
-            address: 'Av. San Martín 567, Bahía Blanca',
-            cuil: '20-87654321-0',
-            cuit: '30-87654321-0',
-            reputation: 3.8,
-        },
-    })
+  console.log('=== Creando productos (20/vendor) ===')
 
-    console.log('📦 Creando productos...')
-    const product1 = await prisma.product.create({
-        data: {
-            vendorId: vendor1.id,
-            name: 'Bidón 20 litros',
-            description: 'Bidón de agua mineral natural',
-            price: 2500,
-            stock: 50,
-        },
-    })
+  let totalProducts = 0
+  for (const vendor of vendors) {
+    const products = []
+    for (let i = 0; i < 20; i++) {
+      const baseName = PRODUCT_NAMES[i % PRODUCT_NAMES.length]
+      const price = Math.round((50 + Math.random() * 150) * 100) / 100
+      const stock = Math.floor(5 + Math.random() * 45)
+      products.push({
+        vendorId: vendor.id,
+        name: `[Seed] ${baseName} #${i + 1}`,
+        price,
+        stock,
+        description: `Producto de ${vendor.name}`,
+      })
+    }
+    await prisma.product.createMany({ data: products })
+    totalProducts += products.length
+  }
+  console.log(`  Creados ${totalProducts} productos`)
 
-    const product2 = await prisma.product.create({
-        data: {
-            vendorId: vendor1.id,
-            name: 'Bidón 12 litros',
-            description: 'Bidón de agua mineral tamaño mediano',
-            price: 1800,
-            stock: 30,
-        },
-    })
+  console.log('=== Creando órdenes (20 PAID + 10 READY por vendor) ===')
 
-    const product3 = await prisma.product.create({
-        data: {
-            vendorId: vendor2.id,
-            name: 'Bidón 20 litros Premium',
-            description: 'Agua de manantial con minerales naturales',
-            price: 3200,
-            stock: 20,
-        },
-    })
+  const allProducts = await prisma.product.findMany({ where: { name: { startsWith: '[Seed]' } } })
 
-    console.log('🛒 Creando órdenes...')
-    await prisma.order.create({
-        data: {
-            externalId: 'seed_order_001',
-            vendorId: vendor1.id,
-            buyerId: 'buyer_seed_001',
-            status: OrderStatus.READY,
-            total: 7300,
-            address: 'Av.ellan 512, Punta Alta',
-            items: {
-                create: [
-                    {
-                        productId: product1.id,
-                        productName: product1.name,
-                        productPrice: product1.price,
-                        quantity: 2,
-                    },
-                    {
-                        productId: product2.id,
-                        productName: product2.name,
-                        productPrice: product2.price,
-                        quantity: 1,
-                    },
-                ],
-            },
-        },
-    })
+  // Generate all order data first, then batch insert in parallel
+  const orderDataList: { vendor: typeof vendors[0]; isPaid: boolean; orderIdx: number }[] = []
+  for (const vendor of vendors) {
+    for (let idx = 0; idx < 30; idx++) {
+      orderDataList.push({ vendor, isPaid: idx < 20, orderIdx: idx })
+    }
+  }
 
-    await prisma.order.create({
-        data: {
-            externalId: 'seed_order_002',
-            vendorId: vendor1.id,
-            buyerId: 'buyer_seed_002',
-            status: OrderStatus.READY,
-            total: 5000,
-            address: 'Av.ellan 512, Punta Alta',
-            items: {
-                create: [
-                    {
-                        productId: product1.id,
-                        productName: product1.name,
-                        productPrice: product1.price,
-                        quantity: 2,
-                    },
-                ],
-            },
-        },
-    })
+  // Insert orders in batches of 20 to avoid overwhelming the DB
+  let globalIdx = 0
+  const BATCH = 20
+  for (let batchStart = 0; batchStart < orderDataList.length; batchStart += BATCH) {
+    const batch = orderDataList.slice(batchStart, batchStart + BATCH)
+    await Promise.all(
+      batch.map(async ({ vendor, isPaid, orderIdx }) => {
+        const vendorProducts = allProducts.filter((p) => p.vendorId === vendor.id)
+        const itemCount = 1 + Math.floor(Math.random() * 3)
+        const itemsData = Array.from({ length: itemCount }, () => {
+          const product = vendorProducts[Math.floor(Math.random() * vendorProducts.length)]
+          const qty = 1 + Math.floor(Math.random() * 4)
+          return {
+            productId: product.id,
+            productName: product.name,
+            productPrice: product.price,
+            quantity: qty,
+          }
+        })
+        const total = Math.round(itemsData.reduce((sum, it) => sum + it.productPrice * it.quantity, 0) * 100) / 100
+        const daysAgo = Math.floor(Math.random() * 14)
+        const createdAt = new Date(Date.now() - daysAgo * 86400000)
 
-    await prisma.order.create({
-        data: {
-            externalId: 'seed_order_003',
-            vendorId: vendor2.id,
-            buyerId: 'buyer_seed_001',
-            status: OrderStatus.PAID,
-            total: 3200,
-            address: 'Av. San Martín 567, Bahía Blanca',
-            items: {
-                create: [
-                    {
-                        productId: product3.id,
-                        productName: product3.name,
-                        productPrice: product3.price,
-                        quantity: 1,
-                    },
-                ],
-            },
-        },
-    })
-
-    console.log('✅ Seed completado')
+        await prisma.order.create({
+          data: {
+            externalId: `ext-seed-${vendor.userId}-${orderIdx + 1}`,
+            vendorId: vendor.id,
+            buyerId: BUYER_NAMES[globalIdx % BUYER_NAMES.length],
+            status: isPaid ? 'PAID' : 'READY',
+            total,
+            address: `Calle Falsa ${100 + globalIdx}, Córdoba`,
+            createdAt,
+            items: { create: itemsData },
+          },
+        })
+        globalIdx++
+      })
+    )
+  }
+  console.log(`  Creadas ${globalIdx} órdenes`)
+  console.log('=== Seed completado ===')
 }
 
 main()
-    .catch((e) => {
-        console.error(e)
-        process.exit(1)
-    })
-    .finally(async () => {
-        await prisma.$disconnect() // desconecto de la bd al finalizar
-    })
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(() => prisma.$disconnect())

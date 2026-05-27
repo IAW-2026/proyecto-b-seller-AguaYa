@@ -1,11 +1,38 @@
 import React, { Suspense } from 'react'
+import { redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
+import { getVendorByUserId, listAllOrdersPaginated } from '@/lib/queries'
+import { getAuthRoles } from '@/lib/auth-utils'
+import AdminOrdersTable from '@/components/admin/AdminOrdersTable'
 import OrdersList from '@/components/orders/OrdersList'
 import RefreshButton from '@/components/orders/RefreshButton'
 import AutoRefresh from '@/lib/AutoRefresh'
 import { Package } from 'lucide-react'
 
-export default async function OrdersPage(props: { searchParams: Promise<{ paid_page?: string; ready_page?: string }> }) {
+async function OrdersContent(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string }> }) {
+  const { userId } = await auth()
+  if (!userId) return null
+
+  const roles = await getAuthRoles()
+  const isAdmin = roles.includes('admin_seller')
   const searchParams = await props.searchParams
+
+  if (isAdmin) {
+    const page = parseInt(searchParams.page || '1', 10)
+    const result = await listAllOrdersPaginated(page)
+    return (
+      <div>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-slate-900">Órdenes</h1>
+        </div>
+        <AdminOrdersTable orders={result.items as any[]} page={page} pageCount={result.pageCount} />
+      </div>
+    )
+  }
+
+  const vendor = await getVendorByUserId(userId)
+  if (!vendor) redirect('/setup-vendor')
+
   const paidPage = parseInt(searchParams.paid_page || '1', 10)
   const readyPage = parseInt(searchParams.ready_page || '1', 10)
 
@@ -29,5 +56,13 @@ export default async function OrdersPage(props: { searchParams: Promise<{ paid_p
       </Suspense>
       <AutoRefresh interval={10000} />
     </div>
+  )
+}
+
+export default async function OrdersPage(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string }> }) {
+  return (
+    <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando órdenes...</div>}>
+      <OrdersContent searchParams={props.searchParams} />
+    </Suspense>
   )
 }

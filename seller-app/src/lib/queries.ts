@@ -131,6 +131,23 @@ export async function listAllVendors() {
   })
 }
 
+export async function listAllVendorsPaginated(page: number = 1) {
+  const limit = 15
+  const skip = (page - 1) * limit
+
+  const [items, total] = await Promise.all([
+    prisma.vendor.findMany({
+      where: { deletedAt: null },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.vendor.count({ where: { deletedAt: null } }),
+  ])
+
+  return { items, total, pageCount: Math.ceil(total / limit) }
+}
+
 export async function getVendorById(vendorId: string) {
   return prisma.vendor.findFirst({
     where: { id: vendorId, deletedAt: null },

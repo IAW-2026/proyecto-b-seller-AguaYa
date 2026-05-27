@@ -53,6 +53,28 @@ export async function getVendorsWithClerkInfo() {
   })
 }
 
+export async function getVendorsWithClerkInfoPaginated(page: number = 1) {
+  await requireAdmin()
+
+  const { listAllVendorsPaginated } = await import('@/lib/queries')
+  const result = await listAllVendorsPaginated(page)
+
+  const client = await clerkClient()
+  const { data: clerkUsers } = await client.users.getUserList({ limit: 500 })
+  const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
+
+  const items = result.items.map((v) => {
+    const clerkUser = clerkMap.get(v.userId)
+    return {
+      ...v,
+      clerkName: clerkUser ? [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || '' : '',
+      clerkEmail: clerkUser?.emailAddresses?.[0]?.emailAddress || '',
+    }
+  })
+
+  return { items, total: result.total, pageCount: result.pageCount }
+}
+
 export async function getVendorWithClerkInfo(vendorId: string) {
   await requireAdmin()
 
