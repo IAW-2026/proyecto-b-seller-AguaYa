@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { getAvailableClerkUsers, createVendorAsAdmin } from '@/actions/admin-vendor'
+import { getAvailableClerkUsers, createVendorAsAdmin } from '@/app/actions/admin-vendor'
 
 export default function NewVendorPage() {
   const router = useRouter()

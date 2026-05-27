@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { deleteVendorAsAdmin } from '@/actions/admin-vendor'
+import { deleteVendorAsAdmin } from '@/app/actions/admin-vendor'
 
 export default function DeleteVendorButton({ vendorId, vendorName }: { vendorId: string; vendorName: string }) {
   const router = useRouter()

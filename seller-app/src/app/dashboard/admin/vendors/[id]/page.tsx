@@ -2,7 +2,7 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getAuthRoles } from '@/lib/auth-utils'
-import { getVendorWithClerkInfo } from '@/actions/admin-vendor'
+import { getVendorWithClerkInfo } from '@/app/actions/admin-vendor'
 import { getVendorProducts, getVendorOrders, getVendorReviews } from '@/lib/queries'
 import VendorDetailTabs from '@/components/admin/VendorDetailTabs'
 

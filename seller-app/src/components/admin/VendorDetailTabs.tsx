@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { deleteProductAsAdmin, updateOrderStatusAsAdmin } from '@/actions/admin-vendor'
+import { deleteProductAsAdmin, updateOrderStatusAsAdmin } from '@/app/actions/admin-vendor'
 
 type Vendor = {
   id: string

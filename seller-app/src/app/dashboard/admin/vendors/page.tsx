@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getAuthRoles } from '@/lib/auth-utils'
-import { getVendorsWithClerkInfo } from '@/actions/admin-vendor'
+import { getVendorsWithClerkInfo } from '@/app/actions/admin-vendor'
 import DeleteVendorButton from '@/components/admin/DeleteVendorButton'
 
 export default async function VendorsPage() {
