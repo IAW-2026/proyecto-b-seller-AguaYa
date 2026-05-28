@@ -1,9 +1,11 @@
 import React from 'react'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { getAuthRoles } from '@/lib/auth-utils'
+import { redirect } from 'next/navigation'
+import { requireAdminPage } from '@/lib/admin-guard'
 import { getVendorWithClerkInfo } from '@/app/actions/admin-vendor'
-import { getVendorProducts, getVendorOrders, getVendorReviews } from '@/lib/queries'
+import { getVendorProducts } from '@/lib/queries/vendors'
+import { getVendorOrders } from '@/lib/queries/orders'
+import { getVendorReviews } from '@/lib/queries/reviews'
 import VendorDetailTabs from '@/components/admin/VendorDetailTabs'
 
 export default async function VendorDetailPage({
@@ -11,8 +13,7 @@ export default async function VendorDetailPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const roles = await getAuthRoles()
-  if (!roles.includes('admin_seller')) redirect('/dashboard/overview')
+  await requireAdminPage()
 
   const { id } = await params
   const vendor = await getVendorWithClerkInfo(id)

@@ -15,7 +15,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-import { getVendorOrders as getCachedVendorOrders } from '@/lib/queries'
+import { getVendorOrders as getCachedVendorOrders } from '@/lib/queries/orders'
 import { notifyExternalService } from '@/lib/external-api'
 import { OrderStatus } from '@prisma/client'
 

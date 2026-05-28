@@ -56,7 +56,7 @@ export async function getVendorsWithClerkInfo() {
 export async function getVendorsWithClerkInfoPaginated(page: number = 1) {
   await requireAdmin()
 
-  const { listAllVendorsPaginated } = await import('@/lib/queries')
+  const { listAllVendorsPaginated } = await import('@/lib/queries/vendors')
   const result = await listAllVendorsPaginated(page)
 
   const client = await clerkClient()

@@ -1,7 +1,8 @@
 import React, { Suspense } from 'react'
 import { auth } from '@clerk/nextjs/server'
-import { getVendorOverview, getVendorReviews } from '@/lib/queries'
-import type { Review } from '@/lib/queries'
+import { getVendorOverview } from '@/lib/queries/vendors'
+import { getVendorReviews } from '@/lib/queries/reviews'
+import type { Review } from '@/lib/queries/reviews'
 
 function ReviewStars({ rating }: { rating: number }) {
   return (

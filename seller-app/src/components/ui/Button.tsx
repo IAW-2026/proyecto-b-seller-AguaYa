@@ -5,13 +5,15 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean
 }
 
-export default function Button({ 
-  variant = 'primary', 
+export default function Button({
+  variant = 'primary',
   fullWidth = false,
   children,
-  ...props 
+  ...props
 }: ButtonProps) {
-  const baseStyles = {
+  const { style: externalStyle, ...rest } = props
+
+  const baseStyles: React.CSSProperties = {
     padding: '12px 16px',
     border: 'none',
     borderRadius: 8,
@@ -22,16 +24,16 @@ export default function Button({
     transition: 'opacity 0.2s'
   }
 
-  const variantStyles = {
-    primary: { backgroundColor: '#3b82f6', color: 'white' },
+  const variantStyles: Record<string, React.CSSProperties> = {
+    primary: { backgroundColor: '#0f172a', color: 'white' },
     danger: { backgroundColor: '#ef4444', color: 'white' },
     secondary: { backgroundColor: '#e5e7eb', color: '#111827' }
   }
 
   return (
-    <button 
-      style={{ ...baseStyles, ...variantStyles[variant] }}
-      {...props}
+    <button
+      style={{ ...baseStyles, ...variantStyles[variant], ...externalStyle }}
+      {...rest}
     >
       {children}
     </button>

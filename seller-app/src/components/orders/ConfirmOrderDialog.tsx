@@ -34,7 +34,7 @@ export default function ConfirmOrderDialog({ orderId, orderLabel }: ConfirmOrder
   return (
     <>
       <Button type="button" onClick={handleOpen}>
-        Confirmar y dejar lista para entregar
+        Confirmar Orden
       </Button>
 
       {open ? (
@@ -54,10 +54,7 @@ export default function ConfirmOrderDialog({ orderId, orderLabel }: ConfirmOrder
               Confirmar orden
             </h3>
             <p className="mt-2 text-sm text-gray-600">
-              Vas a confirmar la orden {orderLabel} y dejarla lista para entrega.
-            </p>
-            <p className="mt-2 text-sm text-gray-600">
-              Esta acción moverá la orden de <strong>Pagada</strong> a <strong>Lista para entregar</strong>.
+              Esta acción cambiara la orden de <strong>Pagada</strong> a <strong>Lista para entregar</strong>.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">

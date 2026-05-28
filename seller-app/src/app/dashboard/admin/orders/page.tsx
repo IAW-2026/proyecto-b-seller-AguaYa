@@ -1,12 +1,10 @@
 import React from 'react'
-import { redirect } from 'next/navigation'
-import { getAuthRoles } from '@/lib/auth-utils'
-import { listAllOrdersPaginated } from '@/lib/queries'
+import { requireAdminPage } from '@/lib/admin-guard'
+import { listAllOrdersPaginated } from '@/lib/queries/orders'
 import AdminOrdersTable from '@/components/admin/AdminOrdersTable'
 
 export default async function AdminOrdersPage(props: { searchParams: Promise<{ page?: string }> }) {
-  const roles = await getAuthRoles()
-  if (!roles.includes('admin_seller')) redirect('/dashboard/overview')
+  await requireAdminPage()
 
   const searchParams = await props.searchParams
   const page = parseInt(searchParams.page || '1', 10)

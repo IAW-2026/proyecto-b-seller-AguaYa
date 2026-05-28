@@ -1,12 +1,14 @@
 import React, { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
-import { getVendorByUserId, listAllOrdersPaginated } from '@/lib/queries'
+import { getVendorByUserId } from '@/lib/queries/vendors'
+import { listAllOrdersPaginated } from '@/lib/queries/orders'
 import { getAuthRoles } from '@/lib/auth-utils'
 import AdminOrdersTable from '@/components/admin/AdminOrdersTable'
 import OrdersList from '@/components/orders/OrdersList'
 import RefreshButton from '@/components/orders/RefreshButton'
 import AutoRefresh from '@/lib/AutoRefresh'
+import OrderNotifier from '@/components/orders/OrderNotifier'
 import { Package } from 'lucide-react'
 
 async function OrdersContent(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string }> }) {
@@ -55,6 +57,7 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
         <OrdersList paidPage={paidPage} readyPage={readyPage} />
       </Suspense>
       <AutoRefresh interval={10000} />
+      <OrderNotifier interval={10000} />
     </div>
   )
 }

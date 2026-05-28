@@ -83,10 +83,7 @@ function OrderCard({ order, showConfirmButton }: { order: OrderWithItems; showCo
         </ul>
       </div>
 
-      <div className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500">
-        <span>ID: {order.id.slice(0, 12)}...</span>
-        <span>{order.externalId ? `Ext: ${order.externalId}` : 'Sin ID externo'}</span>
-      </div>
+      
     </div>
   )
 }

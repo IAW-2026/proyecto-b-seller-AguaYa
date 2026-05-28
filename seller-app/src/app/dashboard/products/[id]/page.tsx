@@ -1,7 +1,8 @@
 import React, { Suspense } from 'react'
 import { redirect, notFound } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
-import { getVendorByUserId, getProductById } from '@/lib/queries'
+import { getVendorByUserId } from '@/lib/queries/vendors'
+import { getProductById } from '@/lib/queries/products'
 import ProductForm from '@/components/ProductForm'
 
 async function ProductDetailContent({ id }: { id: string }) {

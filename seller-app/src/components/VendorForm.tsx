@@ -52,6 +52,18 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
       await createOrUpdateVendor(payload)
       setError('')
       setLoading(false)
+
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        if (Notification.permission === 'granted') {
+          new Notification('AguaYa', { body: 'Cambios guardados exitosamente.' })
+        } else if (Notification.permission !== 'denied') {
+          const permission = await Notification.requestPermission()
+          if (permission === 'granted') {
+            new Notification('AguaYa', { body: 'Cambios guardados exitosamente.' })
+          }
+        }
+      }
+
       if (redirectTo) {
         router.push(redirectTo)
       }
@@ -94,7 +106,7 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
 
       <div style={containerStyle}>
         <div>
-          <label style={labelStyle}>Nombre del negocio *</label>
+          <label style={labelStyle}>Nombre *</label>
           <input
             type="text"
             name="name"
@@ -112,7 +124,7 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
             name="address"
             value={formData.address}
             onChange={handleChange}
-            placeholder="Ej: Av. Mitre 512, Punta Alta"
+            placeholder="Ej: Av. Mitre 512"
             style={inputStyle}
           />
         </div>
@@ -147,7 +159,7 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
           value={formData.image}
           onChange={(url) => setFormData((prev) => ({ ...prev, image: url }))}
           folder="avatars"
-          label="Logo o foto del negocio"
+          label="Logo de negocio"
         />
       </div>
 
@@ -168,7 +180,7 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
 
       <div style={{ marginTop: 24 }}>
         <Button type="submit" disabled={loading} style={{ cursor: loading ? 'not-allowed' : 'pointer' }}>
-          {loading ? 'Guardando...' : 'Guardar datos del vendedor'}
+          {loading ? 'Guardando...' : 'Guardar Cambios'}
         </Button>
       </div>
     </form>

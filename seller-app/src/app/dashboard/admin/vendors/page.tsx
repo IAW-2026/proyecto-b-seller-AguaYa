@@ -1,15 +1,13 @@
 import React from 'react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { getAuthRoles } from '@/lib/auth-utils'
+import { requireAdminPage } from '@/lib/admin-guard'
 import { getVendorsWithClerkInfoPaginated } from '@/app/actions/admin-vendor'
 import DeleteVendorButton from '@/components/admin/DeleteVendorButton'
 import VendorsPagination from '@/components/admin/VendorsPagination'
 import { Package } from 'lucide-react'
 
 export default async function VendorsPage(props: { searchParams: Promise<{ page?: string }> }) {
-  const roles = await getAuthRoles()
-  if (!roles.includes('admin_seller')) redirect('/dashboard/overview')
+  await requireAdminPage()
 
   const searchParams = await props.searchParams
   const page = parseInt(searchParams.page || '1', 10)

@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import { auth } from '@clerk/nextjs/server'
-import { getVendorByUserId } from '@/lib/queries'
+import { getVendorByUserId } from '@/lib/queries/vendors'
 import { redirect } from 'next/navigation'
 import VendorForm from '@/components/VendorForm'
 

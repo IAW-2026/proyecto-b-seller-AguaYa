@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
-import { getVendorByUserId, getVendorOrdersByStatus } from '@/lib/queries'
+import { getVendorByUserId } from '@/lib/queries/vendors'
+import { getVendorOrdersByStatus } from '@/lib/queries/orders'
 import OrdersTabs from '@/components/orders/OrdersTabs'
 import { Package } from 'lucide-react'
 
