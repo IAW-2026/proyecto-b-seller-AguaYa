@@ -1,7 +1,10 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
 import type { PaginatedResult } from '@/lib/paginate'
-import type { Order } from '@prisma/client'
+import type { Order, OrderItem, Product } from '@prisma/client'
+
+type OrderWithItems = Order & { items: (OrderItem & { product: Product })[] }
+type OrderWithVendorAndItems = Order & { vendor: { name: string; id: string }; items: (OrderItem & { product: Product })[] }
 
 export async function getVendorOrders(vendorId: string) {
   return prisma.order.findMany({
@@ -18,7 +21,7 @@ export async function getVendorOrdersByStatus(
   status: 'PAID' | 'READY',
   page: number = 1
 ) {
-  return paginate(
+  return paginate<OrderWithItems>(
     prisma.order,
     { vendorId, status, deletedAt: null },
     {
@@ -31,7 +34,7 @@ export async function getVendorOrdersByStatus(
 }
 
 export async function listAllOrdersPaginated(page: number = 1) {
-  return paginate(
+  return paginate<OrderWithVendorAndItems>(
     prisma.order,
     { deletedAt: null },
     {

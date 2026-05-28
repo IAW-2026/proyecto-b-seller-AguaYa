@@ -64,10 +64,10 @@ export default async function OrdersList({
 
   return (
     <OrdersTabs
-      paidOrders={paidResult.items as any[]}
+      paidOrders={paidResult.items}
       paidPage={paidPage}
       paidPageCount={paidResult.pageCount}
-      readyOrders={readyResult.items as any[]}
+      readyOrders={readyResult.items}
       readyPage={readyPage}
       readyPageCount={readyResult.pageCount}
     />

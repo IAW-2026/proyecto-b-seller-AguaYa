@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { getVendorByUserId } from '@/lib/queries/vendors'
 import { getAuthRoles } from '@/lib/auth-utils'
 import DashboardSidebar from '@/components/layout/DashboardSidebar'
+import MobileBottomNav from '@/components/layout/MobileBottomNav'
 
 async function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { userId } = await auth()
@@ -27,7 +28,8 @@ async function DashboardLayoutContent({ children }: { children: React.ReactNode 
   return (
     <div className="flex min-h-screen bg-transparent text-slate-900">
       <DashboardSidebar vendorName={vendor!.name} vendorImage={vendor!.image} roles={roles} />
-      <main className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">{children}</main>
+      <main className="flex-1 px-4 py-6 pb-20 sm:px-6 lg:px-10 lg:py-8 lg:pb-6">{children}</main>
+      <MobileBottomNav roles={roles} />
     </div>
   )
 }

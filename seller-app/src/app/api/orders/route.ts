@@ -16,13 +16,14 @@ import { revalidatePath } from 'next/cache'
 import { validateApiKey } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { validateCreateOrderInput } from '@/lib/validation'
+import type { Product } from '@prisma/client'
 
 const TOTAL_TOLERANCE = 0.1 // Tolerancia por redondeo de decimales
 
 /**
  * Calcula el total basado en productos y cantidades.
  */
-function calculateTotal(items: { productId: string; quantity: number }[], products: any[]): number {
+function calculateTotal(items: { productId: string; quantity: number }[], products: Product[]): number {
   let total = 0
   for (const item of items) {
     const product = products.find((p) => p.id === item.productId)
@@ -207,7 +208,7 @@ export async function POST(request: Request) {
       )
     } catch (transactionError) {
       // Manejar error de violación de UNIQUE en externalId
-      const errMsg = (transactionError as any).message || ''
+      const errMsg = transactionError instanceof Error ? transactionError.message : String(transactionError)
       if (errMsg.includes('Unique constraint failed') || errMsg.includes('unique constraint')) {
         // Otro request concurrente creó la orden con el mismo externalId
         // Esperar y releer

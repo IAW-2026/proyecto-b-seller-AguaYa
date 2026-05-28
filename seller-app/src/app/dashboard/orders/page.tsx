@@ -27,7 +27,7 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-900">Órdenes</h1>
         </div>
-        <AdminOrdersTable orders={result.items as any[]} page={page} pageCount={result.pageCount} />
+        <AdminOrdersTable orders={result.items} page={page} pageCount={result.pageCount} />
       </div>
     )
   }

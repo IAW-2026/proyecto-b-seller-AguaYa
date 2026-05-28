@@ -213,7 +213,7 @@ export function validateProductFilters(params: Record<string, string | null>): P
   const result: ProductFilterParams = {}
 
   // Validar vendorId (opcional)
-  if (params.vendorId) {
+  if (params.vendorId !== null && params.vendorId !== '') {
     try {
       result.vendorIds = validateVendorIds(params.vendorId)
     } catch (error) {
@@ -222,7 +222,7 @@ export function validateProductFilters(params: Record<string, string | null>): P
   }
 
   // Validar minPrice (opcional)
-  if (params.minPrice) {
+  if (params.minPrice !== null && params.minPrice !== '') {
     const minPrice = parseFloat(params.minPrice)
     if (!Number.isFinite(minPrice) || minPrice < 0) {
       throw new Error('minPrice debe ser un número >= 0')
@@ -231,7 +231,7 @@ export function validateProductFilters(params: Record<string, string | null>): P
   }
 
   // Validar maxPrice (opcional)
-  if (params.maxPrice) {
+  if (params.maxPrice !== null && params.maxPrice !== '') {
     const maxPrice = parseFloat(params.maxPrice)
     if (!Number.isFinite(maxPrice) || maxPrice < 0) {
       throw new Error('maxPrice debe ser un número >= 0')

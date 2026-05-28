@@ -4,6 +4,7 @@ import { clerkClient } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getAuthRoles } from '@/lib/auth-utils'
+import { validateVendorInput, validateProductInput } from '@/lib/validation'
 
 async function requireAdmin() {
   const roles = await getAuthRoles()
@@ -107,7 +108,8 @@ export async function createVendorAsAdmin(data: {
 }) {
   await requireAdmin()
 
-  const vendor = await prisma.vendor.create({ data })
+  const input = validateVendorInput(data)
+  const vendor = await prisma.vendor.create({ data: { ...input, userId: data.userId } })
 
   revalidatePath('/dashboard/admin/vendors')
   return vendor
@@ -185,7 +187,8 @@ export async function createProductAsAdmin(
 ) {
   await requireAdmin()
 
-  const product = await prisma.product.create({ data: { ...data, vendorId } })
+  const input = validateProductInput(data)
+  const product = await prisma.product.create({ data: { ...input, vendorId } })
 
   revalidatePath('/dashboard/admin/products')
   revalidatePath('/dashboard/admin/vendors')

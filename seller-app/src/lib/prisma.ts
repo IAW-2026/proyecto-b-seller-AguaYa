@@ -22,7 +22,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Optional Prisma query logging (enable by setting DEBUG_PRISMA_QUERIES=true)
 if (process.env.DEBUG_PRISMA_QUERIES === 'true') {
-    ;(prisma as any).$on('query', (e: any) => {
+    type PrismaQueryEvent = { query: string; params: string; duration: number }
+    ;(prisma as unknown as { $on: (e: string, cb: (ev: PrismaQueryEvent) => void) => void }).$on('query', (e) => {
         console.debug('[prisma] query', { sql: e.query, params: e.params, duration: e.duration })
     })
 }

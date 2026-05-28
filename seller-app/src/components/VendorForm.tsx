@@ -73,88 +73,63 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
     }
   }
 
-  const inputStyle = {
-    width: '100%',
-    padding: '10px 12px',
-    border: '1px solid #d1d5db',
-    borderRadius: 8,
-    fontSize: 14,
-    marginBottom: 12,
-    fontFamily: 'inherit',
-  }
-
-  const labelStyle = {
-    display: 'block',
-    marginBottom: 6,
-    fontSize: 14,
-    fontWeight: 500,
-  }
-
-  const containerStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: 16,
-  }
-
   return (
     <form onSubmit={handleSubmit}>
       {error && (
-        <div style={{ padding: 12, backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: 8, marginBottom: 16 }}>
-          {error}
-        </div>
+        <div className="p-3 bg-red-100 text-red-600 rounded-lg mb-4">{error}</div>
       )}
 
-      <div style={containerStyle}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label style={labelStyle}>Nombre *</label>
+          <label className="block mb-1.5 text-sm font-medium">Nombre *</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
             placeholder="Ej: Agua Pura SA"
-            style={inputStyle}
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm"
           />
         </div>
 
         <div>
-          <label style={labelStyle}>Dirección *</label>
+          <label className="block mb-1.5 text-sm font-medium">Dirección *</label>
           <input
             type="text"
             name="address"
             value={formData.address}
             onChange={handleChange}
             placeholder="Ej: Av. Mitre 512"
-            style={inputStyle}
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm"
           />
         </div>
 
         <div>
-          <label style={labelStyle}>CUIL</label>
+          <label className="block mb-1.5 text-sm font-medium">CUIL</label>
           <input
             type="text"
             name="cuil"
             value={formData.cuil}
             onChange={handleChange}
             placeholder="Ej: 20-12345678-9"
-            style={inputStyle}
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm"
           />
         </div>
 
         <div>
-          <label style={labelStyle}>CUIT</label>
+          <label className="block mb-1.5 text-sm font-medium">CUIT</label>
           <input
             type="text"
             name="cuit"
             value={formData.cuit}
             onChange={handleChange}
             placeholder="Ej: 30-12345678-9"
-            style={inputStyle}
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm"
           />
         </div>
       </div>
 
-      <div style={{ marginTop: 16 }}>
+      <div className="mt-4">
         <ImageUpload
           value={formData.image}
           onChange={(url) => setFormData((prev) => ({ ...prev, image: url }))}
@@ -163,23 +138,19 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
         />
       </div>
 
-      <div style={{ marginTop: 16 }}>
-        <label style={labelStyle}>Descripción del negocio</label>
+      <div className="mt-4">
+        <label className="block mb-1.5 text-sm font-medium">Descripción del negocio</label>
         <textarea
           name="description"
           value={formData.description}
           onChange={handleChange}
           placeholder="Cuéntanos sobre tu negocio..."
-          style={{
-            ...inputStyle,
-            minHeight: 100,
-            resize: 'vertical',
-          } as React.CSSProperties}
+          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm min-h-[100px] resize-y"
         />
       </div>
 
-      <div style={{ marginTop: 24 }}>
-        <Button type="submit" disabled={loading} style={{ cursor: loading ? 'not-allowed' : 'pointer' }}>
+      <div className="mt-6">
+        <Button type="submit" disabled={loading}>
           {loading ? 'Guardando...' : 'Guardar Cambios'}
         </Button>
       </div>

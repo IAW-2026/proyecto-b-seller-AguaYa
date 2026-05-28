@@ -88,29 +88,25 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
     }
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14, marginBottom: 12,
-  }
-
-  const labelStyle: React.CSSProperties = { display: 'block', marginBottom: 6, fontSize: 14, fontWeight: 500 }
-
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 720 }}>
-      {error && <div style={{ padding: 12, backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: 8, marginBottom: 16 }}>{error}</div>}
+    <form onSubmit={handleSubmit} className="max-w-[720px]">
+      {error && (
+        <div className="p-3 bg-red-100 text-red-600 rounded-lg mb-4">{error}</div>
+      )}
 
       <div>
-        <label style={labelStyle}>Nombre *</label>
-        <input name="name" value={form.name} onChange={handleChange} style={inputStyle} />
+        <label className="block mb-1.5 text-sm font-medium">Nombre *</label>
+        <input name="name" value={form.name} onChange={handleChange} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3" />
       </div>
 
       <div>
-        <label style={labelStyle}>Precio *</label>
-        <input name="price" value={form.price} onChange={handleChange} style={inputStyle} type="number" />
+        <label className="block mb-1.5 text-sm font-medium">Precio *</label>
+        <input name="price" value={form.price} onChange={handleChange} type="number" min="0" step="0.01" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
       </div>
 
       <div>
-        <label style={labelStyle}>Stock</label>
-        <input name="stock" value={form.stock} onChange={handleChange} style={inputStyle} type="number" />
+        <label className="block mb-1.5 text-sm font-medium">Stock</label>
+        <input name="stock" value={form.stock} onChange={handleChange} type="number" min="0" step="1" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
       </div>
 
       <div>
@@ -123,11 +119,11 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
       </div>
 
       <div>
-        <label style={labelStyle}>Descripción</label>
-        <textarea name="description" value={form.description} onChange={handleChange} style={{ ...inputStyle, minHeight: 100 }} />
+        <label className="block mb-1.5 text-sm font-medium">Descripción</label>
+        <textarea name="description" value={form.description} onChange={handleChange} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 min-h-[100px]" />
       </div>
 
-      <div style={{ marginTop: 12, display: 'flex', gap: 12 }}>
+      <div className="mt-3 flex gap-3">
         <Button type="submit" disabled={loading}>{loading ? (mode === 'edit' ? 'Guardando...' : 'Creando...') : (mode === 'edit' ? 'Guardar cambios' : 'Crear producto')}</Button>
         {mode === 'edit' && productId ? (
           <Button type="button" variant="danger" disabled={deleting} onClick={handleDelete}>

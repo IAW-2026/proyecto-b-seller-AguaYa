@@ -58,6 +58,7 @@ export async function GET(request: Request): Promise<Response> {
             id: {
               in: validIds,
             },
+            deletedAt: null,
           },
           orderBy: {
             createdAt: 'desc',
@@ -87,6 +88,9 @@ export async function GET(request: Request): Promise<Response> {
 
     // 4. Si no hay filtro, retornar todos los vendedores
     const allVendors = await prisma.vendor.findMany({
+      where: {
+        deletedAt: null,
+      },
       orderBy: {
         createdAt: 'desc',
       },

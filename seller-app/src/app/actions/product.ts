@@ -120,3 +120,33 @@ export async function deleteProduct(productId: string) {
 
   return { success: true, product: deletedProduct }
 }
+
+export async function updateProductStock(productId: string, stock: number) {
+  const vendor = await getAuthenticatedVendor()
+
+  if (!Number.isInteger(stock) || stock < 0) {
+    throw new Error('El stock debe ser un número entero mayor o igual a cero')
+  }
+
+  const product = await prisma.product.findFirst({
+    where: {
+      id: productId,
+      vendorId: vendor.id,
+      deletedAt: null,
+    },
+  })
+
+  if (!product) {
+    throw new Error('No se encontró el producto para este vendedor')
+  }
+
+  const updated = await prisma.product.update({
+    where: { id: productId },
+    data: { stock },
+  })
+
+  revalidatePath('/dashboard/products')
+  revalidatePath('/dashboard/overview')
+
+  return { success: true, product: updated }
+}

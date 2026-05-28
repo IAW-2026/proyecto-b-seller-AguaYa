@@ -6,6 +6,7 @@ import { getVendorByUserId, getVendorProducts } from '@/lib/queries/vendors'
 import { listAllProductsPaginated } from '@/lib/queries/products'
 import { getAuthRoles } from '@/lib/auth-utils'
 import AdminProductsTable from '@/components/admin/AdminProductsTable'
+import ProductCard from '@/components/products/ProductCard'
 
 async function ProductsContent(props: { searchParams: Promise<{ page?: string }> }) {
   const { userId } = await auth()
@@ -23,7 +24,7 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-900">Productos</h1>
         </div>
-        <AdminProductsTable products={result.items as any[]} page={page} pageCount={result.pageCount} />
+        <AdminProductsTable products={result.items} page={page} pageCount={result.pageCount} />
       </div>
     )
   }
@@ -57,34 +58,11 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
       {productsVendor.products.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-slate-600">No tienes productos aún.</p>
       ) : (
-        <ul className="space-y-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {productsVendor.products.map((p) => (
-            <li key={p.id} className="rounded-[1.5rem] border border-slate-200/80 bg-white/80 p-5 shadow-sm">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-4">
-                  {p.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      width={64}
-                      height={64}
-                      className="rounded-lg object-cover"
-                    />
-                  ) : null}
-                  <div>
-                    <strong className="text-lg text-slate-950">{p.name}</strong>
-                    <div className="mt-2 text-sm text-slate-600">Precio: ${p.price}</div>
-                    <div className="text-sm text-slate-600">Stock: {p.stock}</div>
-                  </div>
-                </div>
-                <div>
-                  <Link className="inline-flex rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-950" href={`/dashboard/products/${p.id}`}>Editar</Link>
-                </div>
-              </div>
-            </li>
+            <ProductCard key={p.id} product={p} />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   )

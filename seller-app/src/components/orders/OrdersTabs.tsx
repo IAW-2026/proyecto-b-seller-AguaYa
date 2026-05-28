@@ -53,7 +53,7 @@ function OrderCard({ order, showConfirmButton }: { order: OrderWithItems; showCo
         </div>
       ) : null}
 
-      <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 text-sm">
         <div>
           <p className="text-gray-600">Comprador</p>
           <p className="font-medium">{order.buyerId}</p>

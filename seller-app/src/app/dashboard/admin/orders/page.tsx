@@ -15,7 +15,7 @@ export default async function AdminOrdersPage(props: { searchParams: Promise<{ p
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Órdenes (global)</h1>
       </div>
-      <AdminOrdersTable orders={result.items as any[]} page={page} pageCount={result.pageCount} />
+      <AdminOrdersTable orders={result.items} page={page} pageCount={result.pageCount} />
     </div>
   )
 }
