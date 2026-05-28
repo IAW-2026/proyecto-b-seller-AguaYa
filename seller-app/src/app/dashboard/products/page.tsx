@@ -7,6 +7,7 @@ import { listAllProductsPaginated } from '@/lib/queries/products'
 import { getAuthRoles } from '@/lib/auth-utils'
 import AdminProductsTable from '@/components/admin/AdminProductsTable'
 import ProductCard from '@/components/products/ProductCard'
+import ProductFormDialog from '@/components/products/ProductFormDialog'
 
 async function ProductsContent(props: { searchParams: Promise<{ page?: string }> }) {
   const { userId } = await auth()
@@ -52,13 +53,17 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700">Products</p>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Catálogo de productos</h1>
         </div>
-        <Link className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800" href="/dashboard/products/new">+ Nuevo producto</Link>
+        <ProductFormDialog>
+          <button type="button" className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+            + Nuevo producto
+          </button>
+        </ProductFormDialog>
       </div>
 
       {productsVendor.products.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-slate-600">No tienes productos aún.</p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {productsVendor.products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

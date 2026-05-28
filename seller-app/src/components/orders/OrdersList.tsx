@@ -67,9 +67,11 @@ export default async function OrdersList({
       paidOrders={paidResult.items}
       paidPage={paidPage}
       paidPageCount={paidResult.pageCount}
+      paidTotal={paidResult.total}
       readyOrders={readyResult.items}
       readyPage={readyPage}
       readyPageCount={readyResult.pageCount}
+      readyTotal={readyResult.total}
     />
   )
 }

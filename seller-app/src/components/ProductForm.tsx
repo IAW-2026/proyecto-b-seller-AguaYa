@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createProduct, deleteProduct, updateProduct } from '@/app/actions/product'
+import { createProduct, updateProduct } from '@/app/actions/product'
 import Button from './ui/Button'
 import ImageUpload from './ui/ImageUpload'
+import DeleteProductDialog from './products/DeleteProductDialog'
 import { validateProductInput } from '../lib/validation'
 
 interface ProductFormProps {
@@ -17,9 +18,10 @@ interface ProductFormProps {
     stock?: number
     image?: string
   }
+  onSuccess?: () => void
 }
 
-export default function ProductForm({ mode = 'create', productId, initialData }: ProductFormProps) {
+export default function ProductForm({ mode = 'create', productId, initialData, onSuccess }: ProductFormProps) {
   const router = useRouter()
   const [form, setForm] = useState({
     name: initialData?.name || '',
@@ -30,7 +32,6 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [deleting, setDeleting] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -62,29 +63,11 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
       }
 
       setLoading(false)
+      onSuccess?.()
       router.push('/dashboard/products')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar producto')
       setLoading(false)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!productId) return
-
-    const confirmed = window.confirm('¿Seguro que quieres eliminar este producto?')
-    if (!confirmed) return
-
-    setError('')
-    setDeleting(true)
-
-    try {
-      await deleteProduct(productId)
-      setDeleting(false)
-      router.push('/dashboard/products')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al eliminar producto')
-      setDeleting(false)
     }
   }
 
@@ -126,9 +109,7 @@ export default function ProductForm({ mode = 'create', productId, initialData }:
       <div className="mt-3 flex gap-3">
         <Button type="submit" disabled={loading}>{loading ? (mode === 'edit' ? 'Guardando...' : 'Creando...') : (mode === 'edit' ? 'Guardar cambios' : 'Crear producto')}</Button>
         {mode === 'edit' && productId ? (
-          <Button type="button" variant="danger" disabled={deleting} onClick={handleDelete}>
-            {deleting ? 'Eliminando...' : 'Eliminar producto'}
-          </Button>
+          <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} />
         ) : null}
       </div>
     </form>

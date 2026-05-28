@@ -1,7 +1,7 @@
-import Link from 'next/link'
 import { Package } from 'lucide-react'
 import type { Product } from '@prisma/client'
 import UpdateStockButton from './UpdateStockButton'
+import ProductFormDialog from './ProductFormDialog'
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
@@ -25,12 +25,21 @@ export default function ProductCard({ product }: { product: Product }) {
       <p className="mt-1 text-lg font-bold text-slate-900">${product.price}</p>
       <UpdateStockButton productId={product.id} currentStock={product.stock} />
 
-      <Link
-        href={`/dashboard/products/${product.id}`}
-        className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-900 hover:text-slate-950"
+      <ProductFormDialog
+        mode="edit"
+        productId={product.id}
+        initialData={{
+          name: product.name,
+          description: product.description || '',
+          price: product.price,
+          stock: product.stock,
+          image: product.image || '',
+        }}
       >
-        Editar
-      </Link>
+        <button type="button" className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-900 hover:text-slate-950">
+          Editar
+        </button>
+      </ProductFormDialog>
     </div>
   )
 }
