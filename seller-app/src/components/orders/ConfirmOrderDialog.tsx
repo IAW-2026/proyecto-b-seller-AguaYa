@@ -44,16 +44,16 @@ export default function ConfirmOrderDialog({ orderId, orderLabel }: ConfirmOrder
           onClick={handleClose}
         >
           <div
-            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
             role="dialog"
             aria-modal="true"
             aria-labelledby={`confirm-order-title-${orderId}`}
             onClick={(event) => event.stopPropagation()}
           >
-            <h3 id={`confirm-order-title-${orderId}`} className="text-lg font-semibold text-gray-900">
+            <h3 id={`confirm-order-title-${orderId}`} className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               Confirmar orden
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
               Esta acción cambiara la orden de <strong>Pagada</strong> a <strong>Lista para entregar</strong>.
             </p>
 

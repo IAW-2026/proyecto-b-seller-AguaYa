@@ -26,7 +26,7 @@ export async function getVendorOrdersByStatus(
     { vendorId, status, deletedAt: null },
     {
       page,
-      limit: 10,
+      limit: 4,
       include: { items: { include: { product: true } } },
       orderBy: { createdAt: 'desc' },
     }

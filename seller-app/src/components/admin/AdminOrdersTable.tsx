@@ -36,9 +36,9 @@ export default function AdminOrdersTable({
 
   return (
     <div>
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left text-slate-500">
+          <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             <tr>
               <th className="px-4 py-3 font-medium">Orden</th>
               <th className="px-4 py-3 font-medium">Vendedor</th>
@@ -49,30 +49,30 @@ export default function AdminOrdersTable({
               <th className="px-4 py-3 font-medium">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
+                <td colSpan={7} className="px-4 py-12 text-center text-slate-400 dark:text-slate-500">
                   No hay órdenes registradas.
                 </td>
               </tr>
             ) : (
               orders.map((o) => (
-                <tr key={o.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-slate-900">
+                <tr key={o.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
                     {o.externalId || o.id.slice(0, 8)}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{o.vendor.name}</td>
-                  <td className="px-4 py-3 text-slate-600 font-mono text-xs">{o.buyerId.slice(0, 12)}</td>
-                  <td className="px-4 py-3 text-slate-600">${o.total.toFixed(2)}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{o.vendor.name}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs">{o.buyerId.slice(0, 12)}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400">${o.total.toFixed(2)}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      o.status === 'PAID' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                      o.status === 'PAID' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300'
                     }`}>
                       {o.status === 'PAID' ? 'Pagada' : 'Lista'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-slate-600 text-xs">
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-xs">
                     {new Date(o.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">

@@ -20,14 +20,14 @@ export default function UpdateStockButton({
   if (!isOpen) {
     return (
       <div className="mt-1 flex items-center gap-2 text-sm">
-        <span className="text-slate-500">Stock: {currentStock}</span>
+        <span className="text-slate-500 dark:text-slate-400">Stock: {currentStock}</span>
         <button
           type="button"
           onClick={() => {
             setValue(currentStock)
             setIsOpen(true)
           }}
-          className="rounded p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          className="rounded p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
           aria-label="Modificar stock"
         >
           <Pencil className="h-3.5 w-3.5" />
@@ -52,7 +52,7 @@ export default function UpdateStockButton({
   return (
     <div className="mt-1">
       <div className="flex items-center gap-1.5">
-        <span className="text-xs text-slate-500 mr-1">Stock:</span>
+        <span className="text-xs text-slate-500 dark:text-slate-400 mr-1">Stock:</span>
         <button
           type="button"
           onClick={() => setValue((v) => Math.max(0, v - 1))}
@@ -70,7 +70,7 @@ export default function UpdateStockButton({
             const n = parseInt(e.target.value, 10)
             setValue(Number.isNaN(n) ? 0 : n)
           }}
-          className="w-16 rounded border border-slate-300 px-2 py-1 text-center text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-16 rounded border border-slate-300 px-2 py-1 text-center text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none dark:bg-slate-800 dark:border-slate-600 dark:text-white"
         />
         <button
           type="button"

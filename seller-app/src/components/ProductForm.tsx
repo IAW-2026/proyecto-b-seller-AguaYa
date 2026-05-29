@@ -11,6 +11,7 @@ import { validateProductInput } from '../lib/validation'
 interface ProductFormProps {
   mode?: 'create' | 'edit'
   productId?: string
+  vendorId?: string
   initialData?: {
     name: string
     description?: string
@@ -21,7 +22,7 @@ interface ProductFormProps {
   onSuccess?: () => void
 }
 
-export default function ProductForm({ mode = 'create', productId, initialData, onSuccess }: ProductFormProps) {
+export default function ProductForm({ mode = 'create', productId, vendorId, initialData, onSuccess }: ProductFormProps) {
   const router = useRouter()
   const [form, setForm] = useState({
     name: initialData?.name || '',
@@ -57,7 +58,7 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
           throw new Error('Falta el identificador del producto')
         }
 
-        await updateProduct({ id: productId, ...payload })
+        await updateProduct({ id: productId, ...payload, vendorId })
       } else {
         await createProduct(payload)
       }
@@ -74,22 +75,22 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
   return (
     <form onSubmit={handleSubmit} className="max-w-[720px]">
       {error && (
-        <div className="p-3 bg-red-100 text-red-600 rounded-lg mb-4">{error}</div>
+        <div className="p-3 bg-red-100 text-red-600 rounded-lg mb-4 dark:bg-red-900/50 dark:text-red-400">{error}</div>
       )}
 
       <div>
-        <label className="block mb-1.5 text-sm font-medium">Nombre *</label>
-        <input name="name" value={form.name} onChange={handleChange} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3" />
+        <label className="block mb-1.5 text-sm font-medium dark:text-slate-300">Nombre *</label>
+        <input name="name" value={form.name} onChange={handleChange} maxLength={100} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500" />
       </div>
 
       <div>
-        <label className="block mb-1.5 text-sm font-medium">Precio *</label>
-        <input name="price" value={form.price} onChange={handleChange} type="number" min="0" step="0.01" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+        <label className="block mb-1.5 text-sm font-medium dark:text-slate-300">Precio *</label>
+        <input name="price" value={form.price} onChange={handleChange} type="number" min="0" step="0.01" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
       </div>
 
       <div>
-        <label className="block mb-1.5 text-sm font-medium">Stock</label>
-        <input name="stock" value={form.stock} onChange={handleChange} type="number" min="0" step="1" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+        <label className="block mb-1.5 text-sm font-medium dark:text-slate-300">Stock</label>
+        <input name="stock" value={form.stock} onChange={handleChange} type="number" min="0" step="1" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
       </div>
 
       <div>
@@ -102,14 +103,14 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
       </div>
 
       <div>
-        <label className="block mb-1.5 text-sm font-medium">Descripción</label>
-        <textarea name="description" value={form.description} onChange={handleChange} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 min-h-[100px]" />
+        <label className="block mb-1.5 text-sm font-medium dark:text-slate-300">Descripción</label>
+        <textarea name="description" value={form.description} onChange={handleChange} maxLength={250} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm mb-3 dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 min-h-[100px]" />
       </div>
 
       <div className="mt-3 flex gap-3">
         <Button type="submit" disabled={loading}>{loading ? (mode === 'edit' ? 'Guardando...' : 'Creando...') : (mode === 'edit' ? 'Guardar cambios' : 'Crear producto')}</Button>
         {mode === 'edit' && productId ? (
-          <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} />
+          <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} vendorId={vendorId} />
         ) : null}
       </div>
     </form>

@@ -41,6 +41,12 @@ function normalizeText(value: string | undefined) {
   return trimmed ? trimmed : undefined
 }
 
+function validateLength(value: string | undefined, max: number, field: string) {
+  if (value && value.length > max) {
+    throw new Error(`El campo ${field} no puede superar los ${max} caracteres`)
+  }
+}
+
 function parseNumber(value: string | number, fieldName: string) {
   const parsed = typeof value === 'number' ? value : Number(value)
 
@@ -57,6 +63,10 @@ export function validateProductInput(data: ProductDraft): ProductInput {
   if (!name) {
     throw new Error('El nombre es obligatorio')
   }
+
+  validateLength(name, 100, 'nombre')
+  validateLength(data.description, 250, 'descripción')
+  validateLength(data.image, 1000, 'imagen')
 
   const price = parseNumber(data.price, 'precio')
   if (price <= 0) {
@@ -85,8 +95,18 @@ export function validateVendorInput(data: VendorDraft): VendorInput {
     throw new Error('El nombre del negocio es obligatorio')
   }
 
+  validateLength(name, 100, 'nombre')
+
   if (!address) {
     throw new Error('La dirección es obligatoria')
+  }
+
+  validateLength(address, 200, 'dirección')
+  validateLength(data.image, 1000, 'imagen')
+
+  const description = normalizeText(data.description)
+  if (description && description.length > 250) {
+    throw new Error('La descripción no puede superar los 250 caracteres')
   }
 
   const cuil = normalizeText(data.cuil)
@@ -103,10 +123,54 @@ export function validateVendorInput(data: VendorDraft): VendorInput {
   return {
     name,
     address,
-    description: normalizeText(data.description),
+    description,
     cuil,
     cuit,
     image: normalizeText(data.image),
+  }
+}
+
+export function validateVendorUpdateInput(data: {
+  name?: string
+  address?: string
+  description?: string
+  cuil?: string
+  cuit?: string
+  image?: string
+}) {
+  if (data.name !== undefined) {
+    const trimmed = data.name.trim()
+    if (!trimmed) throw new Error('El nombre del negocio es obligatorio')
+    validateLength(trimmed, 100, 'nombre')
+  }
+
+  if (data.address !== undefined) {
+    const trimmed = data.address.trim()
+    if (!trimmed) throw new Error('La dirección es obligatoria')
+    validateLength(trimmed, 200, 'dirección')
+  }
+
+  validateLength(data.image, 1000, 'imagen')
+
+  if (data.description !== undefined) {
+    const desc = data.description.trim()
+    if (desc.length > 250) {
+      throw new Error('La descripción no puede superar los 250 caracteres')
+    }
+  }
+
+  if (data.cuil !== undefined) {
+    const cuil = data.cuil.trim()
+    if (cuil && !ARGENTINE_TAX_ID_PATTERN.test(cuil)) {
+      throw new Error('El CUIL debe tener el formato 20-12345678-9')
+    }
+  }
+
+  if (data.cuit !== undefined) {
+    const cuit = data.cuit.trim()
+    if (cuit && !ARGENTINE_TAX_ID_PATTERN.test(cuit)) {
+      throw new Error('El CUIT debe tener el formato 30-12345678-9')
+    }
   }
 }
 

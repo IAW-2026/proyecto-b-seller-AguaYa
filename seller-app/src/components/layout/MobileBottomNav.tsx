@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Package, ShoppingCart, LayoutDashboard, Settings, Users } from 'lucide-react'
+import ThemeToggle from './ThemeToggle'
 
 interface NavItem {
   href: string
@@ -27,7 +28,7 @@ export default function MobileBottomNav({ roles }: { roles?: string[] }) {
   items.push({ href: '/dashboard/settings', label: 'Ajustes', icon: <Settings className="h-5 w-5" /> })
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur xl:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 xl:hidden">
       <ul className="flex justify-around py-2">
         {items.map((item) => {
           const isActive = pathname.startsWith(item.href)
@@ -36,7 +37,7 @@ export default function MobileBottomNav({ roles }: { roles?: string[] }) {
               <Link
                 href={item.href}
                 className={`flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium transition-colors ${
-                  isActive ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'
+                  isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 {item.icon}
@@ -45,6 +46,9 @@ export default function MobileBottomNav({ roles }: { roles?: string[] }) {
             </li>
           )
         })}
+        <li>
+          <ThemeToggle />
+        </li>
       </ul>
     </nav>
   )
