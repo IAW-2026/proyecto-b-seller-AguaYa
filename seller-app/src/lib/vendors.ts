@@ -21,6 +21,7 @@ export interface PublicVendor {
   reputation: number
   address: string
   image: string | null
+  isActive: boolean
 }
 
 /**
@@ -38,6 +39,7 @@ export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
     reputation: vendor.reputation,
     address: vendor.address,
     image: vendor.image ?? null,
+    isActive: vendor.isActive,
   }
 }
 

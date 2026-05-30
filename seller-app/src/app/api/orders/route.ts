@@ -85,7 +85,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // 5. Validar que el Vendor existe
+    // 5. Validar que el Vendor existe y está activo
     const vendor = await prisma.vendor.findUnique({
       where: { id: input.vendorId },
     })
@@ -93,6 +93,13 @@ export async function POST(request: Request) {
     if (!vendor) {
       return NextResponse.json(
         { error: 'Vendor no encontrado' },
+        { status: 400 }
+      )
+    }
+
+    if (!vendor.isActive) {
+      return NextResponse.json(
+        { error: 'Vendor inactivo — no puede recibir pedidos' },
         { status: 400 }
       )
     }

@@ -149,6 +149,22 @@ export async function deleteVendorAsAdmin(vendorId: string) {
   return vendor
 }
 
+export async function toggleVendorActiveStatus(vendorId: string) {
+  await requireAdmin()
+
+  const vendor = await prisma.vendor.findUnique({ where: { id: vendorId } })
+  if (!vendor) throw new Error('Vendedor no encontrado')
+
+  const updated = await prisma.vendor.update({
+    where: { id: vendorId },
+    data: { isActive: !vendor.isActive },
+  })
+
+  revalidatePath('/dashboard/admin/vendors')
+  revalidatePath(`/dashboard/admin/vendors/${vendorId}`)
+  return updated
+}
+
 export async function updateOrderStatusAsAdmin(orderId: string, status: 'PAID' | 'READY') {
   await requireAdmin()
 

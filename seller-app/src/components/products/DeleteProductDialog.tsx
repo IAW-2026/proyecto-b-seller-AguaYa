@@ -3,14 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteProduct } from '@/app/actions/product'
+import { deleteProductAsAdmin } from '@/app/actions/admin-vendor'
 import Button from '@/components/ui/Button'
 
 interface DeleteProductDialogProps {
   productId: string
   productName: string
+  vendorId?: string
 }
 
-export default function DeleteProductDialog({ productId, productName }: DeleteProductDialogProps) {
+export default function DeleteProductDialog({ productId, productName, vendorId }: DeleteProductDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -26,9 +28,13 @@ export default function DeleteProductDialog({ productId, productName }: DeletePr
     setError('')
 
     try {
-      await deleteProduct(productId)
+      if (vendorId) {
+        await deleteProductAsAdmin(vendorId, productId)
+      } else {
+        await deleteProduct(productId)
+      }
       setOpen(false)
-      router.push('/dashboard/products')
+      router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/products')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al eliminar producto')
       setSubmitting(false)

@@ -22,9 +22,10 @@ model Vendor {
   cuil        String?
   cuit        String?
   reputation  Float     @default(0)
+  isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? // Soft delete: vendedor desactivado, datos preservados
+  deletedAt   DateTime? // Soft delete: eliminación definitiva (solo admin)
 
   products    Product[]
   orders      Order[]
