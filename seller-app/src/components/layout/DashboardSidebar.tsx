@@ -19,7 +19,7 @@ export default function DashboardSidebar({
       <div className="mb-6 rounded-2xl bg-slate-900 px-4 py-5 text-white shadow-sm">
         <p className="text-xs uppercase tracking-[0.24em] text-sky-200">AguaYa</p>
         <h2 className="mt-2 text-xl font-semibold">Panel de Control</h2>
-        <p className="mt-2 text-sm text-slate-300">Administración de ventas, pedidos y catálogo.</p>
+        <p className="mt-2 text-sm text-slate-300">Gestiona tus productos y pedidos con suma facilidad.</p>
       </div>
 
       <nav aria-label="Navegación principal">
@@ -49,7 +49,7 @@ export default function DashboardSidebar({
           <li>
             <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950" href="/dashboard/orders">
               <ShoppingCart className="h-4 w-4" />
-              Pedidos
+              Órdenes
             </Link>
           </li>
         </ul>

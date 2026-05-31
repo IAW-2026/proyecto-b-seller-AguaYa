@@ -150,3 +150,24 @@ export async function updateProductStock(productId: string, stock: number) {
 
   return { success: true, product: updated }
 }
+
+export async function toggleProductActiveStatus(productId: string) {
+  const vendor = await getAuthenticatedVendor()
+
+  const product = await prisma.product.findFirst({
+    where: { id: productId, vendorId: vendor.id, deletedAt: null },
+  })
+  if (!product) throw new Error('No se encontró el producto para este vendedor')
+
+  const updated = await prisma.product.update({
+    where: { id: productId },
+    data: { isActive: !product.isActive },
+  })
+
+  await revalidatePath('/dashboard/products')
+  await revalidatePath('/dashboard/overview')
+  await revalidatePath('/dashboard/admin/products')
+  await revalidatePath(`/dashboard/admin/vendors/${vendor.id}`)
+
+  return updated
+}

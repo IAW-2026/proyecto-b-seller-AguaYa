@@ -38,7 +38,7 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
   if (!productsVendor) {
     return (
       <div className="max-w-2xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700">Products</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700">Productos</p>
         <h1 className="text-3xl font-semibold tracking-tight text-slate-950">No existe un vendedor asociado a esta cuenta.</h1>
         <p className="text-slate-600">Registrá tu negocio primero para empezar a administrar el catálogo.</p>
         <Link className="inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800" href="/setup-vendor">Registrar negocio</Link>
@@ -50,7 +50,6 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700">Products</p>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Catálogo de productos</h1>
         </div>
         <ProductFormDialog>

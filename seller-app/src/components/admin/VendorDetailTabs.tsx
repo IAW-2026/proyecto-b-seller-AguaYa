@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { updateOrderStatusAsAdmin } from '@/app/actions/admin-vendor'
 import ProductFormDialog from '@/components/products/ProductFormDialog'
 import AdminVendorEditDialog from '@/components/admin/AdminVendorEditDialog'
-import ToggleVendorStatusButton from '@/components/admin/ToggleVendorStatusButton'
+import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
 import Pagination from '@/components/Pagination'
 import { Package, ShoppingBag, ChevronDown, ChevronUp } from 'lucide-react'
 
@@ -30,6 +30,7 @@ type Product = {
   price: number
   stock: number
   image: string | null
+  isActive: boolean
 }
 
 type OrderItem = {
@@ -142,7 +143,7 @@ function OverviewTab({ vendor, reviews }: { vendor: Vendor; reviews: Review[] })
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Información del vendedor</h3>
           <div className="flex items-center gap-2">
-            <ToggleVendorStatusButton vendorId={vendor.id} isActive={vendor.isActive} vendorName={vendor.name} />
+            <ToggleVendorButton vendorId={vendor.id} isActive={vendor.isActive} vendorName={vendor.name} role="admin" />
             <AdminVendorEditDialog vendor={vendor} />
           </div>
         </div>
@@ -290,22 +291,24 @@ function ProductsTab({ vendorId, products }: { vendorId: string; products: Pagin
                   <td className="px-4 py-3 text-slate-700 dark:text-slate-300">${product.price.toFixed(2)}</td>
                   <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{product.stock}</td>
                   <td className="px-4 py-3">
-                    <ProductFormDialog
-                      mode="edit"
-                      productId={product.id}
-                      initialData={{
-                        name: product.name,
-                        description: product.description || undefined,
-                        price: product.price,
-                        stock: product.stock,
-                        image: product.image || undefined,
-                      }}
-                      vendorId={vendorId}
-                    >
-                      <button className="rounded-lg border border-sky-200 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-50 dark:border-sky-700 dark:text-sky-400 dark:hover:bg-sky-900/20">
-                        Editar
-                      </button>
-                    </ProductFormDialog>
+                    <div className="flex items-center gap-2">
+                      <ProductFormDialog
+                        mode="edit"
+                        productId={product.id}
+                        initialData={{
+                          name: product.name,
+                          description: product.description || undefined,
+                          price: product.price,
+                          stock: product.stock,
+                          image: product.image || undefined,
+                        }}
+                        vendorId={vendorId}
+                      >
+                        <button className="rounded-lg border border-sky-200 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-50 dark:border-sky-700 dark:text-sky-400 dark:hover:bg-sky-900/20">
+                          Editar
+                        </button>
+                      </ProductFormDialog>
+                    </div>
                   </td>
                 </tr>
               ))}

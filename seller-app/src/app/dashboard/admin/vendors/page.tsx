@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { requireAdminPage } from '@/lib/admin-guard'
 import { getVendorsWithClerkInfoPaginated } from '@/app/actions/admin-vendor'
-import ToggleVendorStatusButton from '@/components/admin/ToggleVendorStatusButton'
+import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
 import AdminVendorEditDialog from '@/components/admin/AdminVendorEditDialog'
 import VendorsPagination from '@/components/admin/VendorsPagination'
 import { Package } from 'lucide-react'
@@ -74,7 +74,7 @@ export default async function VendorsPage(props: { searchParams: Promise<{ page?
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <AdminVendorEditDialog vendor={vendor} />
-                        <ToggleVendorStatusButton vendorId={vendor.id} isActive={vendor.isActive} vendorName={vendor.name} />
+                        <ToggleVendorButton vendorId={vendor.id} isActive={vendor.isActive} vendorName={vendor.name} role="admin" />
                       </div>
                     </td>
                   </tr>

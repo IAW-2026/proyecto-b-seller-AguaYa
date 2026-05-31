@@ -160,8 +160,9 @@ export async function toggleVendorActiveStatus(vendorId: string) {
     data: { isActive: !vendor.isActive },
   })
 
-  revalidatePath('/dashboard/admin/vendors')
-  revalidatePath(`/dashboard/admin/vendors/${vendorId}`)
+  await revalidatePath('/dashboard/admin/vendors')
+  await revalidatePath(`/dashboard/admin/vendors/${vendorId}`)
+  await revalidatePath('/dashboard/overview')
   return updated
 }
 
@@ -246,3 +247,4 @@ export async function deleteProductAsAdmin(vendorId: string, productId: string) 
   revalidatePath('/dashboard/admin/vendors')
   return product
 }
+

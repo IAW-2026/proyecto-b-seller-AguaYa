@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import { auth } from '@clerk/nextjs/server'
 import { getVendorOverview } from '@/lib/queries/vendors'
 import { getVendorReviews } from '@/lib/queries/reviews'
+import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
 import type { Review } from '@/lib/queries/reviews'
 
 function ReviewStars({ rating }: { rating: number }) {
@@ -54,7 +55,9 @@ async function OverviewContent() {
         </div>
         <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
           <strong className="text-sm uppercase tracking-wide text-slate-500">Estado</strong>
-          <div className="mt-3 text-2xl font-semibold text-emerald-600">Activo</div>
+          <div className="mt-3">
+            <ToggleVendorButton vendorId={overview.id} isActive={overview.isActive} vendorName={overview.name} role="vendor" />
+          </div>
         </div>
       </div>
 

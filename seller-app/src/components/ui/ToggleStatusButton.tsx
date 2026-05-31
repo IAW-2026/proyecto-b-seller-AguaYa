@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { toggleVendorActiveStatus } from '@/app/actions/admin-vendor'
+import { useRef, useState } from 'react'
 
-export default function ToggleVendorStatusButton({ vendorId, isActive, vendorName }: { vendorId: string; isActive: boolean; vendorName: string }) {
-  const router = useRouter()
+interface ToggleStatusButtonProps {
+  isActive: boolean
+  entityType: string
+  entityName: string
+  onToggle: () => Promise<unknown>
+  size?: 'xs' | 'sm'
+}
+
+export default function ToggleStatusButton({ isActive, entityType, entityName, onToggle, size = 'xs' }: ToggleStatusButtonProps) {
   const [open, setOpen] = useState(false)
   const [error, setError] = useState('')
   const submittingRef = useRef(false)
@@ -22,20 +27,26 @@ export default function ToggleVendorStatusButton({ vendorId, isActive, vendorNam
     setError('')
 
     try {
-      await toggleVendorActiveStatus(vendorId)
+      await onToggle()
       setOpen(false)
-      router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cambiar estado')
+    } finally {
       submittingRef.current = false
     }
   }
+
+  const px = size === 'xs' ? 'px-3 py-1' : 'px-4 py-2'
+  const textSize = size === 'xs' ? 'text-xs' : 'text-sm'
+
+  const isActiveLabel = entityType === 'vendedor' ? 'activo' : 'activo'
+  const inactiveLabel = entityType === 'vendedor' ? 'inactivo' : 'inactivo'
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        className={`rounded-lg border px-3 py-1 text-xs font-medium transition ${
+        className={`rounded-lg border ${px} ${textSize} font-medium transition ${
           isActive
             ? 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white'
             : 'border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white'
@@ -56,13 +67,13 @@ export default function ToggleVendorStatusButton({ vendorId, isActive, vendorNam
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-              {isActive ? 'Desactivar vendedor' : 'Activar vendedor'}
+              {isActive ? `Desactivar ${entityType}` : `Activar ${entityType}`}
             </h3>
             <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
               {isActive ? (
-                <>¿Seguro que quieres desactivar a <strong>{vendorName}</strong>? No aparecerá en BuyerApp ni podrá recibir nuevos pedidos.</>
+                <>¿Seguro que quieres desactivar {entityType === 'vendedor' ? 'a' : 'el'} <strong>{entityName}</strong>? No aparecerá en BuyerApp ni podrá recibir nuevos pedidos.</>
               ) : (
-                <>¿Seguro que quieres activar a <strong>{vendorName}</strong>? Volverá a aparecer en BuyerApp y podrá recibir pedidos.</>
+                <>¿Seguro que quieres activar {entityType === 'vendedor' ? 'a' : 'el'} <strong>{entityName}</strong>? Volverá a aparecer en BuyerApp y podrá recibir pedidos.</>
               )}
             </p>
 
@@ -91,7 +102,9 @@ export default function ToggleVendorStatusButton({ vendorId, isActive, vendorNam
                     : 'bg-emerald-600 hover:bg-emerald-500'
                 }`}
               >
-                {submittingRef.current ? 'Procesando...' : (isActive ? 'Desactivar' : 'Activar')}
+                {submittingRef.current
+                  ? (isActive ? 'Desactivando...' : 'Activando...')
+                  : (isActive ? 'Desactivar' : 'Activar')}
               </button>
             </div>
           </div>

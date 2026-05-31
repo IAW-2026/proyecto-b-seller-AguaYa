@@ -71,8 +71,10 @@ export async function toggleMyVendorActiveStatus() {
     data: { isActive: !vendor.isActive },
   })
 
-  revalidatePath('/dashboard/overview')
-  revalidatePath('/dashboard/products')
-  revalidatePath('/dashboard/settings')
+  await revalidatePath('/dashboard/overview')
+  await revalidatePath('/dashboard/products')
+  await revalidatePath('/dashboard/settings')
+  await revalidatePath('/dashboard/admin/vendors')
+  await revalidatePath(`/dashboard/admin/vendors/${vendor.id}`)
   return updated
 }

@@ -39,6 +39,7 @@ model Product {
   price       Float
   stock       Int         @default(0)
   image       String?
+  isActive    Boolean     @default(true)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   deletedAt   DateTime?   // Soft delete: producto marcado como eliminado, pero datos preservados

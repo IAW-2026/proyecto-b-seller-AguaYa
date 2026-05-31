@@ -80,6 +80,7 @@ export default async function VendorDetailPage({
             price: p.price,
             stock: p.stock,
             image: p.image,
+            isActive: p.isActive,
           })),
           page: productPage,
           pageCount: productsResult.pageCount,

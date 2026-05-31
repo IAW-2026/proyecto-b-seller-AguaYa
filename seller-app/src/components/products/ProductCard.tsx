@@ -2,6 +2,7 @@ import { Package } from 'lucide-react'
 import type { Product } from '@prisma/client'
 import UpdateStockButton from './UpdateStockButton'
 import ProductFormDialog from './ProductFormDialog'
+import ToggleProductButton from './ToggleProductButton'
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
@@ -25,21 +26,24 @@ export default function ProductCard({ product }: { product: Product }) {
       <p className="mt-1 text-lg font-bold text-slate-900">${product.price}</p>
       <UpdateStockButton productId={product.id} currentStock={product.stock} />
 
-      <ProductFormDialog
-        mode="edit"
-        productId={product.id}
-        initialData={{
-          name: product.name,
-          description: product.description || '',
-          price: product.price,
-          stock: product.stock,
-          image: product.image || '',
-        }}
-      >
-        <button type="button" className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-900 hover:text-slate-950">
-          Editar
-        </button>
-      </ProductFormDialog>
+      <div className="mt-4 flex items-center gap-2">
+        <ProductFormDialog
+          mode="edit"
+          productId={product.id}
+          initialData={{
+            name: product.name,
+            description: product.description || '',
+            price: product.price,
+            stock: product.stock,
+            image: product.image || '',
+          }}
+        >
+          <button type="button" className="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-900 hover:text-slate-950">
+            Editar
+          </button>
+        </ProductFormDialog>
+        <ToggleProductButton productId={product.id} isActive={product.isActive} productName={product.name} />
+      </div>
     </div>
   )
 }
