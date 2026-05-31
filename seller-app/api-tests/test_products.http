@@ -7,6 +7,8 @@
 
 @vendorId2 = cmp21j4xu0001zwli69agxgle
 
+@andy = cmpt0mhyx000104jmkvcy7p64
+
 ### =====================
 ### TESTS DE PRODUCTOS
 ### =====================
@@ -16,7 +18,7 @@ GET {{baseUrl}}/api/products
 X-API-Key: {{apiKey}}
 
 ### Test 2: GET productos de un vendedor específico
-GET {{baseUrl}}/api/products?vendorId={{vendorId}}
+GET {{baseUrl}}/api/products?vendorId={{andy}}
 X-API-Key: {{apiKey}}
 
 ### Test 3: GET productos de múltiples vendedores

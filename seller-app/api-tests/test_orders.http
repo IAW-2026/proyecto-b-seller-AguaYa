@@ -11,6 +11,8 @@
 @productId6 = cmpqyfu8c0007ewlidz5p3czy
 
 @vendorId2 = cmp21j4xu0001zwli69agxgle
+@andy = cmpt0mhyx000104jmkvcy7p64
+@productAndy = cmpt0prp1000304jmedp3px2w
 
 ### =====================
 ### TESTS DE ÓRDENES
@@ -23,13 +25,13 @@ Content-Type: application/json
 
 {
   "externalId": "buyer-order-{{$timestamp}}",
-  "vendorId": "{{vendorId}}",
+  "vendorId": "{{andy}}",
   "buyerId": "Don Comprador 3",
   "address": "avenida siempre viva 123 depto 12",
   "items": [
-    {"productId": "{{productId}}", "quantity": 2}
+    {"productId": "{{productAndy}}", "quantity": 1}
   ],
-  "total": 2000
+  "total": 10000000
 }
 
 ### Test 5-2: POST crear orden exitosa con muchos productos
