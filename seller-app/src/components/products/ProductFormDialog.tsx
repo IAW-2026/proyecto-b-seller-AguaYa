@@ -15,7 +15,6 @@ interface ProductFormDialogProps {
     stock?: number
     image?: string
   }
-  vendorId?: string
 }
 
 export default function ProductFormDialog({ children, mode = 'create', productId, vendorId, initialData }: ProductFormDialogProps) {

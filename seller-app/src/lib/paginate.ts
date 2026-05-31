@@ -4,13 +4,18 @@ export type PaginatedResult<T> = {
   pageCount: number
 }
 
+// Prisma model delegates have complex generic signatures; `any` is pragmatic here
 export async function paginate<T>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   delegate: { findMany: (args: any) => Promise<any[]>; count: (args: any) => Promise<number> },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   where: any,
   options: {
     page?: number
     limit?: number
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     include?: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     orderBy?: any
   } = {}
 ): Promise<PaginatedResult<T>> {

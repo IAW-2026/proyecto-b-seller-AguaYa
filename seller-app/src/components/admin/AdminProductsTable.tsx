@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import Pagination from '@/components/Pagination'
-import ProductFormDialog from '@/components/products/ProductFormDialog'
 
 interface Product {
   id: string

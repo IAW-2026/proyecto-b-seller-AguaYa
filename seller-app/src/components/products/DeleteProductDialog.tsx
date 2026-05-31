@@ -10,10 +10,8 @@ interface DeleteProductDialogProps {
   productId: string
   productName: string
   vendorId?: string
-  vendorId?: string
 }
 
-export default function DeleteProductDialog({ productId, productName, vendorId }: DeleteProductDialogProps) {
 export default function DeleteProductDialog({ productId, productName, vendorId }: DeleteProductDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)

@@ -2,7 +2,6 @@ import { Package } from 'lucide-react'
 import type { Product } from '@prisma/client'
 import UpdateStockButton from './UpdateStockButton'
 import ProductFormDialog from './ProductFormDialog'
-import ToggleProductButton from './ToggleProductButton'
 
 export default function ProductCard({ product }: { product: Product }) {
   return (

@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
-import type { PaginatedResult } from '@/lib/paginate'
 import type { Order, OrderItem, Product } from '@prisma/client'
 
 type OrderWithItems = Order & { items: (OrderItem & { product: Product })[] }

@@ -3,7 +3,6 @@ import { auth } from '@clerk/nextjs/server'
 import { getVendorOverview } from '@/lib/queries/vendors'
 import { getVendorReviews } from '@/lib/queries/reviews'
 import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
-import type { Review } from '@/lib/queries/reviews'
 
 function ReviewStars({ rating }: { rating: number }) {
   return (
@@ -53,10 +52,18 @@ async function OverviewContent() {
           <strong className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">Órdenes</strong>
           <div className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">{overview._count.orders}</div>
         </div>
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
-          <strong className="text-sm uppercase tracking-wide text-slate-500">Estado</strong>
-          <div className="mt-3">
-            <ToggleVendorButton vendorId={overview.id} isActive={overview.isActive} vendorName={overview.name} role="vendor" />
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80">
+          <strong className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">Estado</strong>
+          <div className="mt-3 flex items-center gap-3">
+            <span className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium ${
+              overview.isActive
+                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+                : 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+            }`}>
+              <span className={`h-2 w-2 rounded-full ${overview.isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
+              {overview.isActive ? 'Activo' : 'Inactivo'}
+            </span>
+            <ToggleVendorButton vendorId={overview.id} isActive={overview.isActive} vendorName={overview.name} role="vendor" size="sm" />
           </div>
         </div>
       </div>

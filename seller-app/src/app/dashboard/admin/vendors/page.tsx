@@ -5,7 +5,6 @@ import { getVendorsWithClerkInfoPaginated } from '@/app/actions/admin-vendor'
 import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
 import AdminVendorEditDialog from '@/components/admin/AdminVendorEditDialog'
 import VendorsPagination from '@/components/admin/VendorsPagination'
-import AdminVendorEditDialog from '@/components/admin/AdminVendorEditDialog'
 import { Package } from 'lucide-react'
 
 export default async function VendorsPage(props: { searchParams: Promise<{ page?: string }> }) {

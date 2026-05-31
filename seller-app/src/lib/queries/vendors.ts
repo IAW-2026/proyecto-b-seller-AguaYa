@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
-import type { PaginatedResult } from '@/lib/paginate'
 import type { Vendor, Product } from '@prisma/client'
 
 export async function getVendorByUserId(userId: string) {

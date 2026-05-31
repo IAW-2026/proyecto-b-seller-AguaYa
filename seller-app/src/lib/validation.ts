@@ -230,7 +230,7 @@ export function validateCreateOrderInput(data: unknown): CreateOrderInput {
     vendorId: d.vendorId.trim(),
     buyerId: d.buyerId.trim(),
     address: d.address.trim(),
-    items: d.items.map((item: any) => ({
+    items: d.items.map((item: { productId: string; quantity: number }) => ({
       productId: item.productId.trim(),
       quantity: item.quantity as number,
     })),

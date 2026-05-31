@@ -9,7 +9,7 @@ interface ConfirmOrderDialogProps {
   orderLabel: string
 }
 
-export default function ConfirmOrderDialog({ orderId, orderLabel }: ConfirmOrderDialogProps) {
+export default function ConfirmOrderDialog({ orderId }: ConfirmOrderDialogProps) {
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 

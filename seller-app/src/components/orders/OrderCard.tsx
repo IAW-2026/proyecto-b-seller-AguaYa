@@ -2,13 +2,14 @@
 
 import { Package, CheckCircle } from 'lucide-react'
 import type { Order, OrderItem, OrderStatus } from '@prisma/client'
+import type { LucideIcon } from 'lucide-react'
 import ConfirmOrderDialog from '@/components/orders/ConfirmOrderDialog'
 
 export type OrderWithItems = Order & {
-  items: (OrderItem & { product: any })[]
+  items: (OrderItem & { product: Record<string, unknown> })[]
 }
 
-const statusConfig: Record<OrderStatus, { label: string; color: string; icon: any }> = {
+const statusConfig: Record<OrderStatus, { label: string; color: string; icon: LucideIcon }> = {
   PAID: { label: 'Pagada', color: 'bg-green-100 text-green-800', icon: CheckCircle },
   READY: { label: 'Lista para entregar', color: 'bg-blue-100 text-blue-800', icon: Package },
 }

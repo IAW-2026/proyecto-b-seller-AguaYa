@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createProduct, updateProduct } from '@/app/actions/product'
-import { updateProductAsAdmin, deleteProductAsAdmin } from '@/app/actions/admin-vendor'
+import { updateProductAsAdmin } from '@/app/actions/admin-vendor'
 import Button from './ui/Button'
 import ImageUpload from './ui/ImageUpload'
 import DeleteProductDialog from './products/DeleteProductDialog'
@@ -21,7 +21,6 @@ interface ProductFormProps {
     image?: string
   }
   onSuccess?: () => void
-  vendorId?: string
 }
 
 export default function ProductForm({ mode = 'create', productId, initialData, onSuccess, vendorId }: ProductFormProps) {
@@ -116,7 +115,6 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
       <div className="mt-3 flex gap-3">
         <Button type="submit" disabled={loading}>{loading ? (mode === 'edit' ? 'Guardando...' : 'Creando...') : (mode === 'edit' ? 'Guardar cambios' : 'Crear producto')}</Button>
         {mode === 'edit' && productId ? (
-          <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} vendorId={vendorId} />
           <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} vendorId={vendorId} />
         ) : null}
       </div>

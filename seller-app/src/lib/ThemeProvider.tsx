@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import type { ReactNode } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -24,26 +25,23 @@ function getInitialTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-export default function ThemeProvider({ children }: { children: React.ReactNode }) {
+export default function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light')
 
+  // On mount, sync React state with localStorage (the anti-flash script in <head>
+  // already set the correct CSS class before hydration)
   useEffect(() => {
-    setTheme(getInitialTheme())
+    const actual = getInitialTheme()
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTheme(actual)
+    document.documentElement.classList.toggle('dark', actual === 'dark')
   }, [])
-
-  useEffect(() => {
-    const root = document.documentElement
-    if (theme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-  }, [theme])
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
       const next = prev === 'dark' ? 'light' : 'dark'
       localStorage.setItem('theme', next)
+      document.documentElement.classList.toggle('dark', next === 'dark')
       return next
     })
   }, [])

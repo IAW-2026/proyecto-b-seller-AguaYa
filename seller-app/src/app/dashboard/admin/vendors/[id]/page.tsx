@@ -7,24 +7,6 @@ import { getVendorProductsPaginated } from '@/lib/queries/vendors'
 import { getVendorOrdersByStatus } from '@/lib/queries/orders'
 import { getVendorReviews } from '@/lib/queries/reviews'
 import VendorDetailTabs from '@/components/admin/VendorDetailTabs'
-import RefreshPageButton from '@/components/admin/RefreshPageButton'
-
-function mapOrder(o: any) {
-  return {
-    id: o.id,
-    externalId: o.externalId,
-    status: o.status,
-    total: o.total,
-    address: o.address,
-    createdAt: o.createdAt.toISOString(),
-    buyerId: o.buyerId,
-    items: o.items.map((i: any) => ({
-      productName: i.productName,
-      productPrice: i.productPrice,
-      quantity: i.quantity,
-    })),
-  }
-}
 
 export default async function VendorDetailPage({
   params,
@@ -45,15 +27,6 @@ export default async function VendorDetailPage({
   const vendor = await getVendorWithClerkInfo(id)
   if (!vendor) redirect('/dashboard/admin/vendors')
 
-  const { product_page, paid_page, ready_page } = await searchParams
-  const productPage = parseInt(product_page || '1', 10)
-  const paidPage = parseInt(paid_page || '1', 10)
-  const readyPage = parseInt(ready_page || '1', 10)
-
-  const [productsResult, paidResult, readyResult, reviews] = await Promise.all([
-    getVendorProductsPaginated(id, productPage),
-    getVendorOrdersByStatus(id, 'PAID', paidPage),
-    getVendorOrdersByStatus(id, 'READY', readyPage),
   const [productsResult, paidOrdersResult, readyOrdersResult, reviews] = await Promise.all([
     getVendorProductsPaginated(id, productPage),
     getVendorOrdersByStatus(id, 'PAID', paidPage),
