@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,13 +14,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   min-height: 100vh;
   background:
@@ -27,6 +22,19 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   text-rendering: optimizeLegibility;
+}
+
+:root.dark body {
+  --background: #020617;
+  --foreground: #f1f5f9;
+  background:
+    radial-gradient(circle at top, rgba(30, 58, 138, 0.25), transparent 36%),
+    linear-gradient(180deg, #020617 0%, #030712 45%, #000000 100%);
+}
+
+.dark ::selection {
+  background: rgba(56, 189, 248, 0.25);
+  color: #f8fafc;
 }
 
 ::selection {

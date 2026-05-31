@@ -23,7 +23,7 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
     return (
       <div>
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-slate-900">Productos</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Productos</h1>
         </div>
         <AdminProductsTable products={result.items} page={page} pageCount={result.pageCount} />
       </div>
@@ -53,14 +53,14 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Catálogo de productos</h1>
         </div>
         <ProductFormDialog>
-          <button type="button" className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+          <button type="button" className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
             + Nuevo producto
           </button>
         </ProductFormDialog>
       </div>
 
       {productsVendor.products.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-slate-600">No tienes productos aún.</p>
+        <p className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-slate-600 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-400">No tienes productos aún.</p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {productsVendor.products.map((p) => (
@@ -74,7 +74,7 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
 
 export default async function ProductsPage(props: { searchParams: Promise<{ page?: string }> }) {
   return (
-    <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando productos...</div>}>
+    <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando productos...</div>}>
       <ProductsContent searchParams={props.searchParams} />
     </Suspense>
   )

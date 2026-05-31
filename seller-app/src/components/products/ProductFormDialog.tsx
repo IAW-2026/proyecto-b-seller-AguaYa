@@ -7,6 +7,7 @@ interface ProductFormDialogProps {
   children: ReactNode
   mode?: 'create' | 'edit'
   productId?: string
+  vendorId?: string
   initialData?: {
     name: string
     description?: string
@@ -17,7 +18,7 @@ interface ProductFormDialogProps {
   vendorId?: string
 }
 
-export default function ProductFormDialog({ children, mode = 'create', productId, initialData, vendorId }: ProductFormDialogProps) {
+export default function ProductFormDialog({ children, mode = 'create', productId, vendorId, initialData }: ProductFormDialogProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -44,14 +45,14 @@ export default function ProductFormDialog({ children, mode = 'create', productId
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <ProductForm mode={mode} productId={productId} initialData={initialData} onSuccess={() => setOpen(false)} vendorId={vendorId} />
+            <ProductForm mode={mode} productId={productId} vendorId={vendorId} initialData={initialData} onSuccess={() => setOpen(false)} />
           </div>
         </div>
       ) : null}

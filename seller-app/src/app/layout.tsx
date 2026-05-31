@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
 import type { Metadata } from 'next'
+import ThemeProvider from '@/lib/ThemeProvider'
 import './globals.css'
 
 const geistSans = Geist({
@@ -31,7 +32,16 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
-        <body className="bg-background text-foreground antialiased">{children}</body>
+        <head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(){var t=localStorage.getItem('theme');if(t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')})()`,
+            }}
+          />
+        </head>
+        <body className="bg-background text-foreground antialiased">
+          <ThemeProvider>{children}</ThemeProvider>
+        </body>
       </html>
     </ClerkProvider>
   )

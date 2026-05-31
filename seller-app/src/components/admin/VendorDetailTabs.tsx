@@ -68,6 +68,17 @@ type Paginated<T> = {
 export default function VendorDetailTabs({
   vendor,
   products,
+  productsPage,
+  productsPageCount,
+  productsTotal,
+  paidOrders,
+  paidPage,
+  paidPageCount,
+  paidTotal,
+  readyOrders,
+  readyPage,
+  readyPageCount,
+  readyTotal,
   paidOrders,
   readyOrders,
   reviews,
@@ -84,7 +95,10 @@ export default function VendorDetailTabs({
     <div>
       <h1 className="mb-1 text-2xl font-bold text-slate-900 dark:text-white">{vendor.name}</h1>
       <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">{vendor.clerkName}</p>
+      <h1 className="mb-1 text-2xl font-bold text-slate-900 dark:text-white">{vendor.name}</h1>
+      <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">{vendor.clerkName}</p>
 
+      <div className="mb-6 flex gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
       <div className="mb-6 flex gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
         <button
           onClick={() => setActiveTab('overview')}
@@ -94,7 +108,7 @@ export default function VendorDetailTabs({
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          Overview
+          Resumen
         </button>
         <button
           onClick={() => setActiveTab('products')}
@@ -200,6 +214,7 @@ function OverviewTab({ vendor, reviews }: { vendor: Vendor; reviews: Review[] })
         </h3>
         {reviews.length === 0 ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">No hay reseñas todavía.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">No hay reseñas todavía.</p>
         ) : (
           <div className="space-y-3">
             {reviews.map((review) => {
@@ -275,7 +290,9 @@ function ProductsTab({ vendorId, products }: { vendorId: string; products: Pagin
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
           <table className="w-full text-sm">
+            <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-800 dark:text-slate-400">
               <tr>
                 <th className="px-4 py-3 font-medium">Nombre</th>

@@ -67,7 +67,7 @@ export async function listAllVendorsPaginated(page: number = 1) {
   return paginate<Vendor>(
     prisma.vendor,
     { deletedAt: null },
-    { page, limit: 15, orderBy: { createdAt: 'desc' } }
+    { page, limit: 10, orderBy: { createdAt: 'desc' } }
   )
 }
 

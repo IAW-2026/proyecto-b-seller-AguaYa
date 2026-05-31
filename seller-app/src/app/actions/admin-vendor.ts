@@ -4,7 +4,7 @@ import { clerkClient } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getAuthRoles } from '@/lib/auth-utils'
-import { validateVendorInput, validateProductInput } from '@/lib/validation'
+import { validateVendorInput, validateProductInput, validateVendorUpdateInput } from '@/lib/validation'
 
 async function requireAdmin() {
   const roles = await getAuthRoles()
@@ -127,6 +127,8 @@ export async function updateVendorAsAdmin(
   }
 ) {
   await requireAdmin()
+
+  validateVendorUpdateInput(data)
 
   const vendor = await prisma.vendor.update({
     where: { id: vendorId },

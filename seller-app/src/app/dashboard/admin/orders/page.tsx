@@ -13,7 +13,7 @@ export default async function AdminOrdersPage(props: { searchParams: Promise<{ p
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Órdenes (global)</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Órdenes (global)</h1>
       </div>
       <AdminOrdersTable orders={result.items} page={page} pageCount={result.pageCount} />
     </div>

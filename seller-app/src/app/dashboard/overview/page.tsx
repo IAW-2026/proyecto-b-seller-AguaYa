@@ -28,30 +28,30 @@ async function OverviewContent() {
   if (!overview) {
     return (
       <div className="max-w-2xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700">Overview</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">No existe un vendedor asociado a esta cuenta todavía.</h1>
-        <p className="text-slate-600">Cuando registres el perfil del vendedor, acá vas a ver sus métricas, productos y órdenes.</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-700 dark:text-sky-400">Overview</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">No existe un vendedor asociado a esta cuenta todavía.</h1>
+        <p className="text-slate-600 dark:text-slate-400">Cuando registres el perfil del vendedor, acá vas a ver sus métricas, productos y órdenes.</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
-        <strong className="text-lg text-slate-950">{overview.name}</strong>
-        <div className="mt-3 text-sm text-slate-600">{overview.address}</div>
-        {overview.description ? <div className="mt-2 text-sm text-slate-600">{overview.description}</div> : null}
-        <div className="mt-2 text-sm text-slate-600">Reputación: {overview.reputation}</div>
+      <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/80">
+        <strong className="text-lg text-slate-950 dark:text-slate-100">{overview.name}</strong>
+        <div className="mt-3 text-sm text-slate-600 dark:text-slate-400">{overview.address}</div>
+        {overview.description ? <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">{overview.description}</div> : null}
+        <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">Reputación: {overview.reputation}</div>
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
-          <strong className="text-sm uppercase tracking-wide text-slate-500">Productos</strong>
-          <div className="mt-3 text-3xl font-semibold text-slate-950">{overview._count.products}</div>
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80">
+          <strong className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">Productos</strong>
+          <div className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">{overview._count.products}</div>
         </div>
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
-          <strong className="text-sm uppercase tracking-wide text-slate-500">Órdenes</strong>
-          <div className="mt-3 text-3xl font-semibold text-slate-950">{overview._count.orders}</div>
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80">
+          <strong className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">Órdenes</strong>
+          <div className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">{overview._count.orders}</div>
         </div>
         <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm">
           <strong className="text-sm uppercase tracking-wide text-slate-500">Estado</strong>
@@ -62,49 +62,49 @@ async function OverviewContent() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
-          <h2 className="text-xl font-semibold text-slate-950">Reseñas recientes</h2>
+        <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/80">
+          <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Reseñas recientes</h2>
           {reviews.length > 0 ? (
             <ul className="mt-5 space-y-4">
               {reviews.map((review) => (
-                <li key={review.orderId} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
+                <li key={review.orderId} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 dark:border-slate-700/70 dark:bg-slate-800/70">
                   <div className="flex items-center justify-between">
-                    <strong className="text-slate-950">Orden {review.orderId.slice(0, 8)}</strong>
+                    <strong className="text-slate-950 dark:text-slate-100">Orden {review.orderId.slice(0, 8)}</strong>
                     <ReviewStars rating={review.rating} />
                   </div>
-                  <div className="mt-2 text-sm text-slate-600">
+                  <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                     {review.buyerName ? <span>Comprador: {review.buyerName}</span> : null}
                   </div>
                   {review.products.length > 0 ? (
-                    <div className="mt-1 text-sm text-slate-600">
+                    <div className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                       Producto: {review.products.join(', ')}
                     </div>
                   ) : null}
                   {review.description ? (
-                    <p className="mt-2 text-sm text-slate-700 italic">&ldquo;{review.description}&rdquo;</p>
+                    <p className="mt-2 text-sm text-slate-700 italic dark:text-slate-300">&ldquo;{review.description}&rdquo;</p>
                   ) : null}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-4 text-slate-600">No hay reseñas todavía.</p>
+            <p className="mt-4 text-slate-600 dark:text-slate-400">No hay reseñas todavía.</p>
           )}
         </section>
 
-        <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
-          <h2 className="text-xl font-semibold text-slate-950">Órdenes recientes</h2>
+        <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/80">
+          <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Órdenes recientes</h2>
           {overview.orders.length > 0 ? (
             <ul className="mt-5 space-y-4">
               {overview.orders.map((order) => (
-                <li key={order.id} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
-                  <strong className="block text-slate-950">Orden {order.id.slice(0, 8)}</strong>
-                  <div className="mt-2 text-sm text-slate-600">Estado: {order.status}</div>
-                  <div className="text-sm text-slate-600">Total: ${order.total}</div>
+                <li key={order.id} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 dark:border-slate-700/70 dark:bg-slate-800/70">
+                  <strong className="block text-slate-950 dark:text-slate-100">Orden {order.id.slice(0, 8)}</strong>
+                  <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">Estado: {order.status}</div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400">Total: ${order.total}</div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-4 text-slate-600">No hay órdenes cargadas.</p>
+            <p className="mt-4 text-slate-600 dark:text-slate-400">No hay órdenes cargadas.</p>
           )}
         </section>
       </div>
@@ -114,7 +114,7 @@ async function OverviewContent() {
 
 export default function OverviewPage() {
   return (
-    <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando...</div>}>
+    <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando...</div>}>
       <OverviewContent />
     </Suspense>
   )

@@ -10,8 +10,10 @@ interface DeleteProductDialogProps {
   productId: string
   productName: string
   vendorId?: string
+  vendorId?: string
 }
 
+export default function DeleteProductDialog({ productId, productName, vendorId }: DeleteProductDialogProps) {
 export default function DeleteProductDialog({ productId, productName, vendorId }: DeleteProductDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -54,21 +56,21 @@ export default function DeleteProductDialog({ productId, productName, vendorId }
           onClick={handleClose}
         >
           <div
-            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
             role="dialog"
             aria-modal="true"
             aria-labelledby={`delete-product-title-${productId}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 id={`delete-product-title-${productId}`} className="text-lg font-semibold text-gray-900">
+            <h3 id={`delete-product-title-${productId}`} className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               Eliminar producto
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
               ¿Seguro que quieres eliminar <strong>{productName}</strong>? Esta acción no se puede deshacer.
             </p>
 
             {error && (
-              <div className="mt-3 p-3 bg-red-100 text-red-600 rounded-lg text-sm">{error}</div>
+              <div className="mt-3 p-3 bg-red-100 text-red-600 rounded-lg text-sm dark:bg-red-900/50 dark:text-red-400">{error}</div>
             )}
 
             <div className="mt-6 flex justify-end gap-3">
