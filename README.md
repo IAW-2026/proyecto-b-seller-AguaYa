@@ -1,9 +1,30 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/mlS0D64r)
 # seller
 
-Aplicación **Seller** del [Proyecto IAW 2026](https://iaw-2026.github.io/proyecto/) — comisión `<!-- completar -->`.
+Aplicación **Seller** del [Proyecto IAW 2026](https://iaw-2026.github.io/proyecto/) — comisión ``.
 
-Esta app corresponde al rol del vendedor en los proyectos de tipo **B (Delivery)** y **C (Marketplace)**.
+Esta app corresponde al rol del vendedor en el proyecto tipo **B (Delivery)**.
+
+# SellerApp — AguaYa
+
+Aplicacion destinada a la gestion de pedidos y stock para negocios de agua envasada
+
+## Deploy
+
+Link: [\[URL del deploy\]](https://proyecto-b-seller-agua-ya.vercel.app/)
+
+## Credenciales de prueba
+
+### Admin (`admin_seller`)
+- Email: ...
+- Contraseña: ...
+
+### Vendedor (`seller`)
+- Email: ...
+- Contraseña: ...
+
+## Tech Stack
+
+Next.js 16, React 19, Clerk, Prisma + Neon (PostgreSQL), Cloudinary, Recharts
 
 ---
 

@@ -50,7 +50,7 @@ export async function listAllProductsPaginated(
     },
     {
       page,
-      limit: 10,
+      limit: 5,
       include: { vendor: { select: { name: true, id: true } } },
       orderBy: buildProductOrderBy(filters?.sortBy, filters?.sortOrder),
     }

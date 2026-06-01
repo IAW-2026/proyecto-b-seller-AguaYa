@@ -18,7 +18,7 @@ export default function DashboardSidebar({
   const isAdmin = roles?.includes('admin_seller')
 
   return (
-    <aside className="hidden w-72 shrink-0 border-r border-slate-200/80 bg-white/75 px-4 py-6 backdrop-blur dark:border-slate-800 dark:bg-slate-950/75 xl:block">
+    <aside className="hidden w-72 shrink-0 overflow-y-auto border-r border-slate-200/80 bg-white/75 px-4 py-6 backdrop-blur dark:border-slate-800 dark:bg-slate-950/75 xl:block">
       <div className="mb-6 rounded-2xl bg-slate-900 px-4 py-5 text-white shadow-sm">
         <p className="text-xs uppercase tracking-[0.24em] text-sky-200">AguaYa</p>
         <h2 className="mt-2 text-xl font-semibold">Panel de Control</h2>

@@ -109,7 +109,7 @@ export async function listAllOrdersPaginated(
     where,
     {
       page,
-      limit: 10,
+      limit: 5,
       include: {
         vendor: { select: { name: true, id: true } },
         items: { include: { product: true } },

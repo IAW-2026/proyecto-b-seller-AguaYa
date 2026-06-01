@@ -82,7 +82,7 @@ export default function AdminVendorsTable({
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+      <div className="overflow-x-auto overflow-y-auto max-h-[70vh] rounded-xl border border-slate-200 dark:border-slate-700">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             <tr>

@@ -1,10 +1,9 @@
-import React, { Suspense } from 'react'
 import { auth } from '@clerk/nextjs/server'
 import { getVendorByUserId } from '@/lib/queries/vendors'
 import { redirect } from 'next/navigation'
 import VendorForm from '@/components/VendorForm'
 
-async function SetupVendorContent() {
+export default async function SetupVendorPage() {
   const { userId } = await auth()
 
   if (!userId) {
@@ -29,13 +28,5 @@ async function SetupVendorContent() {
         <VendorForm redirectTo="/dashboard/overview" />
       </div>
     </div>
-  )
-}
-
-export default function SetupVendorPage() {
-  return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-slate-500 dark:text-slate-400">Cargando...</div>}>
-      <SetupVendorContent />
-    </Suspense>
   )
 }

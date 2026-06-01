@@ -42,7 +42,7 @@ export default function AdminOrdersTable({
 
   const pushParams = useCallback(
     (updates: Record<string, string>) => {
-      const params = new URLSearchParams(searchParams.toString())
+      const params = new URLSearchParams(globalThis.location?.search ?? '')
       for (const [k, v] of Object.entries(updates)) {
         if (v) params.set(k, v)
         else params.delete(k)
@@ -51,7 +51,7 @@ export default function AdminOrdersTable({
       const str = params.toString()
       router.push(str ? `${pathname}?${str}` : pathname)
     },
-    [router, pathname, searchParams]
+    [router, pathname]
   )
 
   return (
@@ -82,7 +82,7 @@ export default function AdminOrdersTable({
         })}
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+      <div className="overflow-x-auto overflow-y-auto max-h-[70vh] rounded-xl border border-slate-200 dark:border-slate-700">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             <tr>

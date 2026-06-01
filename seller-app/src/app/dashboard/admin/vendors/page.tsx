@@ -4,10 +4,9 @@ import { requireAdminPage } from '@/lib/admin-guard'
 import { getVendorsWithClerkInfoPaginated } from '@/app/actions/admin-vendor'
 import SearchBar from '@/components/ui/SearchBar'
 import AdminVendorsTable from '@/components/admin/AdminVendorsTable'
+import DashboardTableLoading from '@/components/ui/DashboardTableLoading'
 
-export default async function VendorsPage(props: { searchParams: Promise<{ page?: string; q?: string; sortBy?: string; sortOrder?: string }> }) {
-  await requireAdminPage()
-
+async function VendorsTable(props: { searchParams: Promise<{ page?: string; q?: string; sortBy?: string; sortOrder?: string }> }) {
   const searchParams = await props.searchParams
   const page = parseInt(searchParams.page || '1', 10)
   const q = searchParams.q || ''
@@ -19,6 +18,12 @@ export default async function VendorsPage(props: { searchParams: Promise<{ page?
     sortBy: sortBy || undefined,
     sortOrder: sortOrder || undefined,
   })
+
+  return <AdminVendorsTable vendors={vendors} page={page} pageCount={pageCount} />
+}
+
+export default async function VendorsPage(props: { searchParams: Promise<{ page?: string; q?: string; sortBy?: string; sortOrder?: string }> }) {
+  await requireAdminPage()
 
   return (
     <div>
@@ -36,8 +41,8 @@ export default async function VendorsPage(props: { searchParams: Promise<{ page?
         <SearchBar placeholder="Buscar por nombre, email o CUIL/CUIT..." />
       </div>
 
-      <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando...</div>}>
-        <AdminVendorsTable vendors={vendors} page={page} pageCount={pageCount} />
+      <Suspense fallback={<DashboardTableLoading />}>
+        <VendorsTable searchParams={props.searchParams} />
       </Suspense>
     </div>
   )

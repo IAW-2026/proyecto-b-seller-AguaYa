@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ExternalLink, Package, ShoppingCart, LayoutDashboard, Settings, Users } from 'lucide-react'
-import ThemeToggle from './ThemeToggle'
+import { SignOutButton } from '@clerk/nextjs'
+import { ExternalLink, Package, ShoppingCart, LayoutDashboard, Settings, Users, LogOut } from 'lucide-react'
 
 interface NavItem {
   href: string
@@ -21,7 +21,7 @@ export default function MobileBottomNav({ roles, feedbackAppUrl }: { roles?: str
     items.push({ href: '/dashboard/overview', label: 'Resumen', icon: <LayoutDashboard className="h-5 w-5" /> })
   }
   items.push({ href: '/dashboard/products', label: 'Productos', icon: <Package className="h-5 w-5" /> })
-  items.push({ href: '/dashboard/orders', label: 'Pedidos', icon: <ShoppingCart className="h-5 w-5" /> })
+  items.push({ href: '/dashboard/orders', label: 'Órdenes', icon: <ShoppingCart className="h-5 w-5" /> })
   if (!isAdmin && feedbackAppUrl) {
     items.push({ href: feedbackAppUrl, label: 'Reseñas', icon: <ExternalLink className="h-5 w-5" /> })
   }
@@ -62,7 +62,12 @@ export default function MobileBottomNav({ roles, feedbackAppUrl }: { roles?: str
           )
         })}
         <li>
-          <ThemeToggle />
+          <SignOutButton>
+            <button className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Cerrar sesión">
+              <LogOut className="h-5 w-5" />
+              Salir
+            </button>
+          </SignOutButton>
         </li>
       </ul>
     </nav>

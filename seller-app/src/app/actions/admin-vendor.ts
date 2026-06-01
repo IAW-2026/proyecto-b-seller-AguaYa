@@ -104,7 +104,7 @@ export async function getVendorsWithClerkInfoPaginated(
     items.sort((a, b) => (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) * dir)
   }
 
-  const limit = 10
+  const limit = 5
   const total = items.length
   const pageCount = Math.ceil(total / limit)
   const paginatedItems = items.slice((page - 1) * limit, page * limit)

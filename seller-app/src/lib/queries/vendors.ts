@@ -28,7 +28,7 @@ export async function getVendorOverview(userId: string) {
       description: true,
       isActive: true,
       _count: { select: { products: true, orders: true } },
-      orders: { orderBy: { createdAt: 'desc' }, take: 5 },
+      orders: { orderBy: { createdAt: 'desc' }, take: 8, select: { id: true, status: true, total: true, buyerName: true } },
     },
   })
 }

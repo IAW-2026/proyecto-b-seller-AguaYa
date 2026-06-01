@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { requireAdminPage } from '@/lib/admin-guard'
@@ -8,21 +8,16 @@ import { getVendorOrdersByStatus } from '@/lib/queries/orders'
 import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
 import VendorDetailTabs from '@/components/admin/VendorDetailTabs'
 
-export default async function VendorDetailPage({
-  params,
+async function VendorDetailContent({
+  id,
   searchParams,
 }: {
-  params: Promise<{ id: string }>
-  searchParams: Promise<{ product_page?: string; paid_page?: string; ready_page?: string }>
+  id: string
+  searchParams: { product_page?: string; paid_page?: string; ready_page?: string }
 }) {
-  await requireAdminPage()
-
-  const { id } = await params
-  const sp = await searchParams
-
-  const productPage = parseInt(sp.product_page || '1', 10)
-  const paidPage = parseInt(sp.paid_page || '1', 10)
-  const readyPage = parseInt(sp.ready_page || '1', 10)
+  const productPage = parseInt(searchParams.product_page || '1', 10)
+  const paidPage = parseInt(searchParams.paid_page || '1', 10)
+  const readyPage = parseInt(searchParams.ready_page || '1', 10)
 
   const vendor = await getVendorWithClerkInfo(id)
   if (!vendor) redirect('/dashboard/admin/vendors')
@@ -51,6 +46,62 @@ export default async function VendorDetailPage({
   })
 
   return (
+    <VendorDetailTabs
+      vendor={{
+        id: vendor.id,
+        name: vendor.name,
+        description: vendor.description,
+        address: vendor.address,
+        image: vendor.image,
+        cuil: vendor.cuil,
+        cuit: vendor.cuit,
+        clerkName: vendor.clerkName,
+        clerkEmail: vendor.clerkEmail,
+        isActive: vendor.isActive,
+      }}
+      products={{
+        items: productsResult.items.map((p) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          price: p.price,
+          stock: p.stock,
+          image: p.image,
+          isActive: p.isActive,
+        })),
+        page: productPage,
+        pageCount: productsResult.pageCount,
+      }}
+      paidOrders={{
+        items: paidOrdersResult.items.map(mapOrder),
+        page: paidPage,
+        pageCount: paidOrdersResult.pageCount,
+      }}
+      readyOrders={{
+        items: readyOrdersResult.items.map(mapOrder),
+        page: readyPage,
+        pageCount: readyOrdersResult.pageCount,
+      }}
+      reviews={reviews}
+      promedio={reviewStats.promedio}
+      totalReviews={reviewStats.total}
+    />
+  )
+}
+
+export default async function VendorDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ product_page?: string; paid_page?: string; ready_page?: string }>
+}) {
+  await requireAdminPage()
+
+  const { id } = await params
+  const sp = await searchParams
+
+  return (
     <div>
       <Link
         href="/dashboard/admin/vendors"
@@ -58,48 +109,43 @@ export default async function VendorDetailPage({
       >
         &larr; Volver a vendedores
       </Link>
+      <Suspense fallback={<VendorDetailSkeleton />}>
+        <VendorDetailContent id={id} searchParams={sp} />
+      </Suspense>
+    </div>
+  )
+}
 
-      <VendorDetailTabs
-        vendor={{
-          id: vendor.id,
-          name: vendor.name,
-          description: vendor.description,
-          address: vendor.address,
-          image: vendor.image,
-          cuil: vendor.cuil,
-          cuit: vendor.cuit,
+function VendorDetailSkeleton() {
+  return (
+    <div className="animate-pulse space-y-6">
+      <div className="h-8 w-64 rounded-lg bg-slate-200/70" />
+      <div className="h-4 w-48 rounded bg-slate-200/50" />
 
-          clerkName: vendor.clerkName,
-          clerkEmail: vendor.clerkEmail,
-          isActive: vendor.isActive,
-        }}
-        products={{
-          items: productsResult.items.map((p) => ({
-            id: p.id,
-            name: p.name,
-            description: p.description,
-            price: p.price,
-            stock: p.stock,
-            image: p.image,
-            isActive: p.isActive,
-          })),
-          page: productPage,
-          pageCount: productsResult.pageCount,
-        }}
-        paidOrders={{
-          items: paidOrdersResult.items.map(mapOrder),
-          page: paidPage,
-          pageCount: paidOrdersResult.pageCount,
-        }}
-        readyOrders={{
-          items: readyOrdersResult.items.map(mapOrder),
-          page: readyPage,
-          pageCount: readyOrdersResult.pageCount,
-        }}
-        reviews={reviews}
-        promedio={reviewStats.promedio}
-        totalReviews={reviewStats.total}
-      />
+      <div className="flex gap-1 rounded-xl bg-slate-100 p-1">
+        <div className="h-9 flex-1 rounded-lg bg-white" />
+        <div className="h-9 flex-1 rounded-lg bg-slate-200/50" />
+        <div className="h-9 flex-1 rounded-lg bg-slate-200/50" />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 p-6">
+          <div className="mb-4 h-5 w-44 rounded bg-slate-200/70" />
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-4 w-full rounded bg-slate-200/40" />
+            ))}
+          </div>
+        </div>
+        <div className="rounded-xl border border-slate-200 p-6">
+          <div className="mb-4 h-5 w-32 rounded bg-slate-200/70" />
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-4 w-full rounded bg-slate-200/40" />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
