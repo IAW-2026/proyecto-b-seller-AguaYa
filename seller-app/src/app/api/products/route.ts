@@ -67,6 +67,8 @@ export async function GET(request: Request): Promise<Response> {
     // 4. Construir condiciones WHERE dinámicamente
     const where: Prisma.ProductWhereInput = {
       deletedAt: null, // Excluir productos soft-deleted
+      isActive: true,  // Solo productos activos
+      vendor: { isActive: true }, // Solo de vendedores activos
     }
 
     if (filters.vendorIds && filters.vendorIds.length > 0) {

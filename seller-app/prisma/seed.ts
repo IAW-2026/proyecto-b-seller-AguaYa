@@ -47,7 +47,6 @@ async function main() {
           name,
           address: `Av. Siempre Viva ${i + 1}00, Córdoba`,
           description: `Distribuidora de agua de mesa ${name}`,
-          reputation: Math.round((3 + Math.random() * 2) * 10) / 10,
         },
       })
     )

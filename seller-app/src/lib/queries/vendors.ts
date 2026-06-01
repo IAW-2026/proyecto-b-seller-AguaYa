@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
-import type { PaginatedResult } from '@/lib/paginate'
-import type { Product, Vendor } from '@prisma/client'
+import type { Vendor, Product, Prisma } from '@prisma/client'
 
 export async function getVendorByUserId(userId: string) {
   return prisma.vendor.findUnique({
@@ -10,11 +9,11 @@ export async function getVendorByUserId(userId: string) {
       id: true,
       name: true,
       address: true,
-      reputation: true,
       description: true,
       image: true,
       cuil: true,
       cuit: true,
+      isActive: true,
     },
   })
 }
@@ -22,9 +21,14 @@ export async function getVendorByUserId(userId: string) {
 export async function getVendorOverview(userId: string) {
   return prisma.vendor.findUnique({
     where: { userId },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      address: true,
+      description: true,
+      isActive: true,
       _count: { select: { products: true, orders: true } },
-      orders: { orderBy: { createdAt: 'desc' }, take: 5 },
+      orders: { orderBy: { createdAt: 'desc' }, take: 8, select: { id: true, status: true, total: true, buyerName: true } },
     },
   })
 }
@@ -45,13 +49,21 @@ export async function getVendorProductsPaginated(vendorId: string, page: number 
   return paginate<Product>(
     prisma.product,
     { vendorId, deletedAt: null },
-    { page, limit: 10, orderBy: { createdAt: 'desc' } },
+    { page, limit: 10, orderBy: { createdAt: 'desc' } }
   )
 }
 
-export async function listAllVendors() {
+export async function listAllVendors(q?: string) {
+  const where: Prisma.VendorWhereInput = { deletedAt: null }
+  if (q) {
+    where.OR = [
+      { name: { contains: q, mode: 'insensitive' as const } },
+      { cuil: { contains: q, mode: 'insensitive' as const } },
+      { cuit: { contains: q, mode: 'insensitive' as const } },
+    ]
+  }
   return prisma.vendor.findMany({
-    where: { deletedAt: null },
+    where,
     orderBy: { createdAt: 'desc' },
   })
 }

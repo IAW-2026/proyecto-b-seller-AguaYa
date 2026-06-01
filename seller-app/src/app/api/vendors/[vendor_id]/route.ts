@@ -67,8 +67,8 @@ export async function GET(
       where: { id: vendorId },
     })
 
-    // 4. Si no existe, retornar 404
-    if (!vendor) {
+    // 4. Si no existe o está inactivo, retornar 404
+    if (!vendor || !vendor.isActive) {
       return NextResponse.json<ErrorResponse>(
         { error: 'Vendedor no encontrado' },
         { status: 404 }
@@ -80,9 +80,7 @@ export async function GET(
       {
         success: true,
         vendor: toPublicVendor(vendor),
-        
       },
-      
       { status: 200 }
     )
   } catch (error) {

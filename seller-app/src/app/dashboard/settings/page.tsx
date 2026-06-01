@@ -1,19 +1,16 @@
-/**
- * settings/page.tsx — Página de configuración del perfil del vendedor.
- *
- * Muestra el formulario de edición del vendor con los datos actuales precargados.
- * Incluye subida de avatar, nombre, dirección, CUIL/CUIT y descripción.
- */
-
-import React, { Suspense } from 'react'
+import React from 'react'
 import { auth } from '@clerk/nextjs/server'
 import { getVendorByUserId } from '@/lib/queries/vendors'
+import { getAuthRoles } from '@/lib/auth-utils'
 import VendorForm from '@/components/VendorForm'
-import { Settings, Store } from 'lucide-react'
+import ThemeToggle from '@/components/layout/ThemeToggle'
+import { Settings, Store, Moon } from 'lucide-react'
 
-async function SettingsContent() {
+export default async function SettingsPage() {
   const { userId } = await auth()
   const vendor = userId ? await getVendorByUserId(userId) : null
+  const roles = await getAuthRoles()
+  const isAdmin = roles.includes('admin_seller')
 
   return (
     <div className="space-y-6">
@@ -44,7 +41,7 @@ async function SettingsContent() {
             )}
             <div>
               <h2 className="text-lg font-semibold text-slate-950 dark:text-slate-100">{vendor.name}</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{vendor.address}</p>
+              {!isAdmin && <p className="text-sm text-slate-500 dark:text-slate-400">{vendor.address}</p>}
             </div>
           </div>
           <div className="bg-white rounded-lg border border-gray-200 p-6 dark:bg-slate-900 dark:border-slate-700">
@@ -55,20 +52,26 @@ async function SettingsContent() {
               image: vendor.image ?? undefined,
               cuil: vendor.cuil ?? undefined,
               cuit: vendor.cuit ?? undefined,
-            }} redirectTo="/dashboard/settings" />
+            }} redirectTo="/dashboard/settings" simple={isAdmin} />
+          </div>
+
+          {/* Theme toggle — solo visible en mobile/tablet */}
+          <div className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-white/80 p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80 xl:hidden">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
+                <Moon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Apariencia</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Cambiar entre modo claro y oscuro</p>
+              </div>
+            </div>
+            <ThemeToggle />
           </div>
         </>
       ) : (
         <p className="text-gray-500 dark:text-slate-400">No hay un vendedor asociado a esta cuenta.</p>
       )}
     </div>
-  )
-}
-
-export default function SettingsPage() {
-  return (
-    <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando...</div>}>
-      <SettingsContent />
-    </Suspense>
   )
 }

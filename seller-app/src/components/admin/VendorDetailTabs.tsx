@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { updateOrderStatusAsAdmin } from '@/app/actions/admin-vendor'
-import Pagination from '@/components/Pagination'
 import ProductFormDialog from '@/components/products/ProductFormDialog'
 import AdminVendorEditDialog from '@/components/admin/AdminVendorEditDialog'
+import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
+import Pagination from '@/components/Pagination'
+import { Package, ShoppingBag, ChevronDown, ChevronUp } from 'lucide-react'
 
 type Vendor = {
   id: string
@@ -15,9 +17,9 @@ type Vendor = {
   image: string | null
   cuil: string | null
   cuit: string | null
-  reputation: number
   clerkName: string
   clerkEmail: string
+  isActive: boolean
 }
 
 type Product = {
@@ -27,6 +29,13 @@ type Product = {
   price: number
   stock: number
   image: string | null
+  isActive: boolean
+}
+
+type OrderItem = {
+  productName: string
+  productPrice: number
+  quantity: number
 }
 
 type Order = {
@@ -37,55 +46,41 @@ type Order = {
   address: string | null
   createdAt: string
   buyerId: string
-  items: {
-    productName: string
-    productPrice: number
-    quantity: number
-  }[]
+  items: OrderItem[]
 }
 
 type Review = {
   orderId: string
-  buyerName: string
   rating: number
   description?: string
   createdAt: string
   products: string[]
 }
 
+type Paginated<T> = {
+  items: T[]
+  page: number
+  pageCount: number
+}
+
 export default function VendorDetailTabs({
   vendor,
   products,
-  productsPage,
-  productsPageCount,
-  productsTotal,
   paidOrders,
-  paidPage,
-  paidPageCount,
-  paidTotal,
   readyOrders,
-  readyPage,
-  readyPageCount,
-  readyTotal,
   reviews,
+  promedio,
+  totalReviews,
 }: {
   vendor: Vendor
-  products: Product[]
-  productsPage: number
-  productsPageCount: number
-  productsTotal: number
-  paidOrders: Order[]
-  paidPage: number
-  paidPageCount: number
-  paidTotal: number
-  readyOrders: Order[]
-  readyPage: number
-  readyPageCount: number
-  readyTotal: number
+  products: Paginated<Product>
+  paidOrders: Paginated<Order>
+  readyOrders: Paginated<Order>
   reviews: Review[]
+  promedio: number
+  totalReviews: number
 }) {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview')
-  const router = useRouter()
 
   return (
     <div>
@@ -96,7 +91,9 @@ export default function VendorDetailTabs({
         <button
           onClick={() => setActiveTab('overview')}
           className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
-            activeTab === 'overview' ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white'
+            activeTab === 'overview'
+              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Resumen
@@ -104,104 +101,151 @@ export default function VendorDetailTabs({
         <button
           onClick={() => setActiveTab('products')}
           className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
-            activeTab === 'products' ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white'
+            activeTab === 'products'
+              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          Productos ({productsTotal})
+          Productos
         </button>
         <button
           onClick={() => setActiveTab('orders')}
           className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
-            activeTab === 'orders' ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white'
+            activeTab === 'orders'
+              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
-          Órdenes ({paidTotal + readyTotal})
+          Pedidos
         </button>
       </div>
 
-      {activeTab === 'overview' && <OverviewTab vendor={vendor} reviews={reviews} />}
-      {activeTab === 'products' && <ProductsTab
-        vendorId={vendor.id}
-        products={products}
-        productsPage={productsPage}
-        productsPageCount={productsPageCount}
-        productsTotal={productsTotal}
-      />}
-      {activeTab === 'orders' && <OrdersTab
-        paidOrders={paidOrders}
-        paidPage={paidPage}
-        paidPageCount={paidPageCount}
-        paidTotal={paidTotal}
-        readyOrders={readyOrders}
-        readyPage={readyPage}
-        readyPageCount={readyPageCount}
-        readyTotal={readyTotal}
-      />}
+      {activeTab === 'overview' && <OverviewTab vendor={vendor} reviews={reviews} promedio={promedio} totalReviews={totalReviews} />}
+      {activeTab === 'products' && <ProductsTab vendorId={vendor.id} products={products} />}
+      {activeTab === 'orders' && <OrdersTab paidOrders={paidOrders} readyOrders={readyOrders} />}
     </div>
   )
 }
 
-function OverviewTab({ vendor, reviews }: { vendor: Vendor; reviews: Review[] }) {
+function OverviewTab({ vendor, reviews, promedio, totalReviews }: { vendor: Vendor; reviews: Review[]; promedio: number; totalReviews: number }) {
+  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set())
+
+  const toggleReview = (orderId: string) => {
+    setExpandedReviews((prev) => {
+      const next = new Set(prev)
+      if (next.has(orderId)) next.delete(orderId)
+      else next.add(orderId)
+      return next
+    })
+  }
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Información del vendedor</h3>
-          <AdminVendorEditDialog vendor={vendor} />
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Información del vendedor</h3>
+          <div className="flex items-center gap-2">
+            <ToggleVendorButton vendorId={vendor.id} isActive={vendor.isActive} vendorName={vendor.name} role="admin" />
+            <AdminVendorEditDialog vendor={vendor} />
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span className="text-slate-500 dark:text-slate-400">Nombre</span>
-            <p className="font-medium text-slate-900 dark:text-slate-100">{vendor.name}</p>
+            <p className="font-medium text-slate-900 dark:text-white">{vendor.name}</p>
           </div>
           <div>
             <span className="text-slate-500 dark:text-slate-400">Dirección</span>
-            <p className="font-medium text-slate-900 dark:text-slate-100">{vendor.address}</p>
+            <p className="font-medium text-slate-900 dark:text-white">{vendor.address}</p>
           </div>
           {vendor.description && (
             <div className="col-span-2">
               <span className="text-slate-500 dark:text-slate-400">Descripción</span>
-              <p className="font-medium text-slate-900 dark:text-slate-100">{vendor.description}</p>
+              <p className="font-medium text-slate-900 dark:text-white">{vendor.description}</p>
             </div>
           )}
           {vendor.cuil && (
             <div>
               <span className="text-slate-500 dark:text-slate-400">CUIL</span>
-              <p className="font-medium text-slate-900 dark:text-slate-100">{vendor.cuil}</p>
+              <p className="font-medium text-slate-900 dark:text-white">{vendor.cuil}</p>
             </div>
           )}
           {vendor.cuit && (
             <div>
               <span className="text-slate-500 dark:text-slate-400">CUIT</span>
-              <p className="font-medium text-slate-900 dark:text-slate-100">{vendor.cuit}</p>
+              <p className="font-medium text-slate-900 dark:text-white">{vendor.cuit}</p>
             </div>
           )}
           <div>
-            <span className="text-slate-500 dark:text-slate-400">Reputación</span>
-            <p className="font-medium text-slate-900 dark:text-slate-100">{vendor.reputation} / 5</p>
+            <span className="text-slate-500 dark:text-slate-400">Estado</span>
+            <p className="font-medium text-slate-900 dark:text-white">
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                vendor.isActive
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${vendor.isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                {vendor.isActive ? 'Activo' : 'Inactivo'}
+              </span>
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
-        <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Reseñas</h3>
+      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Reseñas</h3>
+          {totalReviews > 0 && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-amber-500 text-base">{'★'.repeat(Math.round(promedio))}{'☆'.repeat(5 - Math.round(promedio))}</span>
+              <span className="font-semibold text-slate-900 dark:text-white">{promedio}</span>
+              <span className="text-slate-400 dark:text-slate-500">({totalReviews} reseñas)</span>
+            </div>
+          )}
+        </div>
         {reviews.length === 0 ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">No hay reseñas todavía.</p>
         ) : (
-          <div className="space-y-4">
-            {reviews.map((review) => (
-              <div key={review.orderId} className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
-                <div className="mb-1 flex items-center justify-between">
-                  <span className="font-medium text-slate-900 dark:text-slate-100">{review.buyerName}</span>
-                  <span className="text-sm text-slate-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+          <div className="space-y-3">
+            {reviews.map((review) => {
+              const isExpanded = expandedReviews.has(review.orderId)
+              return (
+                <div key={review.orderId} className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-600 dark:bg-slate-700/50">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="font-medium text-slate-900 dark:text-white">Orden {review.orderId.slice(0, 8)}</span>
+                    <span className="text-sm text-slate-400 dark:text-slate-500">{new Date(review.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="mb-1 text-sm text-amber-500">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <span key={i}>{i < review.rating ? '★' : '☆'}</span>
+                    ))}
+                  </div>
+                  {review.description && (
+                    <>
+                      <p className={`text-sm text-slate-600 dark:text-slate-300 ${!isExpanded && review.description.length > 100 ? 'line-clamp-2' : ''}`}>
+                        {review.description}
+                      </p>
+                      {review.description.length > 100 && (
+                        <button
+                          onClick={() => toggleReview(review.orderId)}
+                          className="mt-1 flex items-center gap-1 text-xs text-sky-600 hover:text-sky-500 dark:text-sky-400"
+                        >
+                          {isExpanded ? (
+                            <>Ver menos <ChevronUp className="h-3 w-3" /></>
+                          ) : (
+                            <>Ver más <ChevronDown className="h-3 w-3" /></>
+                          )}
+                        </button>
+                      )}
+                    </>
+                  )}
+                  {review.products.length > 0 && (
+                    <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                      Productos: {review.products.join(', ')}
+                    </p>
+                  )}
                 </div>
-                <div className="mb-1 text-sm text-amber-500">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</div>
-                {review.description && <p className="text-sm text-slate-600 dark:text-slate-400">{review.description}</p>}
-                {review.products.length > 0 && (
-                  <p className="mt-1 text-xs text-slate-400">Productos: {review.products.join(', ')}</p>
-                )}
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
@@ -209,18 +253,12 @@ function OverviewTab({ vendor, reviews }: { vendor: Vendor; reviews: Review[] })
   )
 }
 
-function ProductsTab({ vendorId, products, productsPage, productsPageCount, productsTotal }: {
-  vendorId: string
-  products: Product[]
-  productsPage: number
-  productsPageCount: number
-  productsTotal: number
-}) {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+function ProductsTab({ vendorId, products }: { vendorId: string; products: Paginated<Product> }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
 
-  function buildPageUrl(page: number) {
+  const buildPageUrl = (page: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('product_page', String(page))
     return `${pathname}?${params.toString()}`
@@ -229,11 +267,16 @@ function ProductsTab({ vendorId, products, productsPage, productsPageCount, prod
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Productos ({productsTotal})</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+          Productos ({products.items.length})
+        </h3>
       </div>
 
-      {products.length === 0 ? (
-        <p className="text-sm text-slate-500 dark:text-slate-400">No hay productos.</p>
+      {products.items.length === 0 ? (
+        <div className="p-12 text-center text-slate-400 dark:text-slate-500">
+          <Package className="mx-auto mb-4 h-10 w-10" />
+          <p>No hay productos.</p>
+        </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
           <table className="w-full text-sm">
@@ -246,15 +289,30 @@ function ProductsTab({ vendorId, products, productsPage, productsPageCount, prod
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-              {products.map((product) => (
+              {products.items.map((product) => (
                 <tr key={product.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{product.name}</td>
-                  <td className="px-4 py-3 text-slate-700 dark:text-slate-400">${product.price.toFixed(2)}</td>
-                  <td className="px-4 py-3 text-slate-700 dark:text-slate-400">{product.stock}</td>
+                  <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{product.name}</td>
+                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">${product.price.toFixed(2)}</td>
+                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{product.stock}</td>
                   <td className="px-4 py-3">
-                    <ProductFormDialog mode="edit" productId={product.id} vendorId={vendorId} initialData={{ name: product.name, description: product.description || undefined, price: product.price, stock: product.stock, image: product.image || undefined }}>
-                      <span className="rounded-lg border border-sky-600 px-3 py-1 text-xs font-medium text-sky-600 transition hover:bg-sky-600 hover:text-white cursor-pointer dark:border-sky-400 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white">Editar</span>
-                    </ProductFormDialog>
+                    <div className="flex items-center gap-2">
+                      <ProductFormDialog
+                        mode="edit"
+                        productId={product.id}
+                        initialData={{
+                          name: product.name,
+                          description: product.description || undefined,
+                          price: product.price,
+                          stock: product.stock,
+                          image: product.image || undefined,
+                        }}
+                        vendorId={vendorId}
+                      >
+                        <button className="rounded-lg border border-sky-200 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-50 dark:border-sky-700 dark:text-sky-400 dark:hover:bg-sky-900/20">
+                          Editar
+                        </button>
+                      </ProductFormDialog>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -263,38 +321,75 @@ function ProductsTab({ vendorId, products, productsPage, productsPageCount, prod
         </div>
       )}
 
-      <Pagination page={productsPage} pageCount={productsPageCount} onPageChange={(p) => router.push(buildPageUrl(p))} />
+      {products.pageCount > 1 && (
+        <div className="mt-4">
+          <Pagination
+            page={products.page}
+            pageCount={products.pageCount}
+            onPageChange={(p) => router.push(buildPageUrl(p))}
+          />
+        </div>
+      )}
     </div>
   )
 }
 
 function OrdersTab({
   paidOrders,
-  paidPage,
-  paidPageCount,
-  paidTotal,
   readyOrders,
-  readyPage,
-  readyPageCount,
-  readyTotal,
 }: {
-  paidOrders: Order[]
-  paidPage: number
-  paidPageCount: number
-  paidTotal: number
-  readyOrders: Order[]
-  readyPage: number
-  readyPageCount: number
-  readyTotal: number
+  paidOrders: Paginated<Order>
+  readyOrders: Paginated<Order>
 }) {
-  const [activeTab, setActiveTab] = useState<'paid' | 'ready'>('paid')
+  const [activeSubTab, setActiveSubTab] = useState<'paid' | 'ready'>('paid')
+
+  return (
+    <div>
+      <div className="mb-4 flex gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
+        <button
+          onClick={() => setActiveSubTab('paid')}
+          className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
+            activeSubTab === 'paid'
+              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+          }`}
+        >
+          Para confirmar
+        </button>
+        <button
+          onClick={() => setActiveSubTab('ready')}
+          className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
+            activeSubTab === 'ready'
+              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+          }`}
+        >
+          Listas para entregar
+        </button>
+      </div>
+
+      {activeSubTab === 'paid' ? (
+        <OrderList orders={paidOrders} status="PAID" />
+      ) : (
+        <OrderList orders={readyOrders} status="READY" />
+      )}
+    </div>
+  )
+}
+
+function OrderList({ orders, status }: { orders: Paginated<Order>; status: string }) {
   const [updating, setUpdating] = useState<string | null>(null)
   const router = useRouter()
-
+  const searchParams = useSearchParams()
   const pathname = usePathname()
-  const currentOrders = activeTab === 'paid' ? paidOrders : readyOrders
-  const currentPage = activeTab === 'paid' ? paidPage : readyPage
-  const currentPageCount = activeTab === 'paid' ? paidPageCount : readyPageCount
+
+  const paramKey = status === 'PAID' ? 'paid_page' : 'ready_page'
+
+  const buildPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set(paramKey, String(page))
+    return `${pathname}?${params.toString()}`
+  }
 
   const handleConfirm = async (orderId: string) => {
     setUpdating(orderId)
@@ -303,87 +398,71 @@ function OrdersTab({
     router.refresh()
   }
 
-  const ordersSearchParams = useSearchParams()
-
-  function handlePageChange(page: number) {
-    const param = activeTab === 'paid' ? 'paid_page' : 'ready_page'
-    const params = new URLSearchParams(ordersSearchParams.toString())
-    params.set(param, String(page))
-    router.push(`${pathname}?${params.toString()}`)
+  if (orders.items.length === 0) {
+    return (
+      <div className="p-12 text-center text-slate-400 dark:text-slate-500">
+        <ShoppingBag className="mx-auto mb-4 h-10 w-10" />
+        <p>{status === 'PAID' ? 'No hay órdenes pendientes.' : 'No hay órdenes listas.'}</p>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800 w-fit">
-        <button
-          onClick={() => setActiveTab('paid')}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-            activeTab === 'paid'
-              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white'
-          }`}
-        >
-          Para confirmar ({paidTotal})
-        </button>
-        <button
-          onClick={() => setActiveTab('ready')}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-            activeTab === 'ready'
-              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white'
-          }`}
-        >
-          Listas para entregar ({readyTotal})
-        </button>
-      </div>
-
-      {currentOrders.length === 0 ? (
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          {activeTab === 'paid' ? 'No hay órdenes pendientes.' : 'No hay órdenes listas.'}
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {currentOrders.map((order) => (
-            <div key={order.id} className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
-              <div className="mb-2 flex items-center justify-between">
-                <div>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">#{order.externalId}</span>
-                  <span className="ml-2 text-xs text-slate-400">{new Date(order.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  order.status === 'PAID'
-                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
-                    : 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300'
-                }`}>
-                  {order.status}
+    <div>
+      <div className="space-y-3">
+        {orders.items.map((order) => (
+          <div key={order.id} className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-900 dark:text-white">#{order.externalId}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">
+                  {new Date(order.createdAt).toLocaleDateString('es-ES', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit',
+                  })}
                 </span>
               </div>
-              <div className="mb-1.5 flex flex-wrap gap-x-1 text-xs text-slate-600 dark:text-slate-400">
-                {order.items.map((item, i) => (
-                  <span key={i}>
-                    {i > 0 && <span className="mr-1 text-slate-300 dark:text-slate-600">|</span>}
-                    {item.productName} x{item.quantity} — ${(item.productPrice * item.quantity).toFixed(2)}
-                  </span>
-                ))}
-              </div>
-              <div className="flex items-center justify-between border-t border-slate-100 pt-2 dark:border-slate-700">
-                <span className="font-semibold text-slate-900 dark:text-slate-100">Total: ${order.total.toFixed(2)}</span>
-                {order.status === 'PAID' && (
-                  <button
-                    onClick={() => handleConfirm(order.id)}
-                    disabled={updating === order.id}
-                    className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-sky-500 disabled:opacity-50"
-                  >
-                    {updating === order.id ? '...' : 'Marcar lista'}
-                  </button>
-                )}
-              </div>
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                order.status === 'PAID'
+                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
+                  : 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300'
+              }`}>
+                {order.status}
+              </span>
             </div>
-          ))}
+            <div className="mb-2 flex flex-wrap gap-x-1 text-xs text-slate-600 dark:text-slate-300">
+              {order.items.map((item, i) => (
+                <span key={i} className="flex items-center gap-1">
+                  {i > 0 && <span className="text-slate-300 dark:text-slate-600">|</span>}
+                  <span>{item.productName} x{item.quantity} — ${(item.productPrice * item.quantity).toFixed(2)}</span>
+                </span>
+              ))}
+            </div>
+            <div className="flex items-center justify-between border-t border-slate-100 pt-2 dark:border-slate-700">
+              <span className="text-sm font-semibold text-slate-900 dark:text-white">Total: ${order.total.toFixed(2)}</span>
+              {status === 'PAID' && (
+                <button
+                  onClick={() => handleConfirm(order.id)}
+                  disabled={updating === order.id}
+                  className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-sky-500 disabled:opacity-50"
+                >
+                  {updating === order.id ? '...' : 'Marcar lista'}
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {orders.pageCount > 1 && (
+        <div className="mt-4">
+          <Pagination
+            page={orders.page}
+            pageCount={orders.pageCount}
+            onPageChange={(p) => router.push(buildPageUrl(p))}
+          />
         </div>
       )}
-
-      <Pagination page={currentPage} pageCount={currentPageCount} onPageChange={handlePageChange} />
     </div>
   )
 }

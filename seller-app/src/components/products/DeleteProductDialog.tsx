@@ -3,15 +3,17 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteProduct } from '@/app/actions/product'
+import { deleteProductAsAdmin } from '@/app/actions/admin-vendor'
 import Button from '@/components/ui/Button'
 
 interface DeleteProductDialogProps {
   productId: string
   productName: string
   vendorId?: string
+  disableRedirect?: boolean
 }
 
-export default function DeleteProductDialog({ productId, productName, vendorId }: DeleteProductDialogProps) {
+export default function DeleteProductDialog({ productId, productName, vendorId, disableRedirect }: DeleteProductDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -27,9 +29,17 @@ export default function DeleteProductDialog({ productId, productName, vendorId }
     setError('')
 
     try {
-      await deleteProduct(productId, vendorId)
+      if (vendorId) {
+        await deleteProductAsAdmin(vendorId, productId)
+      } else {
+        await deleteProduct(productId)
+      }
       setOpen(false)
-      router.push('/dashboard/products')
+      if (disableRedirect) {
+        router.refresh()
+      } else {
+        router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/products')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al eliminar producto')
       setSubmitting(false)
@@ -46,7 +56,6 @@ export default function DeleteProductDialog({ productId, productName, vendorId }
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
           role="presentation"
-          onClick={handleClose}
         >
           <div
             className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"

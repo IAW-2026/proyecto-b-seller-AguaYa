@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Package, ShoppingCart, LayoutDashboard, Settings, Users } from 'lucide-react'
-import ThemeToggle from './ThemeToggle'
+import { SignOutButton } from '@clerk/nextjs'
+import { ExternalLink, Package, ShoppingCart, LayoutDashboard, Settings, Users, LogOut } from 'lucide-react'
 
 interface NavItem {
   href: string
@@ -11,7 +11,7 @@ interface NavItem {
   icon: React.ReactNode
 }
 
-export default function MobileBottomNav({ roles }: { roles?: string[] }) {
+export default function MobileBottomNav({ roles, feedbackAppUrl }: { roles?: string[]; feedbackAppUrl?: string }) {
   const pathname = usePathname()
   const isAdmin = roles?.includes('admin_seller')
 
@@ -21,7 +21,10 @@ export default function MobileBottomNav({ roles }: { roles?: string[] }) {
     items.push({ href: '/dashboard/overview', label: 'Resumen', icon: <LayoutDashboard className="h-5 w-5" /> })
   }
   items.push({ href: '/dashboard/products', label: 'Productos', icon: <Package className="h-5 w-5" /> })
-  items.push({ href: '/dashboard/orders', label: 'Pedidos', icon: <ShoppingCart className="h-5 w-5" /> })
+  items.push({ href: '/dashboard/orders', label: 'Órdenes', icon: <ShoppingCart className="h-5 w-5" /> })
+  if (!isAdmin && feedbackAppUrl) {
+    items.push({ href: feedbackAppUrl, label: 'Reseñas', icon: <ExternalLink className="h-5 w-5" /> })
+  }
   if (isAdmin) {
     items.push({ href: '/dashboard/admin/vendors', label: 'Vendedores', icon: <Users className="h-5 w-5" /> })
   }
@@ -34,20 +37,37 @@ export default function MobileBottomNav({ roles }: { roles?: string[] }) {
           const isActive = pathname.startsWith(item.href)
           return (
             <li key={item.href}>
-              <Link
-                href={item.href}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium transition-colors ${
-                  isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                }`}
-              >
-                {item.icon}
-                {item.label}
-              </Link>
+              {item.href.startsWith('http') ? (
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium transition-colors text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                >
+                  {item.icon}
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  href={item.href}
+                  className={`flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium transition-colors ${
+                    isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                  }`}
+                >
+                  {item.icon}
+                  {item.label}
+                </Link>
+              )}
             </li>
           )
         })}
         <li>
-          <ThemeToggle />
+          <SignOutButton>
+            <button className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Cerrar sesión">
+              <LogOut className="h-5 w-5" />
+              Salir
+            </button>
+          </SignOutButton>
         </li>
       </ul>
     </nav>

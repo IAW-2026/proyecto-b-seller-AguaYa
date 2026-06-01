@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getAuthRoles } from '@/lib/auth-utils'
 import { validateVendorInput, validateProductInput, validateVendorUpdateInput } from '@/lib/validation'
+import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
 
 async function requireAdmin() {
   const roles = await getAuthRoles()
@@ -54,26 +55,61 @@ export async function getVendorsWithClerkInfo() {
   })
 }
 
-export async function getVendorsWithClerkInfoPaginated(page: number = 1) {
+export async function getVendorsWithClerkInfoPaginated(
+  page: number = 1,
+  filters?: { q?: string; sortBy?: string; sortOrder?: string }
+) {
   await requireAdmin()
 
-  const { listAllVendorsPaginated } = await import('@/lib/queries/vendors')
-  const result = await listAllVendorsPaginated(page)
+  const { listAllVendors } = await import('@/lib/queries/vendors')
+  // When q is present, fetch all vendors so we can filter by name, cuil, cuit, AND email in memory (email is Clerk-only)
+  const vendors = await listAllVendors(filters?.q ? undefined : filters?.q)
 
   const client = await clerkClient()
   const { data: clerkUsers } = await client.users.getUserList({ limit: 500 })
   const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
 
-  const items = result.items.map((v) => {
+  let items = await Promise.all(vendors.map(async (v) => {
     const clerkUser = clerkMap.get(v.userId)
+    const reviews = await getVendorReviewsWithStats(v.userId)
     return {
       ...v,
       clerkName: clerkUser ? [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || '' : '',
       clerkEmail: clerkUser?.emailAddresses?.[0]?.emailAddress || '',
+      promedio: reviews.promedio,
+      totalReviews: reviews.total,
     }
-  })
+  }))
 
-  return { items, total: result.total, pageCount: result.pageCount }
+  // Filter all fields in memory with OR logic (email from Clerk, rest from DB)
+  if (filters?.q) {
+    const q = filters.q.toLowerCase()
+    items = items.filter(
+      (v) =>
+        v.name.toLowerCase().includes(q) ||
+        (v.cuil ?? '').toLowerCase().includes(q) ||
+        (v.cuit ?? '').toLowerCase().includes(q) ||
+        v.clerkEmail.toLowerCase().includes(q)
+    )
+  }
+
+  // Sort in memory
+  const order = filters?.sortOrder === 'desc' ? -1 : 1
+  if (filters?.sortBy === 'name') {
+    items.sort((a, b) => a.name.localeCompare(b.name) * order)
+  } else if (filters?.sortBy === 'isActive') {
+    items.sort((a, b) => (Number(a.isActive) - Number(b.isActive)) * order)
+  } else {
+    const dir = filters?.sortOrder === 'asc' ? 1 : -1
+    items.sort((a, b) => (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) * dir)
+  }
+
+  const limit = 5
+  const total = items.length
+  const pageCount = Math.ceil(total / limit)
+  const paginatedItems = items.slice((page - 1) * limit, page * limit)
+
+  return { items: paginatedItems, total, pageCount }
 }
 
 export async function getVendorWithClerkInfo(vendorId: string) {
@@ -149,6 +185,23 @@ export async function deleteVendorAsAdmin(vendorId: string) {
 
   revalidatePath('/dashboard/admin/vendors')
   return vendor
+}
+
+export async function toggleVendorActiveStatus(vendorId: string) {
+  await requireAdmin()
+
+  const vendor = await prisma.vendor.findUnique({ where: { id: vendorId } })
+  if (!vendor) throw new Error('Vendedor no encontrado')
+
+  const updated = await prisma.vendor.update({
+    where: { id: vendorId },
+    data: { isActive: !vendor.isActive },
+  })
+
+  await revalidatePath('/dashboard/admin/vendors')
+  await revalidatePath(`/dashboard/admin/vendors/${vendorId}`)
+  await revalidatePath('/dashboard/overview')
+  return updated
 }
 
 export async function updateOrderStatusAsAdmin(orderId: string, status: 'PAID' | 'READY') {
@@ -232,3 +285,4 @@ export async function deleteProductAsAdmin(vendorId: string, productId: string) 
   revalidatePath('/dashboard/admin/vendors')
   return product
 }
+

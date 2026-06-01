@@ -59,6 +59,7 @@ export async function GET(request: Request): Promise<Response> {
               in: validIds,
             },
             deletedAt: null,
+            isActive: true,
           },
           orderBy: {
             createdAt: 'desc',
@@ -90,6 +91,7 @@ export async function GET(request: Request): Promise<Response> {
     const allVendors = await prisma.vendor.findMany({
       where: {
         deletedAt: null,
+        isActive: true,
       },
       orderBy: {
         createdAt: 'desc',

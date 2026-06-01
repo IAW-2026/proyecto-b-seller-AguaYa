@@ -6,12 +6,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
-enum OrderStatus {
-  PAID
-  READY
-}
-
 model Vendor {
   id          String    @id @default(cuid())
   userId      String    @unique
@@ -21,10 +15,10 @@ model Vendor {
   image       String?
   cuil        String?
   cuit        String?
-  reputation  Float     @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? // Soft delete: vendedor desactivado, datos preservados
+  deletedAt   DateTime?
+  isActive    Boolean   @default(true)
 
   products    Product[]
   orders      Order[]
@@ -40,24 +34,24 @@ model Product {
   image       String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  deletedAt   DateTime?   // Soft delete: producto marcado como eliminado, pero datos preservados
-
-  vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  deletedAt   DateTime?
+  isActive    Boolean     @default(true)
   orderItems  OrderItem[]
+  vendor      Vendor      @relation(fields: [vendorId], references: [id])
 }
 
 model Order {
   id         String      @id @default(cuid())
-  externalId String     @unique
+  externalId String      @unique
   vendorId   String
   buyerId    String
+  buyerName  String @default("")
   status     OrderStatus @default(PAID)
   total      Float
   address    String?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
-  deletedAt  DateTime?   // Soft delete
-
+  deletedAt  DateTime?
   vendor     Vendor      @relation(fields: [vendorId], references: [id])
   items      OrderItem[]
 }
@@ -69,8 +63,11 @@ model OrderItem {
   productName  String
   productPrice Float
   quantity     Int
-
   order        Order   @relation(fields: [orderId], references: [id])
   product      Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  // onDelete: Cascade es seguro porque productName y productPrice ya están guardados en OrderItem
+}
+
+enum OrderStatus {
+  PAID
+  READY
 }

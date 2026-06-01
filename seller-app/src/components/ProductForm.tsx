@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createProduct, updateProduct } from '@/app/actions/product'
+import { updateProductAsAdmin } from '@/app/actions/admin-vendor'
 import Button from './ui/Button'
 import ImageUpload from './ui/ImageUpload'
 import DeleteProductDialog from './products/DeleteProductDialog'
@@ -20,9 +21,10 @@ interface ProductFormProps {
     image?: string
   }
   onSuccess?: () => void
+  disableRedirect?: boolean
 }
 
-export default function ProductForm({ mode = 'create', productId, vendorId, initialData, onSuccess }: ProductFormProps) {
+export default function ProductForm({ mode = 'create', productId, initialData, onSuccess, vendorId, disableRedirect }: ProductFormProps) {
   const router = useRouter()
   const [form, setForm] = useState({
     name: initialData?.name || '',
@@ -58,14 +60,22 @@ export default function ProductForm({ mode = 'create', productId, vendorId, init
           throw new Error('Falta el identificador del producto')
         }
 
-        await updateProduct({ id: productId, ...payload, vendorId })
+        if (vendorId) {
+          await updateProductAsAdmin(vendorId, productId, payload)
+        } else {
+          await updateProduct({ id: productId, ...payload })
+        }
       } else {
         await createProduct(payload)
       }
 
       setLoading(false)
       onSuccess?.()
-      router.push('/dashboard/products')
+      if (disableRedirect) {
+        router.refresh()
+      } else {
+        router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/products')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar producto')
       setLoading(false)
@@ -110,7 +120,7 @@ export default function ProductForm({ mode = 'create', productId, vendorId, init
       <div className="mt-3 flex gap-3">
         <Button type="submit" disabled={loading}>{loading ? (mode === 'edit' ? 'Guardando...' : 'Creando...') : (mode === 'edit' ? 'Guardar cambios' : 'Crear producto')}</Button>
         {mode === 'edit' && productId ? (
-          <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} vendorId={vendorId} />
+          <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} vendorId={vendorId} disableRedirect={disableRedirect} />
         ) : null}
       </div>
     </form>

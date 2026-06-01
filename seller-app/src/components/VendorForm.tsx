@@ -17,6 +17,7 @@ interface VendorFormProps {
     image?: string
   }
   redirectTo?: string
+  simple?: boolean
 }
 
 function formatCuilCuit(raw: string): string {
@@ -26,7 +27,7 @@ function formatCuilCuit(raw: string): string {
   return `${digits.slice(0, 2)}-${digits.slice(2, 10)}-${digits.slice(10)}`
 }
 
-export default function VendorForm({ initialData, redirectTo }: VendorFormProps) {
+export default function VendorForm({ initialData, redirectTo, simple }: VendorFormProps) {
   const router = useRouter()
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
@@ -39,6 +40,7 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
 
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const descLength = formData.description.length
 
@@ -50,8 +52,8 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleConfirm = async () => {
+    setConfirmOpen(false)
     setError('')
     setLoading(true)
 
@@ -82,6 +84,11 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
     }
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setConfirmOpen(true)
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       {error && (
@@ -89,7 +96,7 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
+        <div className={simple ? 'sm:col-span-2' : ''}>
           <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Nombre *</label>
           <input
             type="text"
@@ -102,44 +109,48 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
           />
         </div>
 
-        <div>
-          <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Dirección *</label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            maxLength={200}
-            placeholder="Ej: Av. Mitre 512"
-            className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
-          />
-        </div>
+        {!simple && (
+          <>
+            <div>
+              <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Dirección *</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                maxLength={200}
+                placeholder="Ej: Av. Mitre 512"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
+              />
+            </div>
 
-        <div>
-          <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">CUIL</label>
-          <input
-            type="text"
-            name="cuil"
-            value={formData.cuil}
-            onChange={(e) => setFormData((prev) => ({ ...prev, cuil: formatCuilCuit(e.target.value) }))}
-            maxLength={13}
-            placeholder="Ej: 20-12345678-9"
-            className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
-          />
-        </div>
+            <div>
+              <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">CUIL</label>
+              <input
+                type="text"
+                name="cuil"
+                value={formData.cuil}
+                onChange={(e) => setFormData((prev) => ({ ...prev, cuil: formatCuilCuit(e.target.value) }))}
+                maxLength={13}
+                placeholder="Ej: 20-12345678-9"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
+              />
+            </div>
 
-        <div>
-          <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">CUIT</label>
-          <input
-            type="text"
-            name="cuit"
-            value={formData.cuit}
-            onChange={(e) => setFormData((prev) => ({ ...prev, cuit: formatCuilCuit(e.target.value) }))}
-            maxLength={13}
-            placeholder="Ej: 30-12345678-9"
-            className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
-          />
-        </div>
+            <div>
+              <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">CUIT</label>
+              <input
+                type="text"
+                name="cuit"
+                value={formData.cuit}
+                onChange={(e) => setFormData((prev) => ({ ...prev, cuit: formatCuilCuit(e.target.value) }))}
+                maxLength={13}
+                placeholder="Ej: 30-12345678-9"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
+              />
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mt-4">
@@ -171,6 +182,35 @@ export default function VendorForm({ initialData, redirectTo }: VendorFormProps)
           {loading ? 'Guardando...' : 'Guardar Cambios'}
         </Button>
       </div>
+
+      {confirmOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          role="presentation"
+        >
+          <div
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+              Guardar cambios
+            </h3>
+            <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
+              ¿Seguro que quieres guardar los cambios?
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button type="button" variant="secondary" onClick={() => setConfirmOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="button" variant="primary" onClick={handleConfirm} disabled={loading}>
+                {loading ? 'Guardando...' : 'Guardar'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </form>
   )
 }

@@ -18,26 +18,19 @@ export interface PublicVendor {
   id: string
   name: string
   description: string | null
-  reputation: number
   address: string
   image: string | null
+  isActive: boolean
 }
 
-/**
- * Convierte un Vendor de Prisma a su representación pública
- * Filtra campos sensibles y retorna solo los datos públicos
- *
- * @param vendor - Vendor object de Prisma
- * @returns PublicVendor - Vendedor con solo datos públicos
- */
 export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
   return {
     id: vendor.id,
     name: vendor.name,
     description: vendor.description,
-    reputation: vendor.reputation,
     address: vendor.address,
     image: vendor.image ?? null,
+    isActive: vendor.isActive,
   }
 }
 

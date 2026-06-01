@@ -13,6 +13,7 @@
 
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
+import { clerkClient } from '@clerk/nextjs/server'
 import { validateApiKey } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { validateCreateOrderInput } from '@/lib/validation'
@@ -85,7 +86,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // 5. Validar que el Vendor existe
+    // 5. Validar que el Vendor existe y está activo
     const vendor = await prisma.vendor.findUnique({
       where: { id: input.vendorId },
     })
@@ -95,6 +96,25 @@ export async function POST(request: Request) {
         { error: 'Vendor no encontrado' },
         { status: 400 }
       )
+    }
+
+    if (!vendor.isActive) {
+      return NextResponse.json(
+        { error: 'Vendor inactivo — no puede recibir pedidos' },
+        { status: 400 }
+      )
+    }
+
+    // 5b. Obtener nombre del comprador desde Clerk
+    let buyerName = input.buyerName
+    if (!buyerName) {
+      try {
+        const client = await clerkClient()
+        const clerkUser = await client.users.getUser(input.buyerId)
+        buyerName = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || clerkUser.id
+      } catch {
+        buyerName = input.buyerId
+      }
     }
 
     // 6. Obtener todos los productos solicitados (solo no eliminados)
@@ -158,6 +178,7 @@ export async function POST(request: Request) {
             externalId: input.externalId,
             vendorId: input.vendorId,
             buyerId: input.buyerId,
+            buyerName,
             status: 'PAID',
             address: input.address,
             total: computedTotal,
