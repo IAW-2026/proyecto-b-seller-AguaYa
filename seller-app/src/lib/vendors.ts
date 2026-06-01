@@ -60,9 +60,4 @@ export interface VendorDetailResponse {
   vendor: PublicVendor
 }
 
-/**
- * Response estándar para errores
- */
-export interface ErrorResponse {
-  error: string
-}
+

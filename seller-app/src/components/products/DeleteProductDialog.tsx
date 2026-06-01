@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteProduct } from '@/app/actions/product'
-import { deleteProductAsAdmin } from '@/app/actions/admin-vendor'
+import { deleteProductAsAdmin } from '@/app/actions/admin-product'
 import Button from '@/components/ui/Button'
 
 interface DeleteProductDialogProps {

@@ -6,7 +6,6 @@ import Button from '@/components/ui/Button'
 
 interface ConfirmOrderDialogProps {
   orderId: string
-  orderLabel: string
 }
 
 export default function ConfirmOrderDialog({ orderId }: ConfirmOrderDialogProps) {

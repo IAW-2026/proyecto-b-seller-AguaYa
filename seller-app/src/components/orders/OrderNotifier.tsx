@@ -16,11 +16,11 @@ export default function OrderNotifier({ interval = 10000 }: { interval?: number 
 
         if (lastCount.current !== null && count > lastCount.current) {
           if (Notification.permission === 'granted') {
-            new Notification('AguaYa', { body: '¡Nueva orden recibida!' })
+            new Notification('AguaYa', { body: '¡Nueva orden recibida!', icon: '/icon.svg' })
           } else if (Notification.permission !== 'denied') {
             const permission = await Notification.requestPermission()
             if (permission === 'granted') {
-              new Notification('AguaYa', { body: '¡Nueva orden recibida!' })
+              new Notification('AguaYa', { body: '¡Nueva orden recibida!', icon: '/icon.svg' })
             }
           }
         }

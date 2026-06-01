@@ -7,23 +7,10 @@
 
 'use server'
 
-import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { validateProductInput } from '../../lib/validation'
-import { getAuthRoles } from '@/lib/auth-utils'
-
-async function getAuthenticatedVendor() {
-  const { userId } = await auth()
-
-  if (!userId) throw new Error('No autenticado')
-
-  const vendor = await prisma.vendor.findUnique({ where: { userId } })
-
-  if (!vendor) throw new Error('No autenticado')
-
-  return vendor
-}
+import { getAuthRoles, getAuthenticatedVendor } from '@/lib/auth-utils'
 
 export async function createProduct(data: {
   name: string

@@ -58,13 +58,6 @@ export interface ProductsListResponse {
 }
 
 /**
- * Response estándar para errores
- */
-export interface ErrorResponse {
-  error: string
-}
-
-/**
  * Parámetros de filtro para buscar productos
  */
 export interface ProductFilterParams {

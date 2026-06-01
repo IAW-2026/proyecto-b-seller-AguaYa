@@ -3,20 +3,16 @@
 import { clerkClient } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
-import { getAuthRoles } from '@/lib/auth-utils'
-import { validateVendorInput, validateProductInput, validateVendorUpdateInput } from '@/lib/validation'
+import { requireAdmin } from '@/lib/auth-utils'
+import { validateVendorInput, validateVendorUpdateInput } from '@/lib/validation'
+import { ADMIN_PAGE_SIZE, CLERK_USERS_FETCH_LIMIT } from '@/lib/constants'
 import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
-
-async function requireAdmin() {
-  const roles = await getAuthRoles()
-  if (!roles.includes('admin_seller')) throw new Error('No autorizado')
-}
 
 export async function getAvailableClerkUsers(): Promise<{ id: string; name: string; email: string }[]> {
   await requireAdmin()
 
   const client = await clerkClient()
-  const { data: clerkUsers } = await client.users.getUserList({ limit: 500 })
+  const { data: clerkUsers } = await client.users.getUserList({ limit: CLERK_USERS_FETCH_LIMIT })
 
   const usedUserIds = (await prisma.vendor.findMany({
     where: { deletedAt: null },
@@ -42,7 +38,7 @@ export async function getVendorsWithClerkInfo() {
   })
 
   const client = await clerkClient()
-  const { data: clerkUsers } = await client.users.getUserList({ limit: 500 })
+  const { data: clerkUsers } = await client.users.getUserList({ limit: CLERK_USERS_FETCH_LIMIT })
   const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
 
   return vendors.map((v) => {
@@ -61,39 +57,65 @@ export async function getVendorsWithClerkInfoPaginated(
 ) {
   await requireAdmin()
 
-  const { listAllVendors } = await import('@/lib/queries/vendors')
-  // When q is present, fetch all vendors so we can filter by name, cuil, cuit, AND email in memory (email is Clerk-only)
-  const vendors = await listAllVendors(filters?.q ? undefined : filters?.q)
-
+  const { listAllVendors, listAllVendorsPaginated } = await import('@/lib/queries/vendors')
   const client = await clerkClient()
-  const { data: clerkUsers } = await client.users.getUserList({ limit: 500 })
+
+  const limit = ADMIN_PAGE_SIZE
+
+  if (!filters?.q) {
+    const dbResult = await listAllVendorsPaginated(page, {
+      limit,
+      sortBy: filters?.sortBy,
+      sortOrder: filters?.sortOrder,
+    })
+
+    const items = await Promise.all(dbResult.items.map(async (v) => {
+      let clerkName = ''
+      let clerkEmail = ''
+      try {
+        const clerkUser = await client.users.getUser(v.userId)
+        clerkName = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || ''
+        clerkEmail = clerkUser.emailAddresses?.[0]?.emailAddress || ''
+      } catch { /* Clerk user not found */ }
+
+      const reviews = await getVendorReviewsWithStats(v.userId)
+      return {
+        ...v,
+        clerkName,
+        clerkEmail,
+        promedio: reviews.promedio,
+        totalReviews: reviews.total,
+      }
+    }))
+
+    return { items, total: dbResult.total, pageCount: dbResult.pageCount }
+  }
+
+  const vendors = await listAllVendors(filters.q)
+
+  const { data: clerkUsers } = await client.users.getUserList({ limit: CLERK_USERS_FETCH_LIMIT })
   const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
 
-  let items = await Promise.all(vendors.map(async (v) => {
+  let items = vendors.map((v) => {
     const clerkUser = clerkMap.get(v.userId)
-    const reviews = await getVendorReviewsWithStats(v.userId)
     return {
       ...v,
       clerkName: clerkUser ? [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || '' : '',
       clerkEmail: clerkUser?.emailAddresses?.[0]?.emailAddress || '',
-      promedio: reviews.promedio,
-      totalReviews: reviews.total,
+      promedio: 0,
+      totalReviews: 0,
     }
-  }))
+  })
 
-  // Filter all fields in memory with OR logic (email from Clerk, rest from DB)
-  if (filters?.q) {
-    const q = filters.q.toLowerCase()
-    items = items.filter(
-      (v) =>
-        v.name.toLowerCase().includes(q) ||
-        (v.cuil ?? '').toLowerCase().includes(q) ||
-        (v.cuit ?? '').toLowerCase().includes(q) ||
-        v.clerkEmail.toLowerCase().includes(q)
-    )
-  }
+  const q = filters.q.toLowerCase()
+  items = items.filter(
+    (v) =>
+      v.name.toLowerCase().includes(q) ||
+      (v.cuil ?? '').toLowerCase().includes(q) ||
+      (v.cuit ?? '').toLowerCase().includes(q) ||
+      v.clerkEmail.toLowerCase().includes(q)
+  )
 
-  // Sort in memory
   const order = filters?.sortOrder === 'desc' ? -1 : 1
   if (filters?.sortBy === 'name') {
     items.sort((a, b) => a.name.localeCompare(b.name) * order)
@@ -104,12 +126,16 @@ export async function getVendorsWithClerkInfoPaginated(
     items.sort((a, b) => (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) * dir)
   }
 
-  const limit = 5
   const total = items.length
   const pageCount = Math.ceil(total / limit)
   const paginatedItems = items.slice((page - 1) * limit, page * limit)
 
-  return { items: paginatedItems, total, pageCount }
+  const itemsWithReviews = await Promise.all(paginatedItems.map(async (v) => {
+    const reviews = await getVendorReviewsWithStats(v.userId)
+    return { ...v, promedio: reviews.promedio, totalReviews: reviews.total }
+  }))
+
+  return { items: itemsWithReviews, total, pageCount }
 }
 
 export async function getVendorWithClerkInfo(vendorId: string) {
@@ -208,86 +234,3 @@ export async function toggleVendorActiveStatus(vendorId: string) {
   await revalidatePath('/dashboard/overview')
   return updated
 }
-
-export async function updateOrderStatusAsAdmin(orderId: string, status: 'PAID' | 'READY') {
-  await requireAdmin()
-
-  const order = await prisma.order.update({
-    where: { id: orderId },
-    data: { status },
-  })
-
-  revalidatePath('/dashboard/admin/orders')
-  revalidatePath('/dashboard/admin/vendors')
-  return order
-}
-
-export async function deleteOrderAsAdmin(orderId: string) {
-  await requireAdmin()
-
-  const order = await prisma.order.update({
-    where: { id: orderId },
-    data: { deletedAt: new Date() },
-  })
-
-  revalidatePath('/dashboard/admin/orders')
-  revalidatePath('/dashboard/admin/vendors')
-  return order
-}
-
-export async function createProductAsAdmin(
-  vendorId: string,
-  data: {
-    name: string
-    description?: string
-    price: number
-    stock: number
-    image?: string
-  }
-) {
-  await requireAdmin()
-
-  const input = validateProductInput(data)
-  const product = await prisma.product.create({ data: { ...input, vendorId } })
-
-  revalidatePath('/dashboard/admin/products')
-  revalidatePath('/dashboard/admin/vendors')
-  return product
-}
-
-export async function updateProductAsAdmin(
-  vendorId: string,
-  productId: string,
-  data: {
-    name?: string
-    description?: string
-    price?: number
-    stock?: number
-    image?: string
-  }
-) {
-  await requireAdmin()
-
-  const product = await prisma.product.update({
-    where: { id: productId, vendorId },
-    data,
-  })
-
-  revalidatePath('/dashboard/admin/products')
-  revalidatePath('/dashboard/admin/vendors')
-  return product
-}
-
-export async function deleteProductAsAdmin(vendorId: string, productId: string) {
-  await requireAdmin()
-
-  const product = await prisma.product.update({
-    where: { id: productId, vendorId },
-    data: { deletedAt: new Date() },
-  })
-
-  revalidatePath('/dashboard/admin/products')
-  revalidatePath('/dashboard/admin/vendors')
-  return product
-}
-

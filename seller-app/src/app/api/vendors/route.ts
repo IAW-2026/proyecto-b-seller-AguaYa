@@ -15,7 +15,8 @@ import { prisma } from '@/lib/prisma'
 import { validateApiKey } from '@/lib/auth'
 import { validateVendorIds } from '@/lib/validation'
 import { toPublicVendors } from '@/lib/vendors'
-import type { VendorsListResponse, ErrorResponse } from '@/lib/vendors'
+import type { ErrorResponse } from '@/lib/api-types'
+import type { VendorsListResponse } from '@/lib/vendors'
 
 /**
  * GET /api/vendors

@@ -77,7 +77,7 @@ export default function OrderCard({ order, showConfirmButton }: { order: OrderWi
       {/* Confirm button */}
       {showConfirmButton && (
         <div className="mt-auto pt-1">
-          <ConfirmOrderDialog orderId={order.id} orderLabel={order.externalId || order.id.slice(0, 8)} />
+          <ConfirmOrderDialog orderId={order.id} />
         </div>
       )}
     </div>

@@ -33,7 +33,7 @@ export default function SearchBar({
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   function buildHref(filters: Record<string, string>) {
-    const params = new URLSearchParams(globalThis.location?.search ?? '')
+    const params = new URLSearchParams(searchParams.toString())
     for (const [key, value] of Object.entries(filters)) {
       if (value) params.set(key, value)
       else params.delete(key)

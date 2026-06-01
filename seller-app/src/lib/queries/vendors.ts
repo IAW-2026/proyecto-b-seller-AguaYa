@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
+import { DEFAULT_PAGE_SIZE, VENDOR_PRODUCTS_PAGE_SIZE } from '@/lib/constants'
 import type { Vendor, Product, Prisma } from '@prisma/client'
 
 export async function getVendorByUserId(userId: string) {
@@ -49,7 +50,7 @@ export async function getVendorProductsPaginated(vendorId: string, page: number 
   return paginate<Product>(
     prisma.product,
     { vendorId, deletedAt: null },
-    { page, limit: 10, orderBy: { createdAt: 'desc' } }
+    { page, limit: VENDOR_PRODUCTS_PAGE_SIZE, orderBy: { createdAt: 'desc' } }
   )
 }
 
@@ -68,11 +69,21 @@ export async function listAllVendors(q?: string) {
   })
 }
 
-export async function listAllVendorsPaginated(page: number = 1) {
+const SORTABLE_VENDOR_COLS = ['name', 'isActive', 'createdAt'] as const
+
+export async function listAllVendorsPaginated(
+  page: number = 1,
+  opts?: { limit?: number; sortBy?: string; sortOrder?: string }
+) {
+  const limit = opts?.limit ?? DEFAULT_PAGE_SIZE
+  let orderBy: Prisma.VendorOrderByWithRelationInput = { createdAt: 'desc' }
+  if (opts?.sortBy && (SORTABLE_VENDOR_COLS as readonly string[]).includes(opts.sortBy)) {
+    orderBy = { [opts.sortBy]: opts.sortOrder === 'desc' ? 'desc' : 'asc' }
+  }
   return paginate<Vendor>(
     prisma.vendor,
     { deletedAt: null },
-    { page, limit: 10, orderBy: { createdAt: 'desc' } }
+    { page, limit, orderBy }
   )
 }
 

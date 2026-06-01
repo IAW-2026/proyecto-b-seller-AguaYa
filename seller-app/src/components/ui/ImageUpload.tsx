@@ -16,6 +16,7 @@
 
 import { useState, useRef } from 'react'
 import { getUploader } from '@/lib/storage'
+import { MAX_IMAGE_URL_LENGTH } from '@/lib/constants'
 
 interface ImageUploadProps {
   value: string
@@ -105,7 +106,7 @@ export default function ImageUpload({ value, onChange, folder = 'general', label
               value={value}
               onChange={handleUrlChange}
               placeholder="https://ejemplo.com/imagen.jpg"
-              maxLength={1000}
+              maxLength={MAX_IMAGE_URL_LENGTH}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
             />
             <button

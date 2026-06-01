@@ -1,0 +1,11 @@
+export const MAX_NAME_LENGTH = 100
+export const MAX_ADDRESS_LENGTH = 200
+export const MAX_DESCRIPTION_LENGTH = 250
+export const MAX_IMAGE_URL_LENGTH = 1000
+
+export const ADMIN_PAGE_SIZE = 5
+export const VENDOR_ORDERS_PAGE_SIZE = 4
+export const DEFAULT_PAGE_SIZE = 10
+export const VENDOR_PRODUCTS_PAGE_SIZE = 10
+
+export const CLERK_USERS_FETCH_LIMIT = 500

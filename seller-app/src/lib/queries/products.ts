@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
 import { buildSearchWhere } from '@/lib/search'
+import { ADMIN_PAGE_SIZE } from '@/lib/constants'
 import type { Product } from '@prisma/client'
 
 function buildProductOrderBy(sortBy?: string, sortOrder?: string) {
@@ -50,7 +51,7 @@ export async function listAllProductsPaginated(
     },
     {
       page,
-      limit: 5,
+      limit: ADMIN_PAGE_SIZE,
       include: { vendor: { select: { name: true, id: true } } },
       orderBy: buildProductOrderBy(filters?.sortBy, filters?.sortOrder),
     }

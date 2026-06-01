@@ -14,7 +14,8 @@ import { prisma } from '@/lib/prisma'
 import { validateApiKey } from '@/lib/auth'
 
 import { toPublicVendor } from '@/lib/vendors'
-import type { VendorDetailResponse, ErrorResponse } from '@/lib/vendors'
+import type { ErrorResponse } from '@/lib/api-types'
+import type { VendorDetailResponse } from '@/lib/vendors'
 
 interface RouteParams {
   params: Promise<{

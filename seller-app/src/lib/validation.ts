@@ -35,6 +35,13 @@ type ProductDraft = {
 
 type VendorDraft = VendorInput
 
+import {
+  MAX_NAME_LENGTH,
+  MAX_ADDRESS_LENGTH,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_IMAGE_URL_LENGTH,
+} from '@/lib/constants'
+
 const ARGENTINE_TAX_ID_PATTERN = /^\d{2}-\d{8}-\d$/
 
 function normalizeText(value: string | undefined) {
@@ -65,9 +72,9 @@ export function validateProductInput(data: ProductDraft): ProductInput {
     throw new Error('El nombre es obligatorio')
   }
 
-  validateLength(name, 100, 'nombre')
-  validateLength(data.description, 250, 'descripción')
-  validateLength(data.image, 1000, 'imagen')
+  validateLength(name, MAX_NAME_LENGTH, 'nombre')
+  validateLength(data.description, MAX_DESCRIPTION_LENGTH, 'descripción')
+  validateLength(data.image, MAX_IMAGE_URL_LENGTH, 'imagen')
 
   const price = parseNumber(data.price, 'precio')
   if (price <= 0) {
@@ -96,17 +103,17 @@ export function validateVendorInput(data: VendorDraft): VendorInput {
     throw new Error('El nombre del negocio es obligatorio')
   }
 
-  validateLength(name, 100, 'nombre')
+  validateLength(name, MAX_NAME_LENGTH, 'nombre')
 
   if (!address) {
     throw new Error('La dirección es obligatoria')
   }
 
-  validateLength(address, 200, 'dirección')
-  validateLength(data.image, 1000, 'imagen')
+  validateLength(address, MAX_ADDRESS_LENGTH, 'dirección')
+  validateLength(data.image, MAX_IMAGE_URL_LENGTH, 'imagen')
 
   const description = normalizeText(data.description)
-  if (description && description.length > 250) {
+  if (description && description.length > MAX_DESCRIPTION_LENGTH) {
     throw new Error('La descripción no puede superar los 250 caracteres')
   }
 
@@ -142,20 +149,20 @@ export function validateVendorUpdateInput(data: {
   if (data.name !== undefined) {
     const trimmed = data.name.trim()
     if (!trimmed) throw new Error('El nombre del negocio es obligatorio')
-    validateLength(trimmed, 100, 'nombre')
+    validateLength(trimmed, MAX_NAME_LENGTH, 'nombre')
   }
 
   if (data.address !== undefined) {
     const trimmed = data.address.trim()
     if (!trimmed) throw new Error('La dirección es obligatoria')
-    validateLength(trimmed, 200, 'dirección')
+    validateLength(trimmed, MAX_ADDRESS_LENGTH, 'dirección')
   }
 
-  validateLength(data.image, 1000, 'imagen')
+  validateLength(data.image, MAX_IMAGE_URL_LENGTH, 'imagen')
 
   if (data.description !== undefined) {
     const desc = data.description.trim()
-    if (desc.length > 250) {
+    if (desc.length > MAX_DESCRIPTION_LENGTH) {
       throw new Error('La descripción no puede superar los 250 caracteres')
     }
   }

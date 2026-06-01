@@ -22,7 +22,7 @@ export default function ProductCard({ product }: { product: Product }) {
       )}
 
       <h3 className="text-sm font-semibold text-slate-950 dark:text-slate-100 truncate">{product.name}</h3>
-      <p className="mt-0.5 text-base font-bold text-slate-900 dark:text-white">${product.price}</p>
+      <p className="mt-0.5 text-base font-bold text-slate-900 dark:text-white">${product.price.toFixed(2)}</p>
       <div className="mt-1.5">
         <UpdateStockButton productId={product.id} currentStock={product.stock} />
       </div>

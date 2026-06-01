@@ -38,9 +38,10 @@ export default function DeleteVendorButton({ vendorId, vendorName }: { vendorId:
             className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="delete-vendor-title"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+            <h3 id="delete-vendor-title" className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               Eliminar vendedor
             </h3>
             <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">

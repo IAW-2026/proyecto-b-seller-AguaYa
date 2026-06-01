@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
 import { buildSearchWhere } from '@/lib/search'
+import { ADMIN_PAGE_SIZE, VENDOR_ORDERS_PAGE_SIZE } from '@/lib/constants'
 import type { Order, OrderItem, Product } from '@prisma/client'
 
 type OrderWithItems = Order & { items: (OrderItem & { product: Product })[] }
@@ -41,7 +42,7 @@ export async function getVendorOrdersByStatus(
     },
     {
       page,
-      limit: 4,
+      limit: VENDOR_ORDERS_PAGE_SIZE,
       include: { items: { include: { product: true } } },
       orderBy: { createdAt: 'desc' },
     }
@@ -109,7 +110,7 @@ export async function listAllOrdersPaginated(
     where,
     {
       page,
-      limit: 5,
+      limit: ADMIN_PAGE_SIZE,
       include: {
         vendor: { select: { name: true, id: true } },
         items: { include: { product: true } },
