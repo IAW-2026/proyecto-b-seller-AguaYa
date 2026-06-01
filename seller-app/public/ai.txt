@@ -1,0 +1,44 @@
+User-Agent: GPTBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /setup-vendor/
+Disallow: /sign-in/
+
+User-Agent: ClaudeBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /setup-vendor/
+Disallow: /sign-in/
+
+User-Agent: Google-Extended
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /setup-vendor/
+Disallow: /sign-in/
+
+User-Agent: CCBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /setup-vendor/
+Disallow: /sign-in/
+
+User-Agent: PerplexityBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /setup-vendor/
+Disallow: /sign-in/
+
+User-Agent: FacebookBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /setup-vendor/
+Disallow: /sign-in/
+
+User-Agent: *
+Disallow: /

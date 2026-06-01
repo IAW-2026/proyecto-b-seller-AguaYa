@@ -29,3 +29,7 @@ Next.js 16, React 19, Clerk, Prisma + Neon (PostgreSQL), Cloudinary, Recharts
 ---
 
 Enunciado completo: <https://iaw-2026.github.io/proyecto/>
+
+
+
+tener en cuenta que luego haremos una landing (para robots.txt ai.txt y sitemap.xml)

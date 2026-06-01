@@ -1,21 +1,11 @@
-/**
- * vendor.ts — Server actions para gestión del perfil del vendedor.
- *
- * Funciones:
- *   createOrUpdateVendor() → Crea o actualiza el perfil del vendedor autenticado
- */
-
 'use server'
 
 import { auth } from '@clerk/nextjs/server'
+import { clerkClient } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { validateVendorInput } from '@/lib/validation'
 
-/**
- * Crea o actualiza el perfil del vendedor para el usuario autenticado.
- * Usa upsert keyeado por userId (único).
- */
 export async function createOrUpdateVendor(data: {
   name: string
   address: string
@@ -32,17 +22,29 @@ export async function createOrUpdateVendor(data: {
 
   const input = validateVendorInput(data)
 
-  const vendor = await prisma.vendor.upsert({
-    where: { userId },
-    update: {
-      name: input.name,
-      address: input.address,
-      description: input.description,
-      cuil: input.cuil,
-      cuit: input.cuit,
-      image: input.image,
-    },
-    create: {
+  const existing = await prisma.vendor.findUnique({ where: { userId } })
+
+  if (existing) {
+    const vendor = await prisma.vendor.update({
+      where: { userId },
+      data: {
+        name: input.name,
+        address: input.address,
+        description: input.description,
+        cuil: input.cuil,
+        cuit: input.cuit,
+        image: input.image,
+      },
+    })
+
+    revalidatePath('/dashboard/overview')
+    revalidatePath('/dashboard/products')
+
+    return vendor
+  }
+
+  const vendor = await prisma.vendor.create({
+    data: {
       userId,
       name: input.name,
       address: input.address,
@@ -51,6 +53,11 @@ export async function createOrUpdateVendor(data: {
       cuit: input.cuit,
       image: input.image,
     },
+  })
+
+  const client = await clerkClient()
+  await client.users.updateUser(userId, {
+    publicMetadata: { roles: ['seller'] },
   })
 
   revalidatePath('/dashboard/overview')

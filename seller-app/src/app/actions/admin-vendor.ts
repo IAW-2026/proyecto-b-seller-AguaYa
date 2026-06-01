@@ -147,6 +147,11 @@ export async function createVendorAsAdmin(data: {
   const input = validateVendorInput(data)
   const vendor = await prisma.vendor.create({ data: { ...input, userId: data.userId } })
 
+  const client = await clerkClient()
+  await client.users.updateUser(data.userId, {
+    publicMetadata: { roles: ['seller'] },
+  })
+
   revalidatePath('/dashboard/admin/vendors')
   return vendor
 }
