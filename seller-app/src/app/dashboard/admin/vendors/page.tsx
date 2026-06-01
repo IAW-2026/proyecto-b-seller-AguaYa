@@ -38,6 +38,7 @@ export default async function VendorsPage(props: { searchParams: Promise<{ page?
                 <tr>
                   <th className="px-4 py-3 font-medium">Vendedor</th>
                   <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium">Reseñas</th>
                   <th className="px-4 py-3 font-medium">CUIL / CUIT</th>
                   <th className="px-4 py-3 font-medium">Creado</th>
                   <th className="px-4 py-3 font-medium">Acciones</th>
@@ -55,6 +56,16 @@ export default async function VendorsPage(props: { searchParams: Promise<{ page?
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-slate-600">{vendor.clerkEmail || '-'}</td>
+                    <td className="px-4 py-3">
+                      {vendor.totalReviews > 0 ? (
+                        <span className="inline-flex items-center gap-1 text-amber-500" title={`${vendor.promedio} de 5 estrellas`}>
+                          <span className="text-slate-700">{'★'.repeat(Math.round(vendor.promedio))}{'☆'.repeat(5 - Math.round(vendor.promedio))}</span>
+                          <span className="text-xs text-slate-400">({vendor.totalReviews})</span>
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-400">Sin reseñas</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-slate-600">{vendor.cuil || vendor.cuit || '-'}</td>
                     <td className="px-4 py-3 text-slate-600">
                       {new Date(vendor.createdAt).toLocaleDateString()}

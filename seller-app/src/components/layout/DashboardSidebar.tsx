@@ -1,16 +1,18 @@
 import React from 'react'
 import Link from 'next/link'
-import { Package, ShoppingCart, LayoutDashboard, Users } from 'lucide-react'
+import { ExternalLink, Package, ShoppingCart, LayoutDashboard, Users } from 'lucide-react'
 import LogoutButton from '../LogoutButton'
 
 export default function DashboardSidebar({
   vendorName,
   vendorImage,
   roles,
+  feedbackAppUrl,
 }: {
   vendorName: string
   vendorImage?: string | null
   roles?: string[]
+  feedbackAppUrl?: string
 }) {
   const isAdmin = roles?.includes('admin_seller')
 
@@ -52,6 +54,19 @@ export default function DashboardSidebar({
               Pedidos
             </Link>
           </li>
+          {!isAdmin && feedbackAppUrl && (
+            <li>
+              <a
+                href={feedbackAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Reseñas
+              </a>
+            </li>
+          )}
         </ul>
       </nav>
 

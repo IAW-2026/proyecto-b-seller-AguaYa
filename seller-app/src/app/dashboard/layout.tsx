@@ -27,9 +27,9 @@ async function DashboardLayoutContent({ children }: { children: React.ReactNode 
 
   return (
     <div className="flex min-h-screen bg-transparent text-slate-900">
-      <DashboardSidebar vendorName={vendor!.name} vendorImage={vendor!.image} roles={roles} />
+      <DashboardSidebar vendorName={vendor!.name} vendorImage={vendor!.image} roles={roles} feedbackAppUrl={process.env.FEEDBACK_APP_URL} />
       <main className="flex-1 px-4 py-6 pb-20 sm:px-6 lg:px-10 lg:py-8 lg:pb-6">{children}</main>
-      <MobileBottomNav roles={roles} />
+      <MobileBottomNav roles={roles} feedbackAppUrl={process.env.FEEDBACK_APP_URL} />
     </div>
   )
 }

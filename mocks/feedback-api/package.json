@@ -1,0 +1,7 @@
+{
+  "name": "feedback-api-mock",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Mock de FeedbackApp para desarrollo local"
+}

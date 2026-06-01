@@ -10,7 +10,6 @@ export async function getVendorByUserId(userId: string) {
       id: true,
       name: true,
       address: true,
-      reputation: true,
       description: true,
       image: true,
       cuil: true,

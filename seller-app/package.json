@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mock:feedback": "node ../mocks/feedback-api/server.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.3.0",

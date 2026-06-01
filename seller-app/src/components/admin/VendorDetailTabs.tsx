@@ -13,7 +13,6 @@ type Vendor = {
   image: string | null
   cuil: string | null
   cuit: string | null
-  reputation: number
   clerkName: string
   clerkEmail: string
 }
@@ -44,7 +43,6 @@ type Order = {
 
 type Review = {
   orderId: string
-  buyerName: string
   rating: number
   description?: string
   createdAt: string
@@ -58,14 +56,17 @@ export default function VendorDetailTabs({
   products,
   orders,
   reviews,
+  promedio,
+  totalReviews,
 }: {
   vendor: Vendor
   products: Product[]
   orders: Order[]
   reviews: Review[]
+  promedio: number
+  totalReviews: number
 }) {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview')
-  const router = useRouter()
 
   return (
     <div>
@@ -99,14 +100,14 @@ export default function VendorDetailTabs({
         </button>
       </div>
 
-      {activeTab === 'overview' && <OverviewTab vendor={vendor} reviews={reviews} />}
+      {activeTab === 'overview' && <OverviewTab vendor={vendor} reviews={reviews} promedio={promedio} totalReviews={totalReviews} />}
       {activeTab === 'products' && <ProductsTab vendorId={vendor.id} products={products} />}
       {activeTab === 'orders' && <OrdersTab orders={orders} />}
     </div>
   )
 }
 
-function OverviewTab({ vendor, reviews }: { vendor: Vendor; reviews: Review[] }) {
+function OverviewTab({ vendor, reviews, promedio, totalReviews }: { vendor: Vendor; reviews: Review[]; promedio: number; totalReviews: number }) {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-slate-200 bg-white p-6">
@@ -138,15 +139,20 @@ function OverviewTab({ vendor, reviews }: { vendor: Vendor; reviews: Review[] })
               <p className="font-medium text-slate-900">{vendor.cuit}</p>
             </div>
           )}
-          <div>
-            <span className="text-slate-500">Reputación</span>
-            <p className="font-medium text-slate-900">{vendor.reputation} / 5</p>
-          </div>
         </div>
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-6">
-        <h3 className="mb-4 text-lg font-semibold text-slate-900">Reseñas</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-slate-900">Reseñas</h3>
+          {totalReviews > 0 && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-amber-500 text-base">{'★'.repeat(Math.round(promedio))}{'☆'.repeat(5 - Math.round(promedio))}</span>
+              <span className="font-semibold text-slate-900">{promedio}</span>
+              <span className="text-slate-400">({totalReviews} reseñas)</span>
+            </div>
+          )}
+        </div>
         {reviews.length === 0 ? (
           <p className="text-sm text-slate-500">No hay reseñas todavía.</p>
         ) : (
@@ -154,7 +160,7 @@ function OverviewTab({ vendor, reviews }: { vendor: Vendor; reviews: Review[] })
             {reviews.map((review) => (
               <div key={review.orderId} className="rounded-lg border border-slate-100 bg-slate-50 p-4">
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="font-medium text-slate-900">{review.buyerName}</span>
+                  <span className="font-medium text-slate-900">Orden {review.orderId.slice(0, 8)}</span>
                   <span className="text-sm text-slate-400">{new Date(review.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="mb-1 text-sm text-amber-500">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</div>

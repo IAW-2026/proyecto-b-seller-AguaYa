@@ -5,7 +5,7 @@ import { requireAdminPage } from '@/lib/admin-guard'
 import { getVendorWithClerkInfo } from '@/app/actions/admin-vendor'
 import { getVendorProducts } from '@/lib/queries/vendors'
 import { getVendorOrders } from '@/lib/queries/orders'
-import { getVendorReviews } from '@/lib/queries/reviews'
+import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
 import VendorDetailTabs from '@/components/admin/VendorDetailTabs'
 
 export default async function VendorDetailPage({
@@ -20,11 +20,12 @@ export default async function VendorDetailPage({
 
   if (!vendor) redirect('/dashboard/admin/vendors')
 
-  const [productsResult, orders, reviews] = await Promise.all([
+  const [productsResult, orders, reviewStats] = await Promise.all([
     getVendorProducts(id),
     getVendorOrders(id),
-    getVendorReviews(vendor.userId),
+    getVendorReviewsWithStats(vendor.userId),
   ])
+  const reviews = reviewStats.reviews
 
   const products = productsResult?.products ?? []
 
@@ -62,6 +63,8 @@ export default async function VendorDetailPage({
           })),
         }))}
         reviews={reviews}
+        promedio={reviewStats.promedio}
+        totalReviews={reviewStats.total}
       />
     </div>
   )

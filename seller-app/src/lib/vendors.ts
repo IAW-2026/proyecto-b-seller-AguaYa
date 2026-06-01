@@ -18,7 +18,6 @@ export interface PublicVendor {
   id: string
   name: string
   description: string | null
-  reputation: number
   address: string
   image: string | null
 }
@@ -35,7 +34,6 @@ export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
     id: vendor.id,
     name: vendor.name,
     description: vendor.description,
-    reputation: vendor.reputation,
     address: vendor.address,
     image: vendor.image ?? null,
   }

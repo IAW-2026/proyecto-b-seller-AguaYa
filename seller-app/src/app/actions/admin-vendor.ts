@@ -58,20 +58,24 @@ export async function getVendorsWithClerkInfoPaginated(page: number = 1) {
   await requireAdmin()
 
   const { listAllVendorsPaginated } = await import('@/lib/queries/vendors')
+  const { getVendorReviewsWithStats } = await import('@/lib/queries/reviews')
   const result = await listAllVendorsPaginated(page)
 
   const client = await clerkClient()
   const { data: clerkUsers } = await client.users.getUserList({ limit: 500 })
   const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
 
-  const items = result.items.map((v) => {
+  const items = await Promise.all(result.items.map(async (v) => {
     const clerkUser = clerkMap.get(v.userId)
+    const reviews = await getVendorReviewsWithStats(v.userId)
     return {
       ...v,
       clerkName: clerkUser ? [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || '' : '',
       clerkEmail: clerkUser?.emailAddresses?.[0]?.emailAddress || '',
+      promedio: reviews.promedio,
+      totalReviews: reviews.total,
     }
-  })
+  }))
 
   return { items, total: result.total, pageCount: result.pageCount }
 }

@@ -1,8 +1,7 @@
 import React, { Suspense } from 'react'
 import { auth } from '@clerk/nextjs/server'
 import { getVendorOverview } from '@/lib/queries/vendors'
-import { getVendorReviews } from '@/lib/queries/reviews'
-import type { Review } from '@/lib/queries/reviews'
+import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
 
 function ReviewStars({ rating }: { rating: number }) {
   return (
@@ -19,10 +18,11 @@ async function OverviewContent() {
     return null
   }
 
-  const [overview, reviews] = await Promise.all([
+  const [overview, reviewStats] = await Promise.all([
     getVendorOverview(userId),
-    getVendorReviews(userId),
+    getVendorReviewsWithStats(userId),
   ])
+  const reviews = reviewStats.reviews
 
   if (!overview) {
     return (
@@ -40,7 +40,7 @@ async function OverviewContent() {
         <strong className="text-lg text-slate-950">{overview.name}</strong>
         <div className="mt-3 text-sm text-slate-600">{overview.address}</div>
         {overview.description ? <div className="mt-2 text-sm text-slate-600">{overview.description}</div> : null}
-        <div className="mt-2 text-sm text-slate-600">Reputación: {overview.reputation}</div>
+
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -60,7 +60,13 @@ async function OverviewContent() {
 
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur">
-          <h2 className="text-xl font-semibold text-slate-950">Reseñas recientes</h2>
+          <h2 className="text-xl font-semibold text-slate-950">
+            Reseñas {reviewStats.total > 0 && (
+              <span className="text-lg text-slate-500 font-normal">
+                ({reviewStats.total}) <ReviewStars rating={Math.round(reviewStats.promedio)} /> <span className="text-amber-400">{reviewStats.promedio}</span>
+              </span>
+            )}
+          </h2>
           {reviews.length > 0 ? (
             <ul className="mt-5 space-y-4">
               {reviews.map((review) => (
@@ -68,9 +74,6 @@ async function OverviewContent() {
                   <div className="flex items-center justify-between">
                     <strong className="text-slate-950">Orden {review.orderId.slice(0, 8)}</strong>
                     <ReviewStars rating={review.rating} />
-                  </div>
-                  <div className="mt-2 text-sm text-slate-600">
-                    {review.buyerName ? <span>Comprador: {review.buyerName}</span> : null}
                   </div>
                   {review.products.length > 0 ? (
                     <div className="mt-1 text-sm text-slate-600">
