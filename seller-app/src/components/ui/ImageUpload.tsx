@@ -54,11 +54,11 @@ export default function ImageUpload({ value, onChange, folder = 'general', label
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">{label}</label>
 
       {/* Preview */}
       {value && !useUrlInput && (
-        <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200">
+        <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
@@ -93,7 +93,7 @@ export default function ImageUpload({ value, onChange, folder = 'general', label
             <button
               type="button"
               onClick={() => setUseUrlInput(true)}
-              className="text-sm text-gray-500 hover:text-gray-700"
+              className="text-sm text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-white"
             >
               o pegar URL
             </button>
@@ -105,7 +105,8 @@ export default function ImageUpload({ value, onChange, folder = 'general', label
               value={value}
               onChange={handleUrlChange}
               placeholder="https://ejemplo.com/imagen.jpg"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              maxLength={1000}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
             />
             <button
               type="button"
@@ -113,7 +114,7 @@ export default function ImageUpload({ value, onChange, folder = 'general', label
                 setUseUrlInput(false)
                 onChange('')
               }}
-              className="text-sm text-gray-500 hover:text-gray-700"
+              className="text-sm text-gray-500 hover:text-gray-700 dark:text-slate-400 dark:hover:text-white"
             >
               subir archivo
             </button>

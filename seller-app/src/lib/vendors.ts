@@ -20,6 +20,7 @@ export interface PublicVendor {
   description: string | null
   address: string
   image: string | null
+  isActive: boolean
 }
 
 /**
@@ -36,6 +37,7 @@ export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
     description: vendor.description,
     address: vendor.address,
     image: vendor.image ?? null,
+    isActive: vendor.isActive,
   }
 }
 

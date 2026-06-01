@@ -4,6 +4,11 @@
 
 @vendorId = cmpc2gjz90000ikli1cg4gmsj
 @productId = cmpc2lgbk0002ikliyzwtlixv
+@productId2 = cmpdhu3090000csli86gyf23f
+@productId3 = cmpqyf8cz0002ewliw2pgh8qf
+@productId4 = cmpqyfbvj0003ewli9gszli4l
+@productId5 =  cmpfv5pkm000004ji07hi6gky
+@productId6 = cmpqyfu8c0007ewlidz5p3czy
 
 @vendorId2 = cmp21j4xu0001zwli69agxgle
 
@@ -26,6 +31,28 @@ Content-Type: application/json
   ],
   "total": 2000
 }
+
+### Test 5-2: POST crear orden exitosa con muchos productos
+POST {{baseUrl}}/api/orders
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "externalId": "buyer-order-{{$timestamp}}",
+  "vendorId": "{{vendorId}}",
+  "buyerId": "Don Comprador 3",
+  "address": "avenida siempre viva 123 depto 12",
+  "items": [
+    {"productId": "{{productId}}", "quantity": 2},
+    {"productId": "{{productId2}}", "quantity": 1},
+    {"productId": "{{productId3}}", "quantity": 3},
+    {"productId": "{{productId4}}", "quantity": 1},
+    {"productId": "{{productId5}}", "quantity": 4},
+    {"productId": "{{productId6}}", "quantity": 2}
+  ],
+  "total": 119954.00
+}
+
 
 ### Test 6: POST sin API Key (401)
 POST {{baseUrl}}/api/orders

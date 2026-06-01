@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
-import type { PaginatedResult } from '@/lib/paginate'
 import type { Order, OrderItem, Product } from '@prisma/client'
 
 type OrderWithItems = Order & { items: (OrderItem & { product: Product })[] }
@@ -26,7 +25,7 @@ export async function getVendorOrdersByStatus(
     { vendorId, status, deletedAt: null },
     {
       page,
-      limit: 10,
+      limit: 4,
       include: { items: { include: { product: true } } },
       orderBy: { createdAt: 'desc' },
     }

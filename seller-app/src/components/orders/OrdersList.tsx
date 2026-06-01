@@ -14,7 +14,7 @@ export default async function OrdersList({
   const { userId } = await auth()
   if (!userId) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400">
         <p className="font-semibold">Error: No autenticado</p>
       </div>
     )
@@ -23,7 +23,7 @@ export default async function OrdersList({
   const vendor = await getVendorByUserId(userId)
   if (!vendor) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400">
         <p className="font-semibold">Error: No autenticado</p>
       </div>
     )
@@ -46,7 +46,7 @@ export default async function OrdersList({
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400">
         <p className="font-semibold">Error: {error}</p>
       </div>
     )
@@ -54,10 +54,10 @@ export default async function OrdersList({
 
   if (!paidResult || !readyResult) {
     return (
-      <div className="p-8 text-center text-gray-500 bg-white rounded-lg border border-gray-200">
-        <Package className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+      <div className="p-8 text-center text-gray-500 bg-white rounded-lg border border-gray-200 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400">
+        <Package className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-slate-600" />
         <p className="text-lg">No hay órdenes aún</p>
-        <p className="text-sm">Las órdenes que recibas aparecerán aquí</p>
+        <p className="text-sm dark:text-slate-400">Las órdenes que recibas aparecerán aquí</p>
       </div>
     )
   }

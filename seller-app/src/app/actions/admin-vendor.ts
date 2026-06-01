@@ -4,7 +4,7 @@ import { clerkClient } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getAuthRoles } from '@/lib/auth-utils'
-import { validateVendorInput, validateProductInput } from '@/lib/validation'
+import { validateVendorInput, validateProductInput, validateVendorUpdateInput } from '@/lib/validation'
 
 async function requireAdmin() {
   const roles = await getAuthRoles()
@@ -132,6 +132,8 @@ export async function updateVendorAsAdmin(
 ) {
   await requireAdmin()
 
+  validateVendorUpdateInput(data)
+
   const vendor = await prisma.vendor.update({
     where: { id: vendorId },
     data,
@@ -151,6 +153,23 @@ export async function deleteVendorAsAdmin(vendorId: string) {
 
   revalidatePath('/dashboard/admin/vendors')
   return vendor
+}
+
+export async function toggleVendorActiveStatus(vendorId: string) {
+  await requireAdmin()
+
+  const vendor = await prisma.vendor.findUnique({ where: { id: vendorId } })
+  if (!vendor) throw new Error('Vendedor no encontrado')
+
+  const updated = await prisma.vendor.update({
+    where: { id: vendorId },
+    data: { isActive: !vendor.isActive },
+  })
+
+  await revalidatePath('/dashboard/admin/vendors')
+  await revalidatePath(`/dashboard/admin/vendors/${vendorId}`)
+  await revalidatePath('/dashboard/overview')
+  return updated
 }
 
 export async function updateOrderStatusAsAdmin(orderId: string, status: 'PAID' | 'READY') {
@@ -234,3 +253,4 @@ export async function deleteProductAsAdmin(vendorId: string, productId: string) 
   revalidatePath('/dashboard/admin/vendors')
   return product
 }
+

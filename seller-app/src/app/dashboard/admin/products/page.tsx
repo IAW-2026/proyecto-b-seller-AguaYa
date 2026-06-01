@@ -13,7 +13,7 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Productos (global)</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Productos (global)</h1>
       </div>
       <AdminProductsTable products={result.items} page={page} pageCount={result.pageCount} />
     </div>

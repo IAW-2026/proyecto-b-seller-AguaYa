@@ -58,3 +58,23 @@ export async function createOrUpdateVendor(data: {
 
   return vendor
 }
+
+export async function toggleMyVendorActiveStatus() {
+  const { userId } = await auth()
+  if (!userId) throw new Error('No autenticado')
+
+  const vendor = await prisma.vendor.findUnique({ where: { userId } })
+  if (!vendor) throw new Error('Vendedor no encontrado')
+
+  const updated = await prisma.vendor.update({
+    where: { userId },
+    data: { isActive: !vendor.isActive },
+  })
+
+  await revalidatePath('/dashboard/overview')
+  await revalidatePath('/dashboard/products')
+  await revalidatePath('/dashboard/settings')
+  await revalidatePath('/dashboard/admin/vendors')
+  await revalidatePath(`/dashboard/admin/vendors/${vendor.id}`)
+  return updated
+}

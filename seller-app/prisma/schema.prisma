@@ -19,8 +19,9 @@ model Vendor {
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
   isActive    Boolean   @default(true)
-  orders      Order[]
+
   products    Product[]
+  orders      Order[]
 }
 
 model Product {

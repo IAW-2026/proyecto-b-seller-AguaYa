@@ -25,7 +25,7 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
     return (
       <div>
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-slate-900">Órdenes</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Órdenes</h1>
         </div>
         <AdminOrdersTable orders={result.items} page={page} pageCount={result.pageCount} />
       </div>
@@ -42,18 +42,18 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Package className="h-6 w-6 text-blue-600" />
+          <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+            <Package className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Órdenes</h1>
-            <p className="text-gray-600">Gestiona tus pedidos entrantes</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Órdenes</h1>
+            <p className="text-gray-600 dark:text-slate-400">Gestiona tus pedidos entrantes</p>
           </div>
         </div>
         <RefreshButton />
       </div>
 
-      <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando órdenes...</div>}>
+      <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando órdenes...</div>}>
         <OrdersList paidPage={paidPage} readyPage={readyPage} />
       </Suspense>
       <AutoRefresh interval={10000} />
@@ -64,7 +64,7 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
 
 export default async function OrdersPage(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string }> }) {
   return (
-    <Suspense fallback={<div className="text-center py-8 text-slate-500">Cargando órdenes...</div>}>
+    <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando órdenes...</div>}>
       <OrdersContent searchParams={props.searchParams} />
     </Suspense>
   )
