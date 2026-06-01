@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getAuthRoles } from '@/lib/auth-utils'
 import { validateVendorInput, validateProductInput, validateVendorUpdateInput } from '@/lib/validation'
+import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
 
 async function requireAdmin() {
   const roles = await getAuthRoles()
@@ -68,7 +69,7 @@ export async function getVendorsWithClerkInfoPaginated(
   const { data: clerkUsers } = await client.users.getUserList({ limit: 500 })
   const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
 
-  let items = vendors.map((v) => {
+  let items = await Promise.all(vendors.map(async (v) => {
     const clerkUser = clerkMap.get(v.userId)
     const reviews = await getVendorReviewsWithStats(v.userId)
     return {
@@ -78,7 +79,7 @@ export async function getVendorsWithClerkInfoPaginated(
       promedio: reviews.promedio,
       totalReviews: reviews.total,
     }
-  })
+  }))
 
   // Filter all fields in memory with OR logic (email from Clerk, rest from DB)
   if (filters?.q) {
