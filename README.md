@@ -6,7 +6,7 @@ Esta app corresponde al rol del vendedor en el proyecto tipo **B (Delivery)**.
 
 # SellerApp — AguaYa
 
-Aplicacion destinada a la gestion de pedidos y stock para negocios de agua envasada
+Gestión de catálogo de productos, stock, pedidos entrantes (PAID → READY) y APIs para BuyerApp/DeliveryApp
 
 ## Deploy
 
@@ -14,9 +14,9 @@ Link: [\[URL del deploy\]](https://proyecto-b-seller-agua-ya.vercel.app/)
 
 ## Credenciales de prueba
 
-### Admin (`admin_seller`)
-- Email: ...
-- Contraseña: ...
+### Admin (`admin_seller`) (mismas credenciales para correo electronico Gmail)
+- Email: aguayaadmin@gmail.com
+- Contraseña: AguaYaAdmin12345678
 
 ### Vendedor (`seller`)
 - Email: ...

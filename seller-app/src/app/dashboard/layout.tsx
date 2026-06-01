@@ -21,13 +21,9 @@ async function DashboardLayoutContent({ children }: { children: React.ReactNode 
     redirect('/setup-vendor')
   }
 
-  if (!vendor && isAdmin) {
-    redirect('/dashboard/admin/vendors')
-  }
-
   return (
     <div className="flex h-screen bg-transparent text-slate-900 dark:text-slate-100">
-      <DashboardSidebar vendorName={vendor!.name} vendorImage={vendor!.image} roles={roles} feedbackAppUrl={process.env.FEEDBACK_APP_URL} />
+      <DashboardSidebar vendorName={vendor?.name ?? null} vendorImage={vendor?.image ?? null} roles={roles} feedbackAppUrl={process.env.FEEDBACK_APP_URL} />
       <main className="flex-1 overflow-y-auto px-4 py-6 pb-20 sm:px-6 lg:px-10 lg:py-8 lg:pb-6">{children}</main>
       <MobileBottomNav roles={roles} feedbackAppUrl={process.env.FEEDBACK_APP_URL} />
     </div>

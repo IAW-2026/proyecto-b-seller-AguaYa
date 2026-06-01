@@ -10,7 +10,7 @@ export default function DashboardSidebar({
   roles,
   feedbackAppUrl,
 }: {
-  vendorName: string
+  vendorName: string | null
   vendorImage?: string | null
   roles?: string[]
   feedbackAppUrl?: string
@@ -77,21 +77,27 @@ export default function DashboardSidebar({
         href="/dashboard/settings"
         className="flex items-center gap-3 rounded-xl px-3 py-2 transition hover:bg-slate-100 dark:hover:bg-slate-800"
       >
-        {vendorImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={vendorImage}
-            alt={vendorName}
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
-          />
+        {vendorName ? (
+          vendorImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={vendorImage}
+              alt={vendorName}
+              width={40}
+              height={40}
+              className="rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-300 text-sm font-semibold text-white">
+              {vendorName.charAt(0).toUpperCase()}
+            </div>
+          )
         ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-300 text-sm font-semibold text-white">
-            {vendorName.charAt(0).toUpperCase()}
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-700 text-sm font-semibold text-white">
+            A
           </div>
         )}
-        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{vendorName}</span>
+        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{vendorName ?? 'Admin'}</span>
       </Link>
 
       <div className="my-4 h-px bg-slate-200 dark:bg-slate-700" />
