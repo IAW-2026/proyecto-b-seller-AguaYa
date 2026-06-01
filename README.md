@@ -18,7 +18,7 @@ Link: [\[URL del deploy\]](https://proyecto-b-seller-agua-ya.vercel.app/)
 - Email: aguayaadmin@gmail.com
 - Contraseña: AguaYaAdmin12345678
 
-### Vendedor (`seller`)
+### Vendedor (`seller`) (pueden usar cuentas personales)
 - Email: ...
 - Contraseña: ...
 
