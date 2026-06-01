@@ -15,9 +15,10 @@ interface ProductFormDialogProps {
     stock?: number
     image?: string
   }
+  disableRedirect?: boolean
 }
 
-export default function ProductFormDialog({ children, mode = 'create', productId, vendorId, initialData }: ProductFormDialogProps) {
+export default function ProductFormDialog({ children, mode = 'create', productId, vendorId, initialData, disableRedirect }: ProductFormDialogProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -29,7 +30,6 @@ export default function ProductFormDialog({ children, mode = 'create', productId
       {open ? (
         <div
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-10"
-          onClick={() => setOpen(false)}
         >
           <div
             className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
@@ -51,7 +51,7 @@ export default function ProductFormDialog({ children, mode = 'create', productId
                 </svg>
               </button>
             </div>
-            <ProductForm mode={mode} productId={productId} vendorId={vendorId} initialData={initialData} onSuccess={() => setOpen(false)} />
+            <ProductForm mode={mode} productId={productId} vendorId={vendorId} initialData={initialData} disableRedirect={disableRedirect} onSuccess={() => setOpen(false)} />
           </div>
         </div>
       ) : null}

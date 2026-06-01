@@ -11,7 +11,7 @@ import AutoRefresh from '@/lib/AutoRefresh'
 import OrderNotifier from '@/components/orders/OrderNotifier'
 import { Package } from 'lucide-react'
 
-async function OrdersContent(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string }> }) {
+async function OrdersContent(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string; q?: string; from?: string; to?: string }> }) {
   const { userId } = await auth()
   if (!userId) return null
 
@@ -21,13 +21,22 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
 
   if (isAdmin) {
     const page = parseInt(searchParams.page || '1', 10)
-    const result = await listAllOrdersPaginated(page)
+    const q = searchParams.q || ''
+    const from = searchParams.from || ''
+    const to = searchParams.to || ''
+    const result = await listAllOrdersPaginated(page, {
+      q: q || undefined,
+      from: from || undefined,
+      to: to || undefined,
+    })
     return (
       <div>
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Órdenes</h1>
         </div>
-        <AdminOrdersTable orders={result.items} page={page} pageCount={result.pageCount} />
+        <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando...</div>}>
+          <AdminOrdersTable orders={result.items} page={page} pageCount={result.pageCount} />
+        </Suspense>
       </div>
     )
   }
@@ -37,6 +46,9 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
 
   const paidPage = parseInt(searchParams.paid_page || '1', 10)
   const readyPage = parseInt(searchParams.ready_page || '1', 10)
+  const q = searchParams.q || ''
+  const from = searchParams.from || ''
+  const to = searchParams.to || ''
 
   return (
     <div className="space-y-6">
@@ -54,7 +66,7 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
       </div>
 
       <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando órdenes...</div>}>
-        <OrdersList paidPage={paidPage} readyPage={readyPage} />
+        <OrdersList paidPage={paidPage} readyPage={readyPage} q={q} from={from} to={to} />
       </Suspense>
       <AutoRefresh interval={10000} />
       <OrderNotifier interval={10000} />
@@ -62,7 +74,7 @@ async function OrdersContent(props: { searchParams: Promise<{ page?: string; pai
   )
 }
 
-export default async function OrdersPage(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string }> }) {
+export default async function OrdersPage(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string; q?: string; from?: string; to?: string }> }) {
   return (
     <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando órdenes...</div>}>
       <OrdersContent searchParams={props.searchParams} />

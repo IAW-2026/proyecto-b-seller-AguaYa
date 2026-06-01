@@ -21,7 +21,6 @@ model Vendor {
   image       String?
   cuil        String?
   cuit        String?
-  reputation  Float     @default(0)
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -53,6 +52,7 @@ model Order {
   externalId String     @unique
   vendorId   String
   buyerId    String
+  buyerName  String @default("")
   status     OrderStatus @default(PAID)
   total      Float
   address    String?

@@ -9,7 +9,7 @@ import AdminProductsTable from '@/components/admin/AdminProductsTable'
 import ProductCard from '@/components/products/ProductCard'
 import ProductFormDialog from '@/components/products/ProductFormDialog'
 
-async function ProductsContent(props: { searchParams: Promise<{ page?: string }> }) {
+async function ProductsContent(props: { searchParams: Promise<{ page?: string; q?: string; isActive?: string; sortBy?: string; sortOrder?: string }> }) {
   const { userId } = await auth()
   if (!userId) return null
 
@@ -19,7 +19,12 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
 
   if (isAdmin) {
     const page = parseInt(searchParams.page || '1', 10)
-    const result = await listAllProductsPaginated(page)
+    const q = searchParams.q || ''
+    const isActive = searchParams.isActive === 'true' ? true : searchParams.isActive === 'false' ? false : undefined
+    const sortBy = searchParams.sortBy || ''
+    const sortOrder = searchParams.sortOrder || ''
+
+    const result = await listAllProductsPaginated(page, { q, isActive, sortBy: sortBy || undefined, sortOrder: sortOrder || undefined })
     return (
       <div>
         <div className="mb-6 flex items-center justify-between">
@@ -62,7 +67,7 @@ async function ProductsContent(props: { searchParams: Promise<{ page?: string }>
       {productsVendor.products.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-slate-600 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-400">No tienes productos aún.</p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {productsVendor.products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

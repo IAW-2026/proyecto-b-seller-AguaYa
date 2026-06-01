@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Pagination from '@/components/Pagination'
-import { Package } from 'lucide-react'
+import SearchBar from '@/components/ui/SearchBar'
+import OrdersChart from '@/components/orders/OrdersChart'
 import OrderCard from '@/components/orders/OrderCard'
+import { Package } from 'lucide-react'
 import type { OrderWithItems } from '@/components/orders/OrderCard'
 
 type TabId = 'confirm' | 'ready'
@@ -15,6 +17,7 @@ const TABS: { id: TabId; label: string }[] = [
 ]
 
 export default function OrdersTabs({
+  vendorId,
   paidOrders,
   paidPage,
   paidPageCount,
@@ -24,6 +27,7 @@ export default function OrdersTabs({
   readyPageCount,
   readyTotal,
 }: {
+  vendorId: string
   paidOrders: OrderWithItems[]
   paidPage: number
   paidPageCount: number
@@ -36,6 +40,7 @@ export default function OrdersTabs({
   const [activeTab, setActiveTab] = useState<TabId>('confirm')
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const currentOrders = activeTab === 'confirm' ? paidOrders : readyOrders
   const showConfirmButton = activeTab === 'confirm'
@@ -44,12 +49,19 @@ export default function OrdersTabs({
   const currentPageCount = activeTab === 'confirm' ? paidPageCount : readyPageCount
 
   function handlePageChange(page: number) {
+    const params = new URLSearchParams(searchParams.toString())
     const param = activeTab === 'confirm' ? 'paid_page' : 'ready_page'
-    router.push(`${pathname}?${param}=${page}`)
+    params.set(param, String(page))
+    const str = params.toString()
+    router.push(str ? `${pathname}?${str}` : pathname)
   }
 
   return (
     <div className="space-y-6">
+      <OrdersChart vendorId={vendorId} />
+
+      <SearchBar placeholder="Buscar por orden, comprador o dirección..." showDateFilter />
+
       <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit dark:bg-slate-800">
         {TABS.map((tab) => {
           const count = tab.id === 'confirm' ? paidTotal : readyTotal

@@ -81,7 +81,6 @@ export default function AdminVendorEditDialog({
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-10"
-          onClick={() => { if (!submitting) setOpen(false) }}
         >
           <div
             className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"

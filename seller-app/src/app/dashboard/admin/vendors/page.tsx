@@ -1,18 +1,25 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { requireAdminPage } from '@/lib/admin-guard'
 import { getVendorsWithClerkInfoPaginated } from '@/app/actions/admin-vendor'
-import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
-import AdminVendorEditDialog from '@/components/admin/AdminVendorEditDialog'
+import SearchBar from '@/components/ui/SearchBar'
+import AdminVendorsTable from '@/components/admin/AdminVendorsTable'
 import VendorsPagination from '@/components/admin/VendorsPagination'
-import { Package } from 'lucide-react'
 
-export default async function VendorsPage(props: { searchParams: Promise<{ page?: string }> }) {
+export default async function VendorsPage(props: { searchParams: Promise<{ page?: string; q?: string; sortBy?: string; sortOrder?: string }> }) {
   await requireAdminPage()
 
   const searchParams = await props.searchParams
   const page = parseInt(searchParams.page || '1', 10)
-  const { items: vendors, pageCount } = await getVendorsWithClerkInfoPaginated(page)
+  const q = searchParams.q || ''
+  const sortBy = searchParams.sortBy || ''
+  const sortOrder = searchParams.sortOrder || ''
+
+  const { items: vendors, pageCount } = await getVendorsWithClerkInfoPaginated(page, {
+    q: q || undefined,
+    sortBy: sortBy || undefined,
+    sortOrder: sortOrder || undefined,
+  })
 
   return (
     <div>
@@ -26,65 +33,13 @@ export default async function VendorsPage(props: { searchParams: Promise<{ page?
         </Link>
       </div>
 
-      {vendors.length === 0 ? (
-        <div className="p-12 text-center text-slate-400 dark:text-slate-500">
-          <Package className="mx-auto mb-4 h-10 w-10" />
-          <p>No hay vendedores registrados.</p>
-        </div>
-      ) : (
-        <>
-          <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Vendedor</th>
-                  <th className="px-4 py-3 font-medium">Estado</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">CUIL / CUIT</th>
-                  <th className="px-4 py-3 font-medium">Creado</th>
-                  <th className="px-4 py-3 font-medium">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                {vendors.map((vendor) => (
-                  <tr key={vendor.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/dashboard/admin/vendors/${vendor.id}`}
-                        className="font-medium text-sky-700 hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300"
-                      >
-                        {vendor.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        vendor.isActive
-                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
-                          : 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
-                      }`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${vendor.isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                        {vendor.isActive ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{vendor.clerkEmail || '-'}</td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{vendor.cuil || vendor.cuit || '-'}</td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
-                      {new Date(vendor.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <AdminVendorEditDialog vendor={vendor} />
-                        <ToggleVendorButton vendorId={vendor.id} isActive={vendor.isActive} vendorName={vendor.name} role="admin" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <VendorsPagination page={page} pageCount={pageCount} />
-        </>
-      )}
+      <div className="mb-4">
+        <SearchBar placeholder="Buscar por nombre, email o CUIL/CUIT..." />
+      </div>
+
+      <Suspense fallback={<div className="text-center py-8 text-slate-500 dark:text-slate-400">Cargando...</div>}>
+        <AdminVendorsTable vendors={vendors} page={page} pageCount={pageCount} />
+      </Suspense>
     </div>
   )
 }

@@ -15,7 +15,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-import { getVendorOrders as getCachedVendorOrders } from '@/lib/queries/orders'
+import { getVendorOrders as getCachedVendorOrders, getVendorOrdersByDateRange } from '@/lib/queries/orders'
 import { notifyExternalService } from '@/lib/external-api'
 import { OrderStatus } from '@prisma/client'
 
@@ -115,4 +115,11 @@ export async function confirmOrderForDelivery(orderId: string) {
   ])
 
   return updatedOrder
+}
+
+export async function getOrderChartData(vendorId: string, from: string, to: string) {
+  const vendor = await getAuthenticatedVendor()
+  if (vendor.id !== vendorId) throw new Error('No autorizado')
+
+  return getVendorOrdersByDateRange(vendorId, from, to)
 }

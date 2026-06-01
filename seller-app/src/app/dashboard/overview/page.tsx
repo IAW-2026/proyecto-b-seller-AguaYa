@@ -39,8 +39,7 @@ async function OverviewContent() {
       <section className="rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/80">
         <strong className="text-lg text-slate-950 dark:text-slate-100">{overview.name}</strong>
         <div className="mt-3 text-sm text-slate-600 dark:text-slate-400">{overview.address}</div>
-        {overview.description ? <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">{overview.description}</div> : null}
-        <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">Reputación: {overview.reputation}</div>
+        {overview.description ?         <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">{overview.description}</div> : null}
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
