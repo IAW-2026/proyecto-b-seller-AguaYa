@@ -13,6 +13,7 @@
 
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
+import { clerkClient } from '@clerk/nextjs/server'
 import { validateApiKey } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { validateCreateOrderInput } from '@/lib/validation'
@@ -104,6 +105,18 @@ export async function POST(request: Request) {
       )
     }
 
+    // 5b. Obtener nombre del comprador desde Clerk
+    let buyerName = input.buyerName
+    if (!buyerName) {
+      try {
+        const client = await clerkClient()
+        const clerkUser = await client.users.getUser(input.buyerId)
+        buyerName = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || clerkUser.id
+      } catch {
+        buyerName = input.buyerId
+      }
+    }
+
     // 6. Obtener todos los productos solicitados (solo no eliminados)
     const productIds = input.items.map((item) => item.productId)
     const products = await prisma.product.findMany({
@@ -165,6 +178,7 @@ export async function POST(request: Request) {
             externalId: input.externalId,
             vendorId: input.vendorId,
             buyerId: input.buyerId,
+            buyerName,
             status: 'PAID',
             address: input.address,
             total: computedTotal,

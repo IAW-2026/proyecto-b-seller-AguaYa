@@ -1,18 +1,25 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { requireAdminPage } from '@/lib/admin-guard'
 import { getVendorsWithClerkInfoPaginated } from '@/app/actions/admin-vendor'
-import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
-import AdminVendorEditDialog from '@/components/admin/AdminVendorEditDialog'
+import SearchBar from '@/components/ui/SearchBar'
+import AdminVendorsTable from '@/components/admin/AdminVendorsTable'
 import VendorsPagination from '@/components/admin/VendorsPagination'
-import { Package } from 'lucide-react'
 
-export default async function VendorsPage(props: { searchParams: Promise<{ page?: string }> }) {
+export default async function VendorsPage(props: { searchParams: Promise<{ page?: string; q?: string; sortBy?: string; sortOrder?: string }> }) {
   await requireAdminPage()
 
   const searchParams = await props.searchParams
   const page = parseInt(searchParams.page || '1', 10)
-  const { items: vendors, pageCount } = await getVendorsWithClerkInfoPaginated(page)
+  const q = searchParams.q || ''
+  const sortBy = searchParams.sortBy || ''
+  const sortOrder = searchParams.sortOrder || ''
+
+  const { items: vendors, pageCount } = await getVendorsWithClerkInfoPaginated(page, {
+    q: q || undefined,
+    sortBy: sortBy || undefined,
+    sortOrder: sortOrder || undefined,
+  })
 
   return (
     <div>

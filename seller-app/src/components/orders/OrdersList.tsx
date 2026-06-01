@@ -7,9 +7,15 @@ import { Package } from 'lucide-react'
 export default async function OrdersList({
   paidPage = 1,
   readyPage = 1,
+  q = '',
+  from = '',
+  to = '',
 }: {
   paidPage?: number
   readyPage?: number
+  q?: string
+  from?: string
+  to?: string
 }) {
   const { userId } = await auth()
   if (!userId) {
@@ -35,8 +41,8 @@ export default async function OrdersList({
 
   try {
     const [pr, rr] = await Promise.all([
-      getVendorOrdersByStatus(vendor.id, 'PAID', paidPage),
-      getVendorOrdersByStatus(vendor.id, 'READY', readyPage),
+      getVendorOrdersByStatus(vendor.id, 'PAID', paidPage, { q, from, to }),
+      getVendorOrdersByStatus(vendor.id, 'READY', readyPage, { q, from, to }),
     ])
     paidResult = pr
     readyResult = rr
@@ -64,6 +70,7 @@ export default async function OrdersList({
 
   return (
     <OrdersTabs
+      vendorId={vendor.id}
       paidOrders={paidResult.items}
       paidPage={paidPage}
       paidPageCount={paidResult.pageCount}

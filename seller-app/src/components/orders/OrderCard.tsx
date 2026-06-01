@@ -46,7 +46,7 @@ export default function OrderCard({ order, showConfirmButton }: { order: OrderWi
       <div className="space-y-1 mb-3 text-xs">
         <p>
           <span className="text-slate-500 dark:text-slate-400">Comprador:</span>{' '}
-          <span className="font-medium text-slate-700 dark:text-slate-300">{order.buyerId.slice(0, 16)}</span>
+          <span className="font-medium text-slate-700 dark:text-slate-300">{order.buyerName || order.buyerId.slice(0, 16)}</span>
         </p>
         <p>
           <span className="text-slate-500 dark:text-slate-400">Total:</span>{' '}

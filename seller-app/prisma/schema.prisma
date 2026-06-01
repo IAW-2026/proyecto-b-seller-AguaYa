@@ -45,6 +45,7 @@ model Order {
   externalId String      @unique
   vendorId   String
   buyerId    String
+  buyerName  String @default("")
   status     OrderStatus @default(PAID)
   total      Float
   address    String?

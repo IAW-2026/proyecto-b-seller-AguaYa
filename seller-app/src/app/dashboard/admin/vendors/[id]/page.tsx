@@ -68,6 +68,7 @@ export default async function VendorDetailPage({
           image: vendor.image,
           cuil: vendor.cuil,
           cuit: vendor.cuit,
+
           clerkName: vendor.clerkName,
           clerkEmail: vendor.clerkEmail,
           isActive: vendor.isActive,

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
-import type { Vendor, Product } from '@prisma/client'
+import type { Vendor, Product, Prisma } from '@prisma/client'
 
 export async function getVendorByUserId(userId: string) {
   return prisma.vendor.findUnique({
@@ -53,9 +53,17 @@ export async function getVendorProductsPaginated(vendorId: string, page: number 
   )
 }
 
-export async function listAllVendors() {
+export async function listAllVendors(q?: string) {
+  const where: Prisma.VendorWhereInput = { deletedAt: null }
+  if (q) {
+    where.OR = [
+      { name: { contains: q, mode: 'insensitive' as const } },
+      { cuil: { contains: q, mode: 'insensitive' as const } },
+      { cuit: { contains: q, mode: 'insensitive' as const } },
+    ]
+  }
   return prisma.vendor.findMany({
-    where: { deletedAt: null },
+    where,
     orderBy: { createdAt: 'desc' },
   })
 }

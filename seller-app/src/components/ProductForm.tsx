@@ -21,9 +21,10 @@ interface ProductFormProps {
     image?: string
   }
   onSuccess?: () => void
+  disableRedirect?: boolean
 }
 
-export default function ProductForm({ mode = 'create', productId, initialData, onSuccess, vendorId }: ProductFormProps) {
+export default function ProductForm({ mode = 'create', productId, initialData, onSuccess, vendorId, disableRedirect }: ProductFormProps) {
   const router = useRouter()
   const [form, setForm] = useState({
     name: initialData?.name || '',
@@ -70,7 +71,11 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
 
       setLoading(false)
       onSuccess?.()
-      router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/products')
+      if (disableRedirect) {
+        router.refresh()
+      } else {
+        router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/products')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar producto')
       setLoading(false)
@@ -115,7 +120,7 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
       <div className="mt-3 flex gap-3">
         <Button type="submit" disabled={loading}>{loading ? (mode === 'edit' ? 'Guardando...' : 'Creando...') : (mode === 'edit' ? 'Guardar cambios' : 'Crear producto')}</Button>
         {mode === 'edit' && productId ? (
-          <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} vendorId={vendorId} />
+          <DeleteProductDialog productId={productId} productName={form.name || 'este producto'} vendorId={vendorId} disableRedirect={disableRedirect} />
         ) : null}
       </div>
     </form>

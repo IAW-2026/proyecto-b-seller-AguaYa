@@ -54,18 +54,21 @@ export async function getVendorsWithClerkInfo() {
   })
 }
 
-export async function getVendorsWithClerkInfoPaginated(page: number = 1) {
+export async function getVendorsWithClerkInfoPaginated(
+  page: number = 1,
+  filters?: { q?: string; sortBy?: string; sortOrder?: string }
+) {
   await requireAdmin()
 
-  const { listAllVendorsPaginated } = await import('@/lib/queries/vendors')
-  const { getVendorReviewsWithStats } = await import('@/lib/queries/reviews')
-  const result = await listAllVendorsPaginated(page)
+  const { listAllVendors } = await import('@/lib/queries/vendors')
+  // When q is present, fetch all vendors so we can filter by name, cuil, cuit, AND email in memory (email is Clerk-only)
+  const vendors = await listAllVendors(filters?.q ? undefined : filters?.q)
 
   const client = await clerkClient()
   const { data: clerkUsers } = await client.users.getUserList({ limit: 500 })
   const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
 
-  const items = await Promise.all(result.items.map(async (v) => {
+  let items = vendors.map((v) => {
     const clerkUser = clerkMap.get(v.userId)
     const reviews = await getVendorReviewsWithStats(v.userId)
     return {
@@ -75,9 +78,37 @@ export async function getVendorsWithClerkInfoPaginated(page: number = 1) {
       promedio: reviews.promedio,
       totalReviews: reviews.total,
     }
-  }))
+  })
 
-  return { items, total: result.total, pageCount: result.pageCount }
+  // Filter all fields in memory with OR logic (email from Clerk, rest from DB)
+  if (filters?.q) {
+    const q = filters.q.toLowerCase()
+    items = items.filter(
+      (v) =>
+        v.name.toLowerCase().includes(q) ||
+        (v.cuil ?? '').toLowerCase().includes(q) ||
+        (v.cuit ?? '').toLowerCase().includes(q) ||
+        v.clerkEmail.toLowerCase().includes(q)
+    )
+  }
+
+  // Sort in memory
+  const order = filters?.sortOrder === 'desc' ? -1 : 1
+  if (filters?.sortBy === 'name') {
+    items.sort((a, b) => a.name.localeCompare(b.name) * order)
+  } else if (filters?.sortBy === 'isActive') {
+    items.sort((a, b) => (Number(a.isActive) - Number(b.isActive)) * order)
+  } else {
+    const dir = filters?.sortOrder === 'asc' ? 1 : -1
+    items.sort((a, b) => (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) * dir)
+  }
+
+  const limit = 10
+  const total = items.length
+  const pageCount = Math.ceil(total / limit)
+  const paginatedItems = items.slice((page - 1) * limit, page * limit)
+
+  return { items: paginatedItems, total, pageCount }
 }
 
 export async function getVendorWithClerkInfo(vendorId: string) {

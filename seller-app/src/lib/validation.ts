@@ -19,6 +19,7 @@ export interface CreateOrderInput {
   externalId: string
   vendorId: string
   buyerId: string
+  buyerName?: string
   items: Array<{ productId: string; quantity: number }>
   total: number
   address: string

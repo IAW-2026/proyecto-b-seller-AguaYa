@@ -41,7 +41,6 @@ export default function ConfirmOrderDialog({ orderId }: ConfirmOrderDialogProps)
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
           role="presentation"
-          onClick={handleClose}
         >
           <div
             className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
