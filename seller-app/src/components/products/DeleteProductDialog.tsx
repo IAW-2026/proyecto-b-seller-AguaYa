@@ -1,9 +1,14 @@
+/**
+ * @file DeleteProductDialog.tsx
+ * @description Diálogo modal de confirmación para eliminar un producto, con soporte para rol admin y vendedor.
+ */
+
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteProduct } from '@/app/actions/product'
-import { deleteProductAsAdmin } from '@/app/actions/admin-vendor'
+import { deleteProductAsAdmin } from '@/app/actions/admin-product'
 import Button from '@/components/ui/Button'
 
 interface DeleteProductDialogProps {
@@ -13,6 +18,7 @@ interface DeleteProductDialogProps {
   disableRedirect?: boolean
 }
 
+/** Renderiza el botón y modal de confirmación para eliminar un producto. */
 export default function DeleteProductDialog({ productId, productName, vendorId, disableRedirect }: DeleteProductDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)

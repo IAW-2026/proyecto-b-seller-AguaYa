@@ -1,3 +1,7 @@
+/**
+ * Página de catálogo de productos del dashboard.
+ * Muestra la tabla global de productos para administradores o las tarjetas de producto para el vendedor.
+ */
 import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -22,6 +26,7 @@ async function AdminProductsContent({ searchParams }: { searchParams: Awaited<{ 
   return <AdminProductsTable products={result.items} page={page} pageCount={result.pageCount} />
 }
 
+/** Página de productos: tabla global (admin) o cuadrícula de tarjetas (vendedor). */
 export default async function ProductsPage(props: { searchParams: Promise<{ page?: string; q?: string; isActive?: string; sortBy?: string; sortOrder?: string }> }) {
   const { userId } = await auth()
   if (!userId) return null

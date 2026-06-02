@@ -1,8 +1,12 @@
+/**
+ * Tabla paginada de pedidos globales para el panel de administración.
+ * Permite filtrar por estado y cambiar el estado de cada orden.
+ */
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
-import { updateOrderStatusAsAdmin } from '@/app/actions/admin-vendor'
+import { updateOrderStatusAsAdmin } from '@/app/actions/admin-order'
 import Pagination from '@/components/Pagination'
 import SearchBar from '@/components/ui/SearchBar'
 
@@ -26,6 +30,7 @@ interface Order {
   items: OrderItem[]
 }
 
+/** Tabla de pedidos global con filtro por estado y cambio de estado. */
 export default function AdminOrdersTable({
   orders,
   page,
@@ -42,7 +47,7 @@ export default function AdminOrdersTable({
 
   const pushParams = useCallback(
     (updates: Record<string, string>) => {
-      const params = new URLSearchParams(globalThis.location?.search ?? '')
+      const params = new URLSearchParams(searchParams.toString())
       for (const [k, v] of Object.entries(updates)) {
         if (v) params.set(k, v)
         else params.delete(k)
@@ -51,7 +56,7 @@ export default function AdminOrdersTable({
       const str = params.toString()
       router.push(str ? `${pathname}?${str}` : pathname)
     },
-    [router, pathname]
+    [router, pathname, searchParams]
   )
 
   return (

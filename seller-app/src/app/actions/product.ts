@@ -1,30 +1,19 @@
 /**
- * This file contains server actions related to product management. 
- * It includes functions to create, update, and delete products for the authenticated vendor. 
- * Each function first checks if the user is authenticated and has an associated vendor profile before performing the respective database operations using Prisma.
+ * product.ts — Server actions de gestión de productos del vendedor.
+ *
+ * Permite crear, actualizar, eliminar (soft-delete), toggle de activo
+ * y actualizar stock de productos. Las funciones verifican que el
+ * producto pertenezca al vendedor autenticado.
  */
-
 
 'use server'
 
-import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { validateProductInput } from '../../lib/validation'
-import { getAuthRoles } from '@/lib/auth-utils'
+import { getAuthRoles, getAuthenticatedVendor } from '@/lib/auth-utils'
 
-async function getAuthenticatedVendor() {
-  const { userId } = await auth()
-
-  if (!userId) throw new Error('No autenticado')
-
-  const vendor = await prisma.vendor.findUnique({ where: { userId } })
-
-  if (!vendor) throw new Error('No autenticado')
-
-  return vendor
-}
-
+/** Crea un nuevo producto para el vendedor autenticado. */
 export async function createProduct(data: {
   name: string
   description?: string
@@ -52,6 +41,10 @@ export async function createProduct(data: {
   return { success: true, product }
 }
 
+/**
+ * Actualiza un producto. Si se pasa vendorId (admin), verifica rol admin_seller.
+ * Si no, verifica que el producto pertenezca al vendedor autenticado.
+ */
 export async function updateProduct(data: {
   id: string
   name: string
@@ -115,6 +108,10 @@ export async function updateProduct(data: {
   return { success: true, product: updatedProduct }
 }
 
+/**
+ * Elimina (soft-delete) un producto. Si se pasa vendorId (admin), verifica
+ * rol admin_seller. Si no, verifica que el producto pertenezca al vendedor.
+ */
 export async function deleteProduct(productId: string, vendorId?: string) {
   if (vendorId) {
     const roles = await getAuthRoles()
@@ -158,6 +155,7 @@ export async function deleteProduct(productId: string, vendorId?: string) {
   return { success: true, product: deletedProduct }
 }
 
+/** Actualiza el stock de un producto (valida entero >= 0). */
 export async function updateProductStock(productId: string, stock: number) {
   const vendor = await getAuthenticatedVendor()
 
@@ -188,6 +186,7 @@ export async function updateProductStock(productId: string, stock: number) {
   return { success: true, product: updated }
 }
 
+/** Alterna el estado activo/inactivo de un producto. */
 export async function toggleProductActiveStatus(productId: string) {
   const vendor = await getAuthenticatedVendor()
 

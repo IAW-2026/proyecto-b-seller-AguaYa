@@ -1,3 +1,7 @@
+/**
+ * Tabla paginada y ordenable de vendedores para el panel de administración.
+ * Incluye acciones de edición y toggle de estado por cada vendedor.
+ */
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
@@ -28,6 +32,7 @@ interface VendorRow {
   totalReviews: number
 }
 
+/** Tabla de vendedores con ordenamiento, paginación y acciones. */
 export default function AdminVendorsTable({
   vendors,
   page,

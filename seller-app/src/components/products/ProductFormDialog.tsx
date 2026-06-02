@@ -1,3 +1,8 @@
+/**
+ * @file ProductFormDialog.tsx
+ * @description Diálogo modal que envuelve el formulario de producto en modo creación o edición.
+ */
+
 'use client'
 
 import { useState, type ReactNode } from 'react'
@@ -18,14 +23,15 @@ interface ProductFormDialogProps {
   disableRedirect?: boolean
 }
 
+/** Renderiza un modal con el formulario de producto para crear o editar. */
 export default function ProductFormDialog({ children, mode = 'create', productId, vendorId, initialData, disableRedirect }: ProductFormDialogProps) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <span className="inline-contents" onClick={() => setOpen(true)}>
+      <div role="button" tabIndex={0} onClick={() => setOpen(true)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setOpen(true) }}>
         {children}
-      </span>
+      </div>
 
       {open ? (
         <div
@@ -35,10 +41,11 @@ export default function ProductFormDialog({ children, mode = 'create', productId
             className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="product-form-title"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+              <h2 id="product-form-title" className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {mode === 'edit' ? 'Editar producto' : 'Nuevo producto'}
               </h2>
               <button

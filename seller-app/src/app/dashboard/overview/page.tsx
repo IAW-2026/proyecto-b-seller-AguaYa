@@ -1,3 +1,6 @@
+/**
+ * Página de resumen del dashboard (`/dashboard/overview`). Muestra métricas, reseñas y órdenes recientes del vendedor.
+ */
 import React from 'react'
 import { auth } from '@clerk/nextjs/server'
 import { getVendorOverview } from '@/lib/queries/vendors'
@@ -5,6 +8,9 @@ import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
 import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
 import AnimatedOrders from '@/components/orders/AnimatedOrders'
 
+/**
+ * Renderiza el panel de overview con nombre, estado, métricas, reseñas y órdenes recientes.
+ */
 export default async function OverviewPage() {
   const { userId } = await auth()
 

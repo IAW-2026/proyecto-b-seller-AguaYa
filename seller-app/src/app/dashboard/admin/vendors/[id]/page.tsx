@@ -1,3 +1,7 @@
+/**
+ * Página de detalle de un vendedor (panel admin).
+ * Muestra pestañas con productos, órdenes PAID/READY y reseñas del vendedor.
+ */
 import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -22,12 +26,20 @@ async function VendorDetailContent({
   const vendor = await getVendorWithClerkInfo(id)
   if (!vendor) redirect('/dashboard/admin/vendors')
 
-  const [productsResult, paidOrdersResult, readyOrdersResult, reviewStats] = await Promise.all([
+  let reviewStats = { promedio: 0, total: 0, reviews: [] as import('@/lib/queries/reviews').Review[] }
+
+  const [productsResult, paidOrdersResult, readyOrdersResult] = await Promise.all([
     getVendorProductsPaginated(id, productPage),
     getVendorOrdersByStatus(id, 'PAID', paidPage),
     getVendorOrdersByStatus(id, 'READY', readyPage),
-    getVendorReviewsWithStats(vendor.userId),
   ])
+
+  try {
+    reviewStats = await getVendorReviewsWithStats(vendor.userId)
+  } catch {
+    console.warn('[VendorDetail] Error al cargar reseñas desde FeedbackApp')
+  }
+
   const reviews = reviewStats.reviews
 
   const mapOrder = (o: typeof paidOrdersResult.items[0]) => ({
@@ -89,6 +101,7 @@ async function VendorDetailContent({
   )
 }
 
+/** Página de detalle de un vendedor con pestañas de productos, órdenes y reseñas. */
 export default async function VendorDetailPage({
   params,
   searchParams,

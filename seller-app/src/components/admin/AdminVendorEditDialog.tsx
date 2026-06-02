@@ -1,17 +1,17 @@
+/**
+ * Diálogo modal para editar los datos de un vendedor desde el panel de administración.
+ * Permite modificar nombre, dirección, CUIL, CUIT, descripción e imagen.
+ */
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateVendorAsAdmin } from '@/app/actions/admin-vendor'
 import ImageUpload from '@/components/ui/ImageUpload'
+import { formatCuilCuit } from '@/lib/format'
+import { MAX_NAME_LENGTH, MAX_ADDRESS_LENGTH, MAX_DESCRIPTION_LENGTH } from '@/lib/constants'
 
-function formatCuilCuit(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 11)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 10) return `${digits.slice(0, 2)}-${digits.slice(2)}`
-  return `${digits.slice(0, 2)}-${digits.slice(2, 10)}-${digits.slice(10)}`
-}
-
+/** Diálogo modal con formulario para editar los datos del vendedor. */
 export default function AdminVendorEditDialog({
   vendor,
 }: {
@@ -86,10 +86,11 @@ export default function AdminVendorEditDialog({
             className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="edit-vendor-title"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Editar vendedor</h2>
+              <h2 id="edit-vendor-title" className="text-lg font-semibold text-gray-900 dark:text-slate-100">Editar vendedor</h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -102,39 +103,42 @@ export default function AdminVendorEditDialog({
             </div>
 
             {error && (
-              <div className="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-600 dark:bg-red-900/50 dark:text-red-400">
+              <div role="alert" className="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-600 dark:bg-red-900/50 dark:text-red-400">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">Nombre *</label>
+                <label htmlFor="admin-vendor-name" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">Nombre *</label>
                 <input
+                  id="admin-vendor-name"
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  maxLength={100}
+                  maxLength={MAX_NAME_LENGTH}
                   required
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
                 />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">Dirección *</label>
+                <label htmlFor="admin-vendor-address" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">Dirección *</label>
                 <input
+                  id="admin-vendor-address"
                   name="address"
                   value={form.address}
                   onChange={handleChange}
-                  maxLength={200}
+                  maxLength={MAX_ADDRESS_LENGTH}
                   required
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
                 />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">CUIL</label>
+                <label htmlFor="admin-vendor-cuil" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">CUIL</label>
                 <input
+                  id="admin-vendor-cuil"
                   name="cuil"
                   value={form.cuil}
                   onChange={handleChange}
@@ -145,8 +149,9 @@ export default function AdminVendorEditDialog({
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">CUIT</label>
+                <label htmlFor="admin-vendor-cuit" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">CUIT</label>
                 <input
+                  id="admin-vendor-cuit"
                   name="cuit"
                   value={form.cuit}
                   onChange={handleChange}
@@ -157,12 +162,13 @@ export default function AdminVendorEditDialog({
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">Descripción</label>
+                <label htmlFor="admin-vendor-description" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-slate-300">Descripción</label>
                 <textarea
+                  id="admin-vendor-description"
                   name="description"
                   value={form.description}
                   onChange={handleChange}
-                  maxLength={250}
+                  maxLength={MAX_DESCRIPTION_LENGTH}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 min-h-[80px]"
                 />
               </div>

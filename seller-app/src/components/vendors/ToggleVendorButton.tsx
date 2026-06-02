@@ -1,3 +1,8 @@
+/**
+ * @file ToggleVendorButton.tsx
+ * @description Botón que activa o desactiva un vendedor, adaptando la acción según el rol (admin o vendedor propio).
+ */
+
 'use client'
 
 import { useRouter } from 'next/navigation'
@@ -13,6 +18,7 @@ interface ToggleVendorButtonProps {
   size?: 'xs' | 'sm'
 }
 
+/** Renderiza un botón para alternar el estado activo/inactivo de un vendedor según el rol. */
 export default function ToggleVendorButton({ vendorId, isActive, vendorName, role, size }: ToggleVendorButtonProps) {
   const router = useRouter()
 

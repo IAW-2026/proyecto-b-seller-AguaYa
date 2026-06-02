@@ -1,3 +1,8 @@
+/**
+ * DashboardTableLoading.tsx — Esqueleto de carga para tablas del dashboard.
+ */
+
+/** Esqueleto animado que simula una tabla con paginación mientras carga. */
 export default function DashboardTableLoading() {
   return (
     <div className="space-y-4 animate-pulse">

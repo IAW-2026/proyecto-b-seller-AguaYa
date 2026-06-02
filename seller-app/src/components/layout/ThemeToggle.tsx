@@ -1,8 +1,13 @@
+/**
+ * ThemeToggle.tsx — Botón para alternar entre tema claro y oscuro.
+ */
+
 'use client'
 
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/lib/ThemeProvider'
 
+/** Botón que alterna el tema usando ThemeProvider. */
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme()
 

@@ -2,8 +2,8 @@
 @baseUrl = http://localhost:3000
 @apiKey = buyer-secret-key-12345
 
-@vendorId = cmpurfqxv0000cslii6aablh3
-@vendorId2 = cmp21j4xu0001zwli69agxgle
+@vendorId = cmpvp75rp0000ugliqx0ksd22
+@vendorId2 = cmpurfqxv0000cslii6aablh3
 ### =====================
 ### TESTS DE VENDEDORES
 ### =====================

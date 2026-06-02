@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /setup-vendor/
+Disallow: /sign-in/
+
+Sitemap: https://proyecto-b-seller-agua-ya.vercel.app/sitemap.xml

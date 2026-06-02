@@ -1,3 +1,8 @@
+/**
+ * @file OrderCard.tsx
+ * @description Componente que renderiza la tarjeta visual de una orden con estado, datos del comprador, total, dirección y productos.
+ */
+
 'use client'
 
 import { Package, CheckCircle } from 'lucide-react'
@@ -14,6 +19,7 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; icon: Lu
   READY: { label: 'Lista para entregar', color: 'bg-blue-100 text-blue-800', icon: Package },
 }
 
+/** Renderiza la tarjeta de una orden mostrando su información y botón de confirmación si corresponde. */
 export default function OrderCard({ order, showConfirmButton }: { order: OrderWithItems; showConfirmButton: boolean }) {
   const config = statusConfig[order.status]
   const StatusIcon = config.icon
@@ -77,7 +83,7 @@ export default function OrderCard({ order, showConfirmButton }: { order: OrderWi
       {/* Confirm button */}
       {showConfirmButton && (
         <div className="mt-auto pt-1">
-          <ConfirmOrderDialog orderId={order.id} orderLabel={order.externalId || order.id.slice(0, 8)} />
+          <ConfirmOrderDialog orderId={order.id} />
         </div>
       )}
     </div>

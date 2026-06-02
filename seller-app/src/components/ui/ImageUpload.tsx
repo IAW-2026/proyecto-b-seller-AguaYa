@@ -1,21 +1,13 @@
 /**
- * ImageUpload.tsx — Componente reutilizable de subida de imágenes.
- *
- * Ofrece dos modos de ingreso:
- *   1. File picker con preview y subida a Cloudinary (u otro provider)
- *   2. Campo de texto para pegar una URL manualmente (fallback)
- *
- * Props:
- *   value     → URL actual de la imagen
- *   onChange  → callback con la nueva URL
- *   folder    → subcarpeta en el storage (ej: 'products', 'avatars')
- *   label     → texto del label (default 'Imagen')
+ * ImageUpload.tsx — Componente de subida de imágenes con preview.
+ * Soporta selección de archivo (subida a Cloudinary) o ingreso manual de URL.
  */
 
 'use client'
 
 import { useState, useRef } from 'react'
 import { getUploader } from '@/lib/storage'
+import { MAX_IMAGE_URL_LENGTH } from '@/lib/constants'
 
 interface ImageUploadProps {
   value: string
@@ -24,6 +16,7 @@ interface ImageUploadProps {
   label?: string
 }
 
+/** Componente de subida de imágenes con file picker y alternativa de URL. */
 export default function ImageUpload({ value, onChange, folder = 'general', label = 'Imagen' }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -105,7 +98,7 @@ export default function ImageUpload({ value, onChange, folder = 'general', label
               value={value}
               onChange={handleUrlChange}
               placeholder="https://ejemplo.com/imagen.jpg"
-              maxLength={1000}
+              maxLength={MAX_IMAGE_URL_LENGTH}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-white"
             />
             <button

@@ -1,19 +1,35 @@
+/**
+ * orders.ts — Consultas a la base de datos para la entidad Order.
+ *
+ * Proporciona funciones de lectura para órdenes del dashboard del vendedor
+ * y del admin, con paginación, filtros por estado, fechas y búsqueda.
+ */
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
 import { buildSearchWhere } from '@/lib/search'
+import { ADMIN_PAGE_SIZE, VENDOR_ORDERS_PAGE_SIZE } from '@/lib/constants'
 import type { Order, OrderItem, Product } from '@prisma/client'
 
 type OrderWithItems = Order & { items: (OrderItem & { product: Product })[] }
 type OrderWithVendorAndItems = Order & { vendor: { name: string; id: string }; items: (OrderItem & { product: Product })[] }
 
+function parseDateSafe(value: string | undefined): Date | null {
+  if (!value) return null
+  const d = new Date(value)
+  return isNaN(d.getTime()) ? null : d
+}
+
 function dateFilter(from?: string, to?: string) {
   if (!from && !to) return {}
   const createdAt: Record<string, Date> = {}
-  if (from) createdAt.gte = new Date(from)
-  if (to) createdAt.lte = new Date(to + 'T23:59:59.999Z')
+  const fromDate = parseDateSafe(from)
+  const toDate = parseDateSafe(to ? to + 'T23:59:59.999Z' : undefined)
+  if (fromDate) createdAt.gte = fromDate
+  if (toDate) createdAt.lte = toDate
   return { createdAt }
 }
 
+/** Obtiene todas las órdenes de un vendedor (sin paginar). */
 export async function getVendorOrders(vendorId: string) {
   return prisma.order.findMany({
     where: { vendorId, deletedAt: null },
@@ -24,6 +40,10 @@ export async function getVendorOrders(vendorId: string) {
   })
 }
 
+/**
+ * Obtiene órdenes de un vendedor filtradas por estado y con paginación.
+ * Soporta búsqueda por externalId, buyerName, buyerId, address y filtro por fechas.
+ */
 export async function getVendorOrdersByStatus(
   vendorId: string,
   status: 'PAID' | 'READY',
@@ -41,22 +61,30 @@ export async function getVendorOrdersByStatus(
     },
     {
       page,
-      limit: 4,
+      limit: VENDOR_ORDERS_PAGE_SIZE,
       include: { items: { include: { product: true } } },
       orderBy: { createdAt: 'desc' },
     }
   )
 }
 
+/**
+ * Obtiene el conteo de órdenes por día (PAID y READY) en un rango de fechas.
+ * Usa una query SQL raw para agregación eficiente.
+ */
 export async function getVendorOrdersByDateRange(
   vendorId: string,
   from: string,
   to: string
 ): Promise<{ date: string; paid: number; ready: number }[]> {
+  const fromDate = parseDateSafe(from)
+  const toDate = parseDateSafe(to ? to + 'T23:59:59.999Z' : undefined)
+  if (!fromDate || !toDate) return []
+
   const rows = await prisma.$queryRaw<{ date: string; status: string; count: bigint }[]>`
     SELECT DATE("createdAt")::text as date, status, COUNT(*)::int as count
     FROM "Order"
-    WHERE "vendorId" = ${vendorId} AND "createdAt" >= ${new Date(from)}::date AND "createdAt" <= ${new Date(to + 'T23:59:59.999Z')} AND "deletedAt" IS NULL
+    WHERE "vendorId" = ${vendorId} AND "createdAt" >= ${fromDate}::date AND "createdAt" <= ${toDate}::date AND "deletedAt" IS NULL
     GROUP BY DATE("createdAt"), status
     ORDER BY DATE("createdAt")
   `
@@ -70,11 +98,9 @@ export async function getVendorOrdersByDateRange(
     else entry.ready += Number(row.count)
   }
 
-  const start = new Date(from)
-  const end = new Date(to)
   const result: { date: string; paid: number; ready: number }[] = []
 
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+  for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
     const key = d.toISOString().slice(0, 10)
     const entry = map.get(key) || { paid: 0, ready: 0 }
     result.push({ date: key, ...entry })
@@ -83,6 +109,11 @@ export async function getVendorOrdersByDateRange(
   return result
 }
 
+/**
+ * Lista todas las órdenes del sistema (admin) con paginación.
+ * Soporta búsqueda por externalId, buyerName, buyerId, address y nombre de vendedor,
+ * filtro por fechas y filtro por estado.
+ */
 export async function listAllOrdersPaginated(
   page: number = 1,
   filters?: { q?: string; from?: string; to?: string; status?: string }
@@ -109,7 +140,7 @@ export async function listAllOrdersPaginated(
     where,
     {
       page,
-      limit: 5,
+      limit: ADMIN_PAGE_SIZE,
       include: {
         vendor: { select: { name: true, id: true } },
         items: { include: { product: true } },

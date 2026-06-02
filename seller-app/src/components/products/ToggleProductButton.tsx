@@ -1,3 +1,8 @@
+/**
+ * @file ToggleProductButton.tsx
+ * @description Botón que activa o desactiva un producto llamando a la acción del servidor.
+ */
+
 'use client'
 
 import { useRouter } from 'next/navigation'
@@ -11,6 +16,7 @@ interface ToggleProductButtonProps {
   size?: 'xs' | 'sm'
 }
 
+/** Renderiza un botón para alternar el estado activo/inactivo de un producto. */
 export default function ToggleProductButton({ productId, isActive, productName, size }: ToggleProductButtonProps) {
   const router = useRouter()
 

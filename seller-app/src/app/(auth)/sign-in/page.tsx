@@ -1,5 +1,11 @@
+/**
+ * Página de inicio de sesión (`/sign-in`). Renderiza el componente SignIn de Clerk con estilos personalizados.
+ */
 import { SignIn } from '@clerk/nextjs'
 
+/**
+ * Página de login con encabezado de marca y formulario de Clerk.
+ */
 export default function LoginPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center px-4">

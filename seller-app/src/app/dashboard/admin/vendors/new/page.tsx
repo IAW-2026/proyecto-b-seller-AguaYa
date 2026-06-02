@@ -1,17 +1,17 @@
+/**
+ * Página de creación de un nuevo vendedor (panel admin).
+ * Formulario que asocia un usuario de Clerk con los datos del negocio.
+ */
 'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getAvailableClerkUsers, createVendorAsAdmin } from '@/app/actions/admin-vendor'
+import { formatCuilCuit } from '@/lib/format'
+import { MAX_NAME_LENGTH, MAX_ADDRESS_LENGTH, MAX_DESCRIPTION_LENGTH } from '@/lib/constants'
 
-function formatCuilCuit(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 11)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 10) return `${digits.slice(0, 2)}-${digits.slice(2)}`
-  return `${digits.slice(0, 2)}-${digits.slice(2, 10)}-${digits.slice(10)}`
-}
-
+/** Página de formulario para crear un nuevo vendedor desde el panel admin. */
 export default function NewVendorPage() {
   const router = useRouter()
   const [clerkUsers, setClerkUsers] = useState<{ id: string; name: string; email: string }[]>([])
@@ -87,7 +87,7 @@ export default function NewVendorPage() {
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
-            maxLength={100}
+            maxLength={MAX_NAME_LENGTH}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none dark:bg-slate-800 dark:border-slate-600 dark:text-white"
           />
         </div>
@@ -99,7 +99,7 @@ export default function NewVendorPage() {
             value={form.address}
             onChange={(e) => setForm({ ...form, address: e.target.value })}
             required
-            maxLength={200}
+            maxLength={MAX_ADDRESS_LENGTH}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none dark:bg-slate-800 dark:border-slate-600 dark:text-white"
           />
         </div>
@@ -110,7 +110,7 @@ export default function NewVendorPage() {
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             rows={3}
-            maxLength={250}
+            maxLength={MAX_DESCRIPTION_LENGTH}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-sky-500 focus:outline-none dark:bg-slate-800 dark:border-slate-600 dark:text-white"
           />
         </div>

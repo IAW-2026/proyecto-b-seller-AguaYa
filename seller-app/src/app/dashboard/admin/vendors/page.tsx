@@ -1,3 +1,7 @@
+/**
+ * Página de listado de vendedores del panel de administración.
+ * Permite buscar, filtrar y paginar vendedores, y acceder al formulario de creación.
+ */
 import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { requireAdminPage } from '@/lib/admin-guard'
@@ -22,6 +26,7 @@ async function VendorsTable(props: { searchParams: Promise<{ page?: string; q?: 
   return <AdminVendorsTable vendors={vendors} page={page} pageCount={pageCount} />
 }
 
+/** Página de listado de vendedores con búsqueda y paginación. */
 export default async function VendorsPage(props: { searchParams: Promise<{ page?: string; q?: string; sortBy?: string; sortOrder?: string }> }) {
   await requireAdminPage()
 

@@ -1,6 +1,14 @@
+/**
+ * reviews.ts — Consulta de reseñas desde FeedbackApp.
+ *
+ * Obtiene las reseñas de un vendedor consultando la API de FeedbackApp
+ * y enriquece los datos con los nombres de los productos desde la BD local.
+ * Si FeedbackApp no está disponible, retorna datos vacíos sin error.
+ */
 import { prisma } from '@/lib/prisma'
 import { getServiceConfig } from '@/lib/external-api'
 
+/** Reseña de un pedido con datos básicos. */
 export type Review = {
   orderId: string
   rating: number
@@ -9,12 +17,19 @@ export type Review = {
   products: string[]
 }
 
+/** Estadísticas de reseñas de un vendedor. */
 export type ReviewStats = {
   promedio: number
   total: number
   reviews: Review[]
 }
 
+/**
+ * Obtiene las reseñas y estadísticas de un vendedor desde FeedbackApp.
+ * Consulta la API externa, cruza los orderIds con la BD local para
+ * obtener nombres de productos, y retorna datos estructurados.
+ * Si FeedbackApp no responde, retorna valores vacíos.
+ */
 export async function getVendorReviewsWithStats(userId: string): Promise<ReviewStats> {
   const config = getServiceConfig('feedback')
   if (!config) return { promedio: 0, total: 0, reviews: [] }

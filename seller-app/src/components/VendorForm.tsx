@@ -1,3 +1,8 @@
+/**
+ * VendorForm.tsx — Formulario de creación/edición de vendedor.
+ * Incluye validación, subida de imagen y confirmación previa al guardado.
+ */
+
 'use client'
 
 import React, { useState } from 'react'
@@ -6,6 +11,8 @@ import { createOrUpdateVendor } from '@/app/actions/vendor'
 import Button from '@/components/ui/Button'
 import ImageUpload from '@/components/ui/ImageUpload'
 import { validateVendorInput } from '../lib/validation'
+import { formatCuilCuit } from '@/lib/format'
+import { MAX_NAME_LENGTH, MAX_ADDRESS_LENGTH, MAX_DESCRIPTION_LENGTH, MAX_IMAGE_URL_LENGTH } from '@/lib/constants'
 
 interface VendorFormProps {
   initialData?: {
@@ -20,13 +27,7 @@ interface VendorFormProps {
   simple?: boolean
 }
 
-function formatCuilCuit(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 11)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 10) return `${digits.slice(0, 2)}-${digits.slice(2)}`
-  return `${digits.slice(0, 2)}-${digits.slice(2, 10)}-${digits.slice(10)}`
-}
-
+/** Formulario de datos del vendedor con soporte para creación y edición. */
 export default function VendorForm({ initialData, redirectTo, simple }: VendorFormProps) {
   const router = useRouter()
   const [formData, setFormData] = useState({
@@ -66,11 +67,11 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
 
       if (typeof window !== 'undefined' && 'Notification' in window) {
         if (Notification.permission === 'granted') {
-          new Notification('AguaYa', { body: 'Cambios guardados exitosamente.' })
+          new Notification('AguaYa', { body: 'Cambios guardados exitosamente.', icon: '/icon.svg' })
         } else if (Notification.permission !== 'denied') {
           const permission = await Notification.requestPermission()
           if (permission === 'granted') {
-            new Notification('AguaYa', { body: 'Cambios guardados exitosamente.' })
+            new Notification('AguaYa', { body: 'Cambios guardados exitosamente.', icon: '/icon.svg' })
           }
         }
       }
@@ -92,18 +93,19 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
   return (
     <form onSubmit={handleSubmit}>
       {error && (
-        <div className="p-3 bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400 rounded-lg mb-4 text-sm font-medium">{error}</div>
+        <div role="alert" className="p-3 bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400 rounded-lg mb-4 text-sm font-medium">{error}</div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className={simple ? 'sm:col-span-2' : ''}>
-          <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Nombre *</label>
+          <label htmlFor="vendor-name" className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Nombre *</label>
           <input
+            id="vendor-name"
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            maxLength={100}
+            maxLength={MAX_NAME_LENGTH}
             placeholder="Ej: Agua Pura SA"
             className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
           />
@@ -112,21 +114,23 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
         {!simple && (
           <>
             <div>
-              <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Dirección *</label>
+              <label htmlFor="vendor-address" className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Dirección *</label>
               <input
+                id="vendor-address"
                 type="text"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                maxLength={200}
+                maxLength={MAX_ADDRESS_LENGTH}
                 placeholder="Ej: Av. Mitre 512"
                 className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
               />
             </div>
 
             <div>
-              <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">CUIL</label>
+              <label htmlFor="vendor-cuil" className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">CUIL</label>
               <input
+                id="vendor-cuil"
                 type="text"
                 name="cuil"
                 value={formData.cuil}
@@ -138,8 +142,9 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
             </div>
 
             <div>
-              <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">CUIT</label>
+              <label htmlFor="vendor-cuit" className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">CUIT</label>
               <input
+                id="vendor-cuit"
                 type="text"
                 name="cuit"
                 value={formData.cuit}
@@ -163,17 +168,18 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
       </div>
 
       <div className="mt-4">
-        <label className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Descripción del negocio</label>
+        <label htmlFor="vendor-description" className="block mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200">Descripción del negocio</label>
         <textarea
+          id="vendor-description"
           name="description"
           value={formData.description}
           onChange={handleChange}
           placeholder="Cuéntanos sobre tu negocio..."
-          maxLength={250}
+          maxLength={MAX_DESCRIPTION_LENGTH}
           className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400 min-h-[100px] resize-y"
         />
-        <p className={`mt-1 text-xs text-right ${descLength >= 250 ? 'text-red-500 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
-          {descLength}/250
+        <p className={`mt-1 text-xs text-right ${descLength >= MAX_DESCRIPTION_LENGTH ? 'text-red-500 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
+          {descLength}/{MAX_DESCRIPTION_LENGTH}
         </p>
       </div>
 
@@ -192,9 +198,10 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
             className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
             role="dialog"
             aria-modal="true"
+            aria-labelledby="confirm-vendor-title"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+            <h3 id="confirm-vendor-title" className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               Guardar cambios
             </h3>
             <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">

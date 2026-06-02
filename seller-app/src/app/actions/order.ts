@@ -12,24 +12,12 @@
 
 'use server'
 
-import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getVendorOrders as getCachedVendorOrders, getVendorOrdersByDateRange } from '@/lib/queries/orders'
 import { notifyExternalService } from '@/lib/external-api'
 import { OrderStatus } from '@prisma/client'
-
-async function getAuthenticatedVendor() {
-  const { userId } = await auth()
-
-  if (!userId) throw new Error('No autenticado')
-
-  const vendor = await prisma.vendor.findUnique({ where: { userId } })
-
-  if (!vendor) throw new Error('No autenticado')
-
-  return vendor
-}
+import { getAuthenticatedVendor } from '@/lib/auth-utils'
 
 const allowedStatusTransitions: Record<OrderStatus, OrderStatus[]> = {
   PAID: ['READY'],

@@ -1,3 +1,7 @@
+/**
+ * Página de productos globales del panel de administración.
+ * Lista paginada y filtrable de todos los productos del sistema.
+ */
 import React, { Suspense } from 'react'
 import { requireAdminPage } from '@/lib/admin-guard'
 import { listAllProductsPaginated } from '@/lib/queries/products'
@@ -17,6 +21,7 @@ async function ProductsTable(props: { searchParams: Promise<{ page?: string; q?:
   return <AdminProductsTable products={result.items} page={page} pageCount={result.pageCount} />
 }
 
+/** Página de productos globales del panel de administración. */
 export default async function AdminProductsPage(props: { searchParams: Promise<{ page?: string; q?: string; isActive?: string; sortBy?: string; sortOrder?: string }> }) {
   await requireAdminPage()
 

@@ -1,9 +1,18 @@
+/**
+ * DashboardSidebar.tsx — Barra lateral de navegación del dashboard.
+ * Muestra información del vendedor, enlaces de navegación, ThemeToggle y LogoutButton.
+ */
+
 import React from 'react'
 import Link from 'next/link'
-import { ExternalLink, Package, ShoppingCart, LayoutDashboard, Users } from 'lucide-react'
 import LogoutButton from '../LogoutButton'
 import ThemeToggle from './ThemeToggle'
+import { dashboardLinks, feedbackLink, iconMap } from '@/lib/navigation'
 
+const linkClass = 'flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
+const disabledClass = 'flex items-center gap-3 rounded-xl px-3 py-2 text-slate-400 cursor-not-allowed opacity-50 dark:text-slate-600'
+
+/** Sidebar de navegación visible en pantallas xl en adelante. */
 export default function DashboardSidebar({
   vendorName,
   vendorImage,
@@ -16,6 +25,9 @@ export default function DashboardSidebar({
   feedbackAppUrl?: string
 }) {
   const isAdmin = roles?.includes('admin_seller')
+  const visibleLinks = dashboardLinks.filter((l) => l.showFor === 'all' || (l.showFor === 'admin') === isAdmin)
+  const showFeedback = !isAdmin
+  const Icon = iconMap[feedbackLink.icon]
 
   return (
     <aside className="hidden w-72 shrink-0 overflow-y-auto border-r border-slate-200/80 bg-white/75 px-4 py-6 backdrop-blur dark:border-slate-800 dark:bg-slate-950/75 xl:block">
@@ -27,45 +39,30 @@ export default function DashboardSidebar({
 
       <nav aria-label="Navegación principal">
         <ul className="space-y-1 text-sm font-medium">
-          {isAdmin && (
+          {visibleLinks.map((l) => {
+            const LinkIcon = iconMap[l.icon]
+            return (
+              <li key={l.href}>
+                <Link href={l.href} className={linkClass}>
+                  <LinkIcon className="h-4 w-4" aria-hidden="true" />
+                  {l.label}
+                </Link>
+              </li>
+            )
+          })}
+          {showFeedback && (
             <li>
-              <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100" href="/dashboard/admin/vendors">
-                <Users className="h-4 w-4" />
-                Vendedores
-              </Link>
-            </li>
-          )}
-          {!isAdmin && (
-            <li>
-              <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100" href="/dashboard/overview">
-                <LayoutDashboard className="h-4 w-4" />
-                Resumen
-              </Link>
-            </li>
-          )}
-          <li>
-            <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100" href="/dashboard/products">
-              <Package className="h-4 w-4" />
-              Productos
-            </Link>
-          </li>
-          <li>
-            <Link className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100" href="/dashboard/orders">
-              <ShoppingCart className="h-4 w-4" />
-              Órdenes
-            </Link>
-          </li>
-          {!isAdmin && feedbackAppUrl && (
-            <li>
-              <a
-                href={feedbackAppUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Reseñas
-              </a>
+              {feedbackAppUrl ? (
+                <a href={feedbackAppUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  {feedbackLink.label}
+                </a>
+              ) : (
+                <span className={disabledClass} title="No disponible: falta configurar la URL de FeedbackApp">
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  {feedbackLink.label}
+                </span>
+              )}
             </li>
           )}
         </ul>

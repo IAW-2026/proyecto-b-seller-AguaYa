@@ -5,7 +5,8 @@ import { validateApiKey } from '@/lib/auth'
 import { validateProductFilters } from '@/lib/validation'
 import { toPublicProducts } from '@/lib/products'
 import type { Prisma } from '@prisma/client'
-import type { ProductsListResponse, ErrorResponse } from '@/lib/products'
+import type { ErrorResponse } from '@/lib/api-types'
+import type { ProductsListResponse } from '@/lib/products'
 
 /**
  * GET /api/products
