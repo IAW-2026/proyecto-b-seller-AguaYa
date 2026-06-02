@@ -3,7 +3,7 @@
 @apiKey = aguaya-payments-secret-key-123
 
 @vendorId = cmpc2gjz90000ikli1cg4gmsj
-@productId = cmpc2lgbk0002ikliyzwtlixv
+@productId = cmpvxtbiw000104l5iigaovcc
 @productId2 = cmpdhu3090000csli86gyf23f
 @productId3 = cmpqyf8cz0002ewliw2pgh8qf
 @productId4 = cmpqyfbvj0003ewli9gszli4l
@@ -11,8 +11,8 @@
 @productId6 = cmpqyfu8c0007ewlidz5p3czy
 
 @vendorId2 = cmp21j4xu0001zwli69agxgle
-@andy = cmpt0mhyx000104jmkvcy7p64
-@productAndy = cmpt0prp1000304jmedp3px2w
+@andy = cmpvxr5er000004l51nrtqen5
+@productAndy = cmpvxtbiw000104l5iigaovcc
 
 ### =====================
 ### TESTS DE ÓRDENES
@@ -31,7 +31,7 @@ Content-Type: application/json
   "items": [
     {"productId": "{{productAndy}}", "quantity": 1}
   ],
-  "total": 10000000
+  "total": 500
 }
 
 ### Test 5-2: POST crear orden exitosa con muchos productos

@@ -10,8 +10,9 @@ Aplicación **Seller** del [Proyecto IAW 2026](https://iaw-2026.github.io/proyec
 
 | Rol | Email | Contraseña |
 |-----|-------|-----------|
-| Admin (`admin_seller`) | aguayaadmin@gmail.com | AguaYaAdmin12345678 |
-| Vendedor (`seller`) | *(proximamente)* | *(proximamente)* |
+| Admin (`admin_seller`) | admin_seller+clerk_test@iaw.com | iawuser# |
+| Vendedor 1 (prueba con usuario ya creado) (`seller`) | seller+clerk_test@iaw.com | iawuser# |
+| Vendedor 2 (prueba con usuario sin crear) (`seller`) | seller2+clerk_test@iaw.com | iawuser# |
 
 El admin tiene acceso completo al panel de administración (gestión de vendedores, productos y órdenes globales).
 
@@ -19,10 +20,12 @@ El admin tiene acceso completo al panel de administración (gestión de vendedor
 
 1. **Iniciar sesión** — Usar Clerk con Gmail (proveedor por defecto) o las credenciales de prueba.
 2. **Dashboard** — Al entrar, redirige según el rol: admin ve el listado de vendedores; seller ve su resumen.
-3. **Gestión de productos** — Ir a "Productos" para crear, editar, activar/desactivar y eliminar productos del catálogo. Cada producto tiene nombre, precio, stock, descripción e imagen (subida a Cloudinary).
-4. **Órdenes entrantes** — Ir a "Órdenes". Las órdenes llegan con estado `PAID` desde PaymentsApp. El vendedor las marca como `READY` cuando están listas para entregar. El panel se actualiza automáticamente cada 10s y muestra notificaciones del navegador cuando llegan órdenes nuevas.
-5. **Gestión de vendedores (admin)** — Ir a "Vendedores" para crear, editar, activar/desactivar y eliminar vendedores. Cada vendedor se asocia a un usuario de Clerk existente.
-6. **Reseñas** — Las reseñas se consultan en tiempo real desde FeedbackApp y se muestran en el resumen del vendedor y en el detalle de cada vendedor (admin).
+3. **Gestión de productos (Seller)** — Ir a "Productos" para crear, editar, activar/desactivar y eliminar productos del catálogo propio. Cada producto tiene nombre, precio, stock, descripción e imagen (subida a Cloudinary).
+4. **Gestión de productos (Admin_Seller)** — Ir a "Productos" editar y eliminar productos de todos los catalogos de todos los sellers.
+4. **Órdenes entrantes (Seller)** — Ir a "Órdenes". Las órdenes llegan con estado `PAID` desde PaymentsApp. El vendedor las marca como `READY` cuando están listas para entregar. El panel se actualiza automáticamente cada 10s y muestra notificaciones del navegador cuando llegan órdenes nuevas.
+4. **Órdenes entrantes (Admin_Seller)** — Ir a "Órdenes". Podemos ver las ordenes de todos los sellers, marcarlas como `PAID` o `READY`.
+5. **Gestión de vendedores (admin)** — Ir a "Vendedores" para crear, editar, activar/desactivar y eliminar vendedores. Cada vendedor se asocia a un usuario de Clerk existente. Podemos acceder al resumen del vendedor, sus ordenes y productos desde aqui.
+6. **Reseñas** — Las reseñas se consultan en tiempo real desde FeedbackApp y se muestran en el resumen del vendedor y en el detalle de cada vendedor (admin). Tenemos un boton que ridirige a FeedbackApp desde seller si queremos ver todas las reseñas asociadas a nuestro negocio.
 
 ## Descripción del proyecto
 
@@ -43,4 +46,4 @@ El frontend está construido con Next.js 16 App Router y React 19, con Server Co
 - **Seguridad inter-servicio**: Cada endpoint de API valida `X-API-Key` en el header. Las claves se configuran por variable de entorno y se validan contra el valor esperado.
 - **Auto-refresh**: La página de órdenes usa un componente cliente que llama a `router.refresh()` cada 10s para re-ejecutar las Server Components y reflejar nuevas órdenes sin recarga manual. Se complementa con un notificador que muestra alertas del navegador.
 - **Crawlers**: La app cuenta con robots.txt, ai.txt y sitemap.xml.
-- **Limitaciones conocidas**: La sección de reseñas depende de FeedbackApp; si ese servicio no responde, se muestra vacía con un warning en consola. La paginación con búsqueda en admin/vendors trae hasta 500 usuarios de Clerk por página. No se llego a implementar una landing-page decente
+- **Limitaciones conocidas**: La sección de reseñas depende de FeedbackApp; si ese servicio no responde, se muestra vacía con un warning en consola. La paginación con búsqueda en admin/vendors trae hasta 500 usuarios de Clerk por página. No se llego a implementar una landing-page decente. Desde admin seller se pueden acceder a rutas como dashboard/overview que no se deberia. Los vendedores no tienen paginacion en la vista de productos. En la tabla de sellers de admin_seller, aparecen admin_sellers
