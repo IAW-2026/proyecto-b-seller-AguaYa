@@ -142,7 +142,7 @@ export default function AdminProductsTable({
                   <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{p.vendor.name}</td>
                   <td className="px-4 py-3 text-slate-700 dark:text-slate-300">${p.price.toFixed(2)}</td>
                   <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{p.stock}</td>
-                  <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                  <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-500">
                     {new Date(p.createdAt).toLocaleDateString('es-ES', {
                       day: '2-digit', month: '2-digit', year: 'numeric',
                     })}

@@ -58,7 +58,7 @@ export default function UpdateStockButton({
   return (
     <div className="mt-1">
       <div className="flex items-center gap-1.5">
-        <span className="text-xs text-slate-500 dark:text-slate-400 mr-1">Stock:</span>
+        <span className="text-xs text-slate-600 dark:text-slate-500 mr-1">Stock:</span>
         <button
           type="button"
           onClick={() => setValue((v) => Math.max(0, v - 1))}

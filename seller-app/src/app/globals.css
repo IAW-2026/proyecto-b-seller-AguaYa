@@ -12,6 +12,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-slate-400: #64748b;
+  --color-gray-400: #6b7280;
+  --color-amber-400: #d97706;
 }
 
 body {

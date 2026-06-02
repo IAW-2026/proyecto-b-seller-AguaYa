@@ -69,7 +69,7 @@ export default async function SettingsPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Apariencia</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Cambiar entre modo claro y oscuro</p>
+                <p className="text-xs text-slate-600 dark:text-slate-500">Cambiar entre modo claro y oscuro</p>
               </div>
             </div>
             <ThemeToggle />

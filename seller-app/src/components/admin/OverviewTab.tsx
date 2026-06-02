@@ -134,7 +134,7 @@ export default function OverviewTab({
                     </>
                   )}
                   {review.products.length > 0 && (
-                    <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                    <p className="mt-1 text-xs text-slate-600 dark:text-slate-500">
                       Productos: {review.products.join(', ')}
                     </p>
                   )}

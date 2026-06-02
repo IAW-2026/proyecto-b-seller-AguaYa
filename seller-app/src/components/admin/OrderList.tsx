@@ -50,7 +50,7 @@ export default function OrderList({ orders, status }: { orders: Paginated<Order>
             <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-slate-900 dark:text-white">#{order.externalId}</span>
-                <span className="text-xs text-slate-400 dark:text-slate-500">
+                <span className="text-xs text-slate-600 dark:text-slate-500">
                   {new Date(order.createdAt).toLocaleDateString('es-ES', {
                     day: '2-digit', month: '2-digit', year: 'numeric',
                     hour: '2-digit', minute: '2-digit',

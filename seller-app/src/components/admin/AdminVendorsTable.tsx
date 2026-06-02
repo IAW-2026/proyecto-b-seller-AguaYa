@@ -132,14 +132,14 @@ export default function AdminVendorsTable({
                   {vendor.totalReviews > 0 ? (
                     <span className="inline-flex items-center gap-1 text-amber-500" title={`${vendor.promedio} de 5 estrellas`}>
                       <span className="text-slate-700 dark:text-slate-300">{'★'.repeat(Math.round(vendor.promedio))}{'☆'.repeat(5 - Math.round(vendor.promedio))}</span>
-                      <span className="text-xs text-slate-400 dark:text-slate-500">({vendor.totalReviews})</span>
+                      <span className="text-xs text-slate-600 dark:text-slate-500">({vendor.totalReviews})</span>
                     </span>
                   ) : (
-                    <span className="text-xs text-slate-400 dark:text-slate-500">Sin reseñas</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-500">Sin reseñas</span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{vendor.cuil || vendor.cuit || '-'}</td>
-                <td className="px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                <td className="px-4 py-3 text-xs text-slate-600 dark:text-slate-500">
                   {new Date(vendor.createdAt).toLocaleDateString('es-ES', {
                     day: '2-digit', month: '2-digit', year: 'numeric',
                   })}

@@ -32,7 +32,7 @@ export default function OrderCard({ order, showConfirmButton }: { order: OrderWi
           <h3 className="font-semibold text-sm text-slate-900 truncate dark:text-slate-100">
             Orden {order.externalId || order.id.slice(0, 8)}
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">
+          <p className="text-xs text-slate-600 mt-0.5 dark:text-slate-500">
             {new Date(order.createdAt).toLocaleString('es-ES', {
               day: '2-digit',
               month: '2-digit',

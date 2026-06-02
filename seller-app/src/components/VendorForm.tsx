@@ -178,7 +178,7 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
           maxLength={MAX_DESCRIPTION_LENGTH}
           className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder-slate-400 bg-white focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition dark:bg-slate-800 dark:border-slate-600 dark:text-white dark:placeholder-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400 min-h-[100px] resize-y"
         />
-        <p className={`mt-1 text-xs text-right ${descLength >= MAX_DESCRIPTION_LENGTH ? 'text-red-500 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
+        <p className={`mt-1 text-xs text-right ${descLength >= MAX_DESCRIPTION_LENGTH ? 'text-red-500 font-semibold' : 'text-slate-600 dark:text-slate-500'}`}>
           {descLength}/{MAX_DESCRIPTION_LENGTH}
         </p>
       </div>

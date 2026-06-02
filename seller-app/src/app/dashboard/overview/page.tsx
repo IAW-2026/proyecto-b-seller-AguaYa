@@ -103,7 +103,7 @@ export default async function OverviewPage() {
                     <span className="text-amber-400 text-xs">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
                   </div>
                   {review.products.length > 0 && (
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{review.products.join(', ')}</p>
+                    <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-500">{review.products.join(', ')}</p>
                   )}
                   {review.description && (
                     <p className="mt-1 text-xs italic text-slate-600 dark:text-slate-300">&ldquo;{review.description}&rdquo;</p>
@@ -111,7 +111,7 @@ export default async function OverviewPage() {
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-500 dark:text-slate-400">No hay reseñas todavía.</p>
+              <p className="text-xs text-slate-600 dark:text-slate-500">No hay reseñas todavía.</p>
             )}
           </div>
         </section>
