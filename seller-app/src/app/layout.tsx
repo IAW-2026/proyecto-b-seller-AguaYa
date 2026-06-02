@@ -1,3 +1,6 @@
+/**
+ * Layout raíz de la SellerApp. Configura Clerk, los tipos de fuente Geist y el proveedor de tema (claro/oscuro).
+ */
 import { ClerkProvider } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
 import type { Metadata } from 'next'
@@ -24,6 +27,9 @@ export const metadata: Metadata = {
   description: 'Panel para gestionar productos, pedidos y vendedores de AguaYa.',
 }
 
+/**
+ * Renderiza el HTML raíz con fuentes, Clerk y ThemeProvider envueltos alrededor de los children.
+ */
 export default function RootLayout({
   children,
 }: {

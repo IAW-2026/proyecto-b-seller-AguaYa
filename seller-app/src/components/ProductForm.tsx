@@ -1,3 +1,8 @@
+/**
+ * ProductForm.tsx — Formulario de creación/edición de productos.
+ * Soporta modo create y edit, subida de imagen y eliminación.
+ */
+
 'use client'
 
 import React, { useState } from 'react'
@@ -25,6 +30,7 @@ interface ProductFormProps {
   disableRedirect?: boolean
 }
 
+/** Formulario de producto con soporte para creación, edición y carga de imagen. */
 export default function ProductForm({ mode = 'create', productId, initialData, onSuccess, vendorId, disableRedirect }: ProductFormProps) {
   const router = useRouter()
   const [form, setForm] = useState({

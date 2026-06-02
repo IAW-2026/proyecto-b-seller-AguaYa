@@ -1,3 +1,8 @@
+/**
+ * @file UpdateStockButton.tsx
+ * @description Control inline para modificar el stock de un producto con botones de incremento, decremento y guardado.
+ */
+
 'use client'
 
 import { useState } from 'react'
@@ -5,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { updateProductStock } from '@/app/actions/product'
 import { Pencil } from 'lucide-react'
 
+/** Renderiza un control de stock con visualización del valor actual y modo de edición inline. */
 export default function UpdateStockButton({
   productId,
   currentStock,

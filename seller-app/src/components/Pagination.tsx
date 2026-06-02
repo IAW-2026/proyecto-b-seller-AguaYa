@@ -1,5 +1,10 @@
+/**
+ * Pagination.tsx — Componente de paginación con elipsis y botones anterior/siguiente.
+ */
+
 'use client'
 
+/** Paginación con números de página, elipsis y controles de navegación. */
 export default function Pagination({
   page,
   pageCount,

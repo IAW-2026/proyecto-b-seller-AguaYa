@@ -1,3 +1,7 @@
+/**
+ * Diálogo modal para editar los datos de un vendedor desde el panel de administración.
+ * Permite modificar nombre, dirección, CUIL, CUIT, descripción e imagen.
+ */
 'use client'
 
 import { useState } from 'react'
@@ -7,6 +11,7 @@ import ImageUpload from '@/components/ui/ImageUpload'
 import { formatCuilCuit } from '@/lib/format'
 import { MAX_NAME_LENGTH, MAX_ADDRESS_LENGTH, MAX_DESCRIPTION_LENGTH } from '@/lib/constants'
 
+/** Diálogo modal con formulario para editar los datos del vendedor. */
 export default function AdminVendorEditDialog({
   vendor,
 }: {

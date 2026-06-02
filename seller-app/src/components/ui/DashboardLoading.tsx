@@ -1,3 +1,8 @@
+/**
+ * DashboardLoading.tsx — Esqueleto de carga para la página principal del dashboard.
+ */
+
+/** Esqueleto animado que simula tarjetas y paneles del dashboard. */
 export default function DashboardLoading() {
   return (
     <div className="space-y-6 animate-pulse">

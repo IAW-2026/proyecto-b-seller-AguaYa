@@ -1,8 +1,13 @@
+/**
+ * RefreshButton.tsx — Botón de recarga que hace router.refresh() con animación.
+ */
+
 'use client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { RefreshCw } from 'lucide-react'
 
+/** Botón que recarga los datos del servidor con spinner de sincronización. */
 export default function RefreshButton({ compact = false }: { compact?: boolean }) {
   const router = useRouter()
   const [spinning, setSpinning] = useState(false)

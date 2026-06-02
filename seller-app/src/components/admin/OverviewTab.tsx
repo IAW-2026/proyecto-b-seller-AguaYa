@@ -1,3 +1,7 @@
+/**
+ * Panel de vista general del vendedor para administradores.
+ * Muestra información del vendedor y la lista de reseñas con opción de expandir/colapsar.
+ */
 'use client'
 
 import { useState } from 'react'
@@ -6,8 +10,9 @@ import type { Vendor, Review } from '@/lib/types'
 import ToggleVendorButton from '@/components/vendors/ToggleVendorButton'
 import AdminVendorEditDialog from '@/components/admin/AdminVendorEditDialog'
 
-const star = (filled: boolean) => <span key={String(filled)}>{filled ? '★' : '☆'}</span>
+const star = (filled: boolean, i: number) => <span key={i}>{filled ? '★' : '☆'}</span>
 
+/** Vista general del vendedor con información y reseñas. */
 export default function OverviewTab({
   vendor,
   reviews,
@@ -107,7 +112,7 @@ export default function OverviewTab({
                     <span className="text-sm text-slate-400 dark:text-slate-500">{new Date(review.createdAt).toLocaleDateString()}</span>
                   </div>
                   <div className="mb-1 text-sm text-amber-500">
-                    {Array.from({ length: 5 }, (_, i) => star(i < review.rating))}
+                    {Array.from({ length: 5 }, (_, i) => star(i < review.rating, i))}
                   </div>
                   {review.description && (
                     <>

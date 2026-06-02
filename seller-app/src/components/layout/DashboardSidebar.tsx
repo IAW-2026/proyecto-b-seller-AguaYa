@@ -1,3 +1,8 @@
+/**
+ * DashboardSidebar.tsx — Barra lateral de navegación del dashboard.
+ * Muestra información del vendedor, enlaces de navegación, ThemeToggle y LogoutButton.
+ */
+
 import React from 'react'
 import Link from 'next/link'
 import LogoutButton from '../LogoutButton'
@@ -7,6 +12,7 @@ import { dashboardLinks, feedbackLink, iconMap } from '@/lib/navigation'
 const linkClass = 'flex items-center gap-3 rounded-xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
 const disabledClass = 'flex items-center gap-3 rounded-xl px-3 py-2 text-slate-400 cursor-not-allowed opacity-50 dark:text-slate-600'
 
+/** Sidebar de navegación visible en pantallas xl en adelante. */
 export default function DashboardSidebar({
   vendorName,
   vendorImage,

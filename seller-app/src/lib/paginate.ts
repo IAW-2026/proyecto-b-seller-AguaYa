@@ -1,24 +1,38 @@
+/**
+ * paginate.ts — Utilidad de paginación genérica para Prisma.
+ *
+ * Ejecuta una consulta paginada (findMany + count) en paralelo,
+ * retornando los items de la página solicitada y el total de páginas.
+ */
+
+import { DEFAULT_PAGE_SIZE } from '@/lib/constants'
+
+/** Resultado de una consulta paginada. */
 export type PaginatedResult<T> = {
   items: T[]
   total: number
   pageCount: number
 }
 
-// Prisma model delegates have complex generic signatures; `any` is pragmatic here
-import { DEFAULT_PAGE_SIZE } from '@/lib/constants'
-
+/**
+ * Ejecuta una consulta paginada sobre un modelo de Prisma.
+ *
+ * @param delegate - Objeto Prisma con findMany y count (ej. prisma.product, prisma.order).
+ * @param where - Filtro WHERE de Prisma.
+ * @param options.page - Número de página (default: 1).
+ * @param options.limit - Items por página (default: 10).
+ * @param options.include - Relaciones a incluir.
+ * @param options.orderBy - Ordenamiento.
+ * @returns Items de la página y metadatos de paginación.
+ */
 export async function paginate<T>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  delegate: { findMany: (args: any) => Promise<any[]>; count: (args: any) => Promise<number> },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  where: any,
+  delegate: { findMany: (args: Record<string, unknown>) => Promise<T[]>; count: (args: Record<string, unknown>) => Promise<number> },
+  where: Record<string, unknown>,
   options: {
     page?: number
     limit?: number
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    include?: any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    orderBy?: any
+    include?: Record<string, unknown>
+    orderBy?: Record<string, unknown>
   } = {}
 ): Promise<PaginatedResult<T>> {
   const page = options.page ?? 1

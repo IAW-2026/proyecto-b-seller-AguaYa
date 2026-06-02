@@ -1,3 +1,7 @@
+/**
+ * Lista de pedidos paginada para el panel de administración.
+ * Muestra pedidos filtrados por estado (PAID/READY) con opción de confirmar.
+ */
 'use client'
 
 import { useState } from 'react'
@@ -7,6 +11,7 @@ import type { Order, Paginated } from '@/lib/types'
 import { updateOrderStatusAsAdmin } from '@/app/actions/admin-order'
 import Pagination from '@/components/Pagination'
 
+/** Lista paginada de pedidos con acción para marcar como listos. */
 export default function OrderList({ orders, status }: { orders: Paginated<Order>; status: string }) {
   const [updating, setUpdating] = useState<string | null>(null)
   const router = useRouter()

@@ -1,3 +1,8 @@
+/**
+ * VendorForm.tsx — Formulario de creación/edición de vendedor.
+ * Incluye validación, subida de imagen y confirmación previa al guardado.
+ */
+
 'use client'
 
 import React, { useState } from 'react'
@@ -22,6 +27,7 @@ interface VendorFormProps {
   simple?: boolean
 }
 
+/** Formulario de datos del vendedor con soporte para creación y edición. */
 export default function VendorForm({ initialData, redirectTo, simple }: VendorFormProps) {
   const router = useRouter()
   const [formData, setFormData] = useState({

@@ -1,7 +1,13 @@
+/**
+ * @file OrderNotifier.tsx
+ * @description Componente oculto que consulta periódicamente el conteo de órdenes pendientes y muestra una notificación del navegador cuando llega una nueva.
+ */
+
 'use client'
 
 import { useEffect, useRef } from 'react'
 
+/** Componente invisible que notifica al vendedor cuando se recibe una nueva orden vía Notification API. */
 export default function OrderNotifier({ interval = 10000 }: { interval?: number }) {
   const lastCount = useRef<number | null>(null)
 

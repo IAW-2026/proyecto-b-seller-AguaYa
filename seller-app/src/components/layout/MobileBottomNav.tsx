@@ -1,3 +1,8 @@
+/**
+ * MobileBottomNav.tsx — Barra de navegación inferior para dispositivos móviles.
+ * Muestra enlaces del dashboard, acceso a FeedbackApp y botón de cierre de sesión.
+ */
+
 'use client'
 
 import Link from 'next/link'
@@ -10,6 +15,7 @@ const activeClass = 'text-slate-900 dark:text-slate-100'
 const inactiveClass = 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
 const disabledClass = 'text-slate-400 cursor-not-allowed opacity-50 dark:text-slate-600'
 
+/** Navegación inferior fija visible en pantallas menores a xl. */
 export default function MobileBottomNav({ roles, feedbackAppUrl }: { roles?: string[]; feedbackAppUrl?: string }) {
   const pathname = usePathname()
   const isAdmin = roles?.includes('admin_seller')

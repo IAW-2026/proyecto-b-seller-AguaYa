@@ -1,3 +1,8 @@
+/**
+ * @file ConfirmOrderDialog.tsx
+ * @description Diálogo modal para confirmar una orden pagada y cambiarla a estado "Lista para entregar".
+ */
+
 'use client'
 
 import { useState } from 'react'
@@ -8,6 +13,7 @@ interface ConfirmOrderDialogProps {
   orderId: string
 }
 
+/** Renderiza el botón y modal para confirmar una orden como lista para entregar. */
 export default function ConfirmOrderDialog({ orderId }: ConfirmOrderDialogProps) {
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)

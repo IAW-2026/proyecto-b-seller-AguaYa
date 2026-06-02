@@ -1,3 +1,8 @@
+/**
+ * @file AnimatedOrders.tsx
+ * @description Componente que muestra una animación de desplazamiento vertical infinito con las últimas órdenes.
+ */
+
 'use client'
 
 type Order = {
@@ -7,6 +12,7 @@ type Order = {
   buyerName: string
 }
 
+/** Renderiza un carrusel animado con scroll infinito de las órdenes recibidas. */
 export default function AnimatedOrders({ orders }: { orders: Order[] }) {
   if (orders.length === 0) {
     return <p className="text-sm text-slate-500 dark:text-slate-400">No hay órdenes cargadas.</p>

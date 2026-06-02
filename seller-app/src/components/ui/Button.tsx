@@ -1,3 +1,7 @@
+/**
+ * Button.tsx — Componente de botón reutilizable con variantes de estilo.
+ */
+
 import React from 'react'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -11,6 +15,7 @@ const variantClasses: Record<string, string> = {
   secondary: 'bg-gray-200 text-gray-900 hover:opacity-90 dark:bg-slate-700 dark:text-slate-200',
 }
 
+/** Botón con variantes primary, danger y secondary. */
 export default function Button({
   variant = 'primary',
   fullWidth = false,

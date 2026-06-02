@@ -1,3 +1,8 @@
+/**
+ * SearchBar.tsx — Barra de búsqueda con filtro por fechas opcional.
+ * Navega con query params y aplica debounce en el texto de búsqueda.
+ */
+
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
@@ -14,6 +19,7 @@ interface SearchBarProps {
   children?: React.ReactNode
 }
 
+/** Barra de búsqueda con debounce y filtros por query params. */
 export default function SearchBar({
   placeholder = 'Buscar...',
   showDateFilter = false,

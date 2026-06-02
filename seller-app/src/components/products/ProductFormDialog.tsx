@@ -1,3 +1,8 @@
+/**
+ * @file ProductFormDialog.tsx
+ * @description Diálogo modal que envuelve el formulario de producto en modo creación o edición.
+ */
+
 'use client'
 
 import { useState, type ReactNode } from 'react'
@@ -18,6 +23,7 @@ interface ProductFormDialogProps {
   disableRedirect?: boolean
 }
 
+/** Renderiza un modal con el formulario de producto para crear o editar. */
 export default function ProductFormDialog({ children, mode = 'create', productId, vendorId, initialData, disableRedirect }: ProductFormDialogProps) {
   const [open, setOpen] = useState(false)
 

@@ -1,3 +1,7 @@
+/**
+ * Contenedor de tabs para la vista detallada de un vendedor.
+ * Permite alternar entre las vistas de resumen, productos y pedidos.
+ */
 'use client'
 
 import { useState } from 'react'
@@ -8,6 +12,7 @@ import OrdersTab from './OrdersTab'
 
 export type { Vendor, Product, Order, Review, Paginated, OrderItem } from '@/lib/types'
 
+/** Tabs de navegación entre resumen, productos y pedidos del vendedor. */
 export default function VendorDetailTabs({
   vendor,
   products,

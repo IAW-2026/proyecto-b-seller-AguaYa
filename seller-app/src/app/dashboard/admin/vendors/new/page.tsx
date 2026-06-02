@@ -1,3 +1,7 @@
+/**
+ * Página de creación de un nuevo vendedor (panel admin).
+ * Formulario que asocia un usuario de Clerk con los datos del negocio.
+ */
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -7,6 +11,7 @@ import { getAvailableClerkUsers, createVendorAsAdmin } from '@/app/actions/admin
 import { formatCuilCuit } from '@/lib/format'
 import { MAX_NAME_LENGTH, MAX_ADDRESS_LENGTH, MAX_DESCRIPTION_LENGTH } from '@/lib/constants'
 
+/** Página de formulario para crear un nuevo vendedor desde el panel admin. */
 export default function NewVendorPage() {
   const router = useRouter()
   const [clerkUsers, setClerkUsers] = useState<{ id: string; name: string; email: string }[]>([])

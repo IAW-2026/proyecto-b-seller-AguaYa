@@ -1,3 +1,6 @@
+/**
+ * Página de configuración del vendedor (`/dashboard/settings`). Permite editar perfil y cambiar tema en mobile.
+ */
 import React from 'react'
 import { auth } from '@clerk/nextjs/server'
 import { getVendorByUserId } from '@/lib/queries/vendors'
@@ -6,6 +9,9 @@ import VendorForm from '@/components/VendorForm'
 import ThemeToggle from '@/components/layout/ThemeToggle'
 import { Settings, Store, Moon } from 'lucide-react'
 
+/**
+ * Renderiza el formulario de edición del vendedor y el toggle de tema (solo en mobile/tablet).
+ */
 export default async function SettingsPage() {
   const { userId } = await auth()
   const vendor = userId ? await getVendorByUserId(userId) : null

@@ -1,3 +1,6 @@
+/**
+ * Tab de productos de un vendedor con tabla paginada y enlace a edición.
+ */
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
@@ -6,6 +9,7 @@ import type { Product, Paginated } from '@/lib/types'
 import ProductFormDialog from '@/components/products/ProductFormDialog'
 import Pagination from '@/components/Pagination'
 
+/** Tabla paginada de productos del vendedor con opción de edición. */
 export default function ProductsTab({ vendorId, products }: { vendorId: string; products: Paginated<Product> }) {
   const router = useRouter()
   const searchParams = useSearchParams()

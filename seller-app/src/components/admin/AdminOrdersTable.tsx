@@ -1,3 +1,7 @@
+/**
+ * Tabla paginada de pedidos globales para el panel de administración.
+ * Permite filtrar por estado y cambiar el estado de cada orden.
+ */
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
@@ -26,6 +30,7 @@ interface Order {
   items: OrderItem[]
 }
 
+/** Tabla de pedidos global con filtro por estado y cambio de estado. */
 export default function AdminOrdersTable({
   orders,
   page,

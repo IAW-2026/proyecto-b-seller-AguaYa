@@ -1,3 +1,6 @@
+/**
+ * Página de inicio (`/`) — landing pública de la SellerApp con enlace a iniciar sesión.
+ */
 export default async function Home() {
     return (
         <main className="grid min-h-screen place-items-center px-6 py-12">

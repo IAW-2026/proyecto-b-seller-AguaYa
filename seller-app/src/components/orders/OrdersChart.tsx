@@ -1,3 +1,8 @@
+/**
+ * @file OrdersChart.tsx
+ * @description Gráfico de barras colapsable que muestra el volumen de órdenes pagadas y listas por día en un rango de fechas.
+ */
+
 'use client'
 
 import { useState } from 'react'
@@ -11,6 +16,7 @@ interface ChartData {
   ready: number
 }
 
+/** Renderiza un gráfico de barras interactivo con las órdenes agrupadas por día. */
 export default function OrdersChart({ vendorId }: { vendorId: string }) {
   const [open, setOpen] = useState(false)
   const [from, setFrom] = useState(() => {

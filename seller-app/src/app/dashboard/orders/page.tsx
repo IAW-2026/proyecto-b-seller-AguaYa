@@ -1,3 +1,7 @@
+/**
+ * Página principal de órdenes del dashboard.
+ * Renderiza la vista de administrador (tabla global) o la del vendedor (lista segmentada).
+ */
 import React, { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
@@ -30,6 +34,7 @@ async function AdminOrdersContent(props: { searchParams: Promise<{ page?: string
   return <AdminOrdersTable orders={result.items} page={page} pageCount={result.pageCount} />
 }
 
+/** Página de órdenes: vista admin (global) o vendedor (segmentada por estado). */
 export default async function OrdersPage(props: { searchParams: Promise<{ page?: string; paid_page?: string; ready_page?: string; q?: string; from?: string; to?: string; status?: string }> }) {
   const { userId } = await auth()
   if (!userId) return null

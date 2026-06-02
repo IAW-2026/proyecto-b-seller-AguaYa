@@ -1,8 +1,14 @@
+/**
+ * Página de alta de vendedor (`/setup-vendor`). Muestra el formulario de registro si el usuario no tiene vendedor asociado.
+ */
 import { auth } from '@clerk/nextjs/server'
 import { getVendorByUserId } from '@/lib/queries/vendors'
 import { redirect } from 'next/navigation'
 import VendorForm from '@/components/VendorForm'
 
+/**
+ * Renderiza el formulario de registro del negocio; redirige si ya existe un vendedor.
+ */
 export default async function SetupVendorPage() {
   const { userId } = await auth()
 

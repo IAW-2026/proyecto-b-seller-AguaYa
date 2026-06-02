@@ -1,3 +1,11 @@
+/**
+ * admin-vendor.ts — Server actions de administración de vendedores.
+ *
+ * Permite listar, crear, actualizar y eliminar vendedores desde el panel admin.
+ * Integra datos de Clerk (nombre, email) y reseñas desde FeedbackApp.
+ * Todas las funciones requieren rol admin_seller.
+ */
+
 'use server'
 
 import { clerkClient } from '@clerk/nextjs/server'
@@ -8,6 +16,7 @@ import { validateVendorInput, validateVendorUpdateInput } from '@/lib/validation
 import { ADMIN_PAGE_SIZE, CLERK_USERS_FETCH_LIMIT } from '@/lib/constants'
 import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
 
+/** Retorna usuarios de Clerk que aún no tienen perfil de vendedor. */
 export async function getAvailableClerkUsers(): Promise<{ id: string; name: string; email: string }[]> {
   await requireAdmin()
 
@@ -29,6 +38,7 @@ export async function getAvailableClerkUsers(): Promise<{ id: string; name: stri
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 
+/** Retorna todos los vendedores con datos de Clerk (sin paginación). */
 export async function getVendorsWithClerkInfo() {
   await requireAdmin()
 
@@ -51,6 +61,11 @@ export async function getVendorsWithClerkInfo() {
   })
 }
 
+/**
+ * Retorna vendedores paginados con datos de Clerk y reseñas.
+ * Soporta búsqueda y ordenamiento. Sin query, usa paginación
+ * batch de Clerk. Con query, filtra en memoria todo Clerk.
+ */
 export async function getVendorsWithClerkInfoPaginated(
   page: number = 1,
   filters?: { q?: string; sortBy?: string; sortOrder?: string }
@@ -69,14 +84,17 @@ export async function getVendorsWithClerkInfoPaginated(
       sortOrder: filters?.sortOrder,
     })
 
+    const userIds = dbResult.items.map((v) => v.userId)
+    const { data: clerkUsers } = await client.users.getUserList({
+      userId: userIds,
+      limit: userIds.length,
+    })
+    const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
+
     const items = await Promise.all(dbResult.items.map(async (v) => {
-      let clerkName = ''
-      let clerkEmail = ''
-      try {
-        const clerkUser = await client.users.getUser(v.userId)
-        clerkName = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || ''
-        clerkEmail = clerkUser.emailAddresses?.[0]?.emailAddress || ''
-      } catch { /* Clerk user not found */ }
+      const clerkUser = clerkMap.get(v.userId)
+      const clerkName = clerkUser ? [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || '' : ''
+      const clerkEmail = clerkUser?.emailAddresses?.[0]?.emailAddress || ''
 
       const reviews = await getVendorReviewsWithStats(v.userId)
       return {
@@ -138,6 +156,7 @@ export async function getVendorsWithClerkInfoPaginated(
   return { items: itemsWithReviews, total, pageCount }
 }
 
+/** Retorna un vendedor individual con datos de Clerk. */
 export async function getVendorWithClerkInfo(vendorId: string) {
   await requireAdmin()
 
@@ -159,6 +178,7 @@ export async function getVendorWithClerkInfo(vendorId: string) {
   }
 }
 
+/** Crea un vendedor (admin) y asigna rol 'seller' en Clerk. */
 export async function createVendorAsAdmin(data: {
   userId: string
   name: string
@@ -182,6 +202,7 @@ export async function createVendorAsAdmin(data: {
   return vendor
 }
 
+/** Actualiza un vendedor (admin). */
 export async function updateVendorAsAdmin(
   vendorId: string,
   data: {
@@ -206,6 +227,7 @@ export async function updateVendorAsAdmin(
   return vendor
 }
 
+/** Elimina (soft-delete) un vendedor (admin). */
 export async function deleteVendorAsAdmin(vendorId: string) {
   await requireAdmin()
 
@@ -218,6 +240,7 @@ export async function deleteVendorAsAdmin(vendorId: string) {
   return vendor
 }
 
+/** Alterna el estado activo/inactivo de un vendedor (admin). */
 export async function toggleVendorActiveStatus(vendorId: string) {
   await requireAdmin()
 

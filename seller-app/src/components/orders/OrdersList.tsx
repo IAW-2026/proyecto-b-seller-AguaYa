@@ -1,9 +1,15 @@
+/**
+ * @file OrdersList.tsx
+ * @description Componente servidor que obtiene las órdenes del vendedor autenticado y las pasa a OrdersTabs para su visualización con filtros y paginación.
+ */
+
 import { auth } from '@clerk/nextjs/server'
 import { getVendorByUserId } from '@/lib/queries/vendors'
 import { getVendorOrdersByStatus } from '@/lib/queries/orders'
 import OrdersTabs from '@/components/orders/OrdersTabs'
 import { Package } from 'lucide-react'
 
+/** Obtiene las órdenes pagadas y listas del vendedor autenticado y renderiza las tabs con paginación y búsqueda. */
 export default async function OrdersList({
   paidPage = 1,
   readyPage = 1,

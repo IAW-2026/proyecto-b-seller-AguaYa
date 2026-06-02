@@ -1,3 +1,6 @@
+/**
+ * Layout del dashboard. Verifica autenticación, existencia del vendedor, y renderiza sidebar + navegación inferior.
+ */
 import React, { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
@@ -6,6 +9,9 @@ import { getAuthRoles } from '@/lib/auth-utils'
 import DashboardSidebar from '@/components/layout/DashboardSidebar'
 import MobileBottomNav from '@/components/layout/MobileBottomNav'
 
+/**
+ * Contenido del layout con lógica de autenticación y datos del vendedor.
+ */
 async function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { userId } = await auth()
 
@@ -30,6 +36,9 @@ async function DashboardLayoutContent({ children }: { children: React.ReactNode 
   )
 }
 
+/**
+ * Layout principal del dashboard envuelto en un Suspense con indicador de carga.
+ */
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-slate-500 dark:text-slate-400">Cargando...</div>}>

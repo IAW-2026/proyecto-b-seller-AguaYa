@@ -1,3 +1,7 @@
+/**
+ * Tabla paginada y ordenable de productos globales para el panel de administración.
+ * Permite filtrar por estado y buscar por producto o vendedor.
+ */
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
@@ -23,6 +27,7 @@ interface Product {
 const SORTABLE_COLS = ['name', 'vendor', 'price', 'stock', 'createdAt'] as const
 type SortCol = (typeof SORTABLE_COLS)[number]
 
+/** Tabla de productos global con filtros, búsqueda y ordenamiento. */
 export default function AdminProductsTable({
   products,
   page,

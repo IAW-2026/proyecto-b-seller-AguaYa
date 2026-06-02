@@ -1,9 +1,14 @@
+/**
+ * Botón para eliminar (desactivar) un vendedor desde el panel de administración.
+ * Muestra un diálogo de confirmación antes de ejecutar la acción.
+ */
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteVendorAsAdmin } from '@/app/actions/admin-vendor'
 
+/** Botón con diálogo de confirmación para eliminar un vendedor. */
 export default function DeleteVendorButton({ vendorId, vendorName }: { vendorId: string; vendorName: string }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)

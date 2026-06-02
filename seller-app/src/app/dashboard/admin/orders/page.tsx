@@ -1,3 +1,7 @@
+/**
+ * Página de órdenes globales del panel de administración.
+ * Lista paginada y filtrable de todas las órdenes del sistema.
+ */
 import React, { Suspense } from 'react'
 import { requireAdminPage } from '@/lib/admin-guard'
 import { listAllOrdersPaginated } from '@/lib/queries/orders'
@@ -22,6 +26,7 @@ async function OrdersTable(props: { searchParams: Promise<{ page?: string; q?: s
   return <AdminOrdersTable orders={result.items} page={page} pageCount={result.pageCount} />
 }
 
+/** Página de órdenes globales del panel de administración. */
 export default async function AdminOrdersPage(props: { searchParams: Promise<{ page?: string; q?: string; from?: string; to?: string; status?: string }> }) {
   await requireAdminPage()
 

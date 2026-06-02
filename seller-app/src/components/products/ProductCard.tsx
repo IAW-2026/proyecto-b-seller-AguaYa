@@ -1,8 +1,14 @@
+/**
+ * @file ProductCard.tsx
+ * @description Tarjeta visual de un producto que muestra imagen, nombre, precio, stock y acciones de edición.
+ */
+
 import { Package } from 'lucide-react'
 import type { Product } from '@prisma/client'
 import UpdateStockButton from './UpdateStockButton'
 import ProductFormDialog from './ProductFormDialog'
 
+/** Renderiza la tarjeta de un producto con imagen, precio, stock y botones de edición. */
 export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="flex flex-col rounded-xl border border-slate-200/80 bg-white/80 dark:border-slate-700/80 dark:bg-slate-900/80 p-3 shadow-sm">

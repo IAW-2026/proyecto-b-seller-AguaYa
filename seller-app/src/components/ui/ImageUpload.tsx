@@ -1,15 +1,6 @@
 /**
- * ImageUpload.tsx — Componente reutilizable de subida de imágenes.
- *
- * Ofrece dos modos de ingreso:
- *   1. File picker con preview y subida a Cloudinary (u otro provider)
- *   2. Campo de texto para pegar una URL manualmente (fallback)
- *
- * Props:
- *   value     → URL actual de la imagen
- *   onChange  → callback con la nueva URL
- *   folder    → subcarpeta en el storage (ej: 'products', 'avatars')
- *   label     → texto del label (default 'Imagen')
+ * ImageUpload.tsx — Componente de subida de imágenes con preview.
+ * Soporta selección de archivo (subida a Cloudinary) o ingreso manual de URL.
  */
 
 'use client'
@@ -25,6 +16,7 @@ interface ImageUploadProps {
   label?: string
 }
 
+/** Componente de subida de imágenes con file picker y alternativa de URL. */
 export default function ImageUpload({ value, onChange, folder = 'general', label = 'Imagen' }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)

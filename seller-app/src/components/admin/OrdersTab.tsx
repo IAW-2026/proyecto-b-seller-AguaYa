@@ -1,3 +1,6 @@
+/**
+ * Tab de pedidos con sub-tabs para filtrar entre pedidos pendientes y listos para entregar.
+ */
 'use client'
 
 import { useState } from 'react'
@@ -5,6 +8,7 @@ import { ShoppingBag } from 'lucide-react'
 import type { Order, Paginated } from '@/lib/types'
 import OrderList from './OrderList'
 
+/** Tabs internos para filtrar pedidos pagados vs listos para entregar. */
 export default function OrdersTab({
   paidOrders,
   readyOrders,

@@ -1,3 +1,11 @@
+/**
+ * vendor.ts — Server actions de perfil del vendedor.
+ *
+ * Permite crear/actualizar el perfil del vendedor autenticado
+ * y toggle de estado activo. Al crear, asigna el rol 'seller'
+ * en Clerk.
+ */
+
 'use server'
 
 import { auth } from '@clerk/nextjs/server'
@@ -6,6 +14,11 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { validateVendorInput } from '@/lib/validation'
 
+/**
+ * Crea o actualiza el perfil del vendedor autenticado.
+ * Si ya existe un vendor para el userId, lo actualiza.
+ * Si no, lo crea y asigna el rol 'seller' en Clerk.
+ */
 export async function createOrUpdateVendor(data: {
   name: string
   address: string
@@ -66,6 +79,7 @@ export async function createOrUpdateVendor(data: {
   return vendor
 }
 
+/** Alterna el estado activo/inactivo del vendedor autenticado. */
 export async function toggleMyVendorActiveStatus() {
   const { userId } = await auth()
   if (!userId) throw new Error('No autenticado')

@@ -1,3 +1,8 @@
+/**
+ * @file OrdersTabs.tsx
+ * @description Contenedor cliente con tabs para alternar entre órdenes "Para confirmar" y "Listas para entregar", incluye gráfico, búsqueda y paginación.
+ */
+
 'use client'
 
 import { useState } from 'react'
@@ -16,6 +21,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'ready', label: 'Listas para entregar' },
 ]
 
+/** Renderiza las tabs de órdenes con el gráfico, buscador, lista de tarjetas y paginación. */
 export default function OrdersTabs({
   vendorId,
   paidOrders,

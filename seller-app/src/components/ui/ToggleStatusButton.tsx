@@ -1,3 +1,8 @@
+/**
+ * ToggleStatusButton.tsx — Botón con confirmación para activar/desactivar entidades.
+ * Muestra un modal de confirmación antes de ejecutar la acción onToggle.
+ */
+
 'use client'
 
 import { useState } from 'react'
@@ -10,6 +15,7 @@ interface ToggleStatusButtonProps {
   size?: 'xs' | 'sm'
 }
 
+/** Botón que alterna el estado de una entidad con confirmación previa. */
 export default function ToggleStatusButton({ isActive, entityType, entityName, onToggle, size = 'xs' }: ToggleStatusButtonProps) {
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)

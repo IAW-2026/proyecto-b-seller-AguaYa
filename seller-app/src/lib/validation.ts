@@ -1,3 +1,11 @@
+/**
+ * validation.ts — Validación y sanitización de inputs de formularios y APIs.
+ *
+ * Centraliza las reglas de validación para productos, vendedores, órdenes
+ * y filtros de búsqueda. Tira error con el mensaje descriptivo si algún
+ * campo no cumple las reglas.
+ */
+
 export interface ProductInput {
   name: string
   description?: string

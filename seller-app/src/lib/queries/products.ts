@@ -1,3 +1,9 @@
+/**
+ * products.ts — Consultas a la base de datos para la entidad Product.
+ *
+ * Proporciona funciones de lectura para productos del dashboard de admin,
+ * con búsqueda, filtrado por estado activo y ordenamiento por columnas.
+ */
 import { prisma } from '@/lib/prisma'
 import { paginate } from '@/lib/paginate'
 import { buildSearchWhere } from '@/lib/search'
@@ -16,6 +22,7 @@ function buildProductOrderBy(sortBy?: string, sortOrder?: string) {
   }
 }
 
+/** Obtiene un producto por ID, verificando que pertenezca al vendor indicado. */
 export async function getProductById(productId: string, vendorId: string) {
   return prisma.product.findFirst({
     where: { id: productId, vendorId, deletedAt: null },
@@ -33,6 +40,10 @@ function buildProductSearchWhere(q?: string) {
   }
 }
 
+/**
+ * Lista todos los productos con paginación, búsqueda, filtro por estado
+ * y ordenamiento. Incluye datos del vendedor asociado.
+ */
 export async function listAllProductsPaginated(
   page: number = 1,
   filters?: {
