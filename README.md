@@ -21,11 +21,11 @@ El admin tiene acceso completo al panel de administración (gestión de vendedor
 1. **Iniciar sesión** — Usar Clerk con Gmail (proveedor por defecto) o las credenciales de prueba.
 2. **Dashboard** — Al entrar, redirige según el rol: admin ve el listado de vendedores; seller ve su resumen.
 3. **Gestión de productos (Seller)** — Ir a "Productos" para crear, editar, activar/desactivar y eliminar productos del catálogo propio. Cada producto tiene nombre, precio, stock, descripción e imagen (subida a Cloudinary).
-4. **Gestión de productos (Admin_Seller)** — Ir a "Productos" editar y eliminar productos de todos los catalogos de todos los sellers.
-4. **Órdenes entrantes (Seller)** — Ir a "Órdenes". Las órdenes llegan con estado `PAID` desde PaymentsApp. El vendedor las marca como `READY` cuando están listas para entregar. El panel se actualiza automáticamente cada 10s y muestra notificaciones del navegador cuando llegan órdenes nuevas.
-4. **Órdenes entrantes (Admin_Seller)** — Ir a "Órdenes". Podemos ver las ordenes de todos los sellers, marcarlas como `PAID` o `READY`.
-5. **Gestión de vendedores (admin)** — Ir a "Vendedores" para crear, editar, activar/desactivar y eliminar vendedores. Cada vendedor se asocia a un usuario de Clerk existente. Podemos acceder al resumen del vendedor, sus ordenes y productos desde aqui.
-6. **Reseñas** — Las reseñas se consultan en tiempo real desde FeedbackApp y se muestran en el resumen del vendedor y en el detalle de cada vendedor (admin). Tenemos un boton que ridirige a FeedbackApp desde seller si queremos ver todas las reseñas asociadas a nuestro negocio.
+5. **Gestión de productos (Admin_Seller)** — Ir a "Productos" editar y eliminar productos de todos los catalogos de todos los sellers.
+6. **Órdenes entrantes (Seller)** — Ir a "Órdenes". Las órdenes llegan con estado `PAID` desde PaymentsApp. El vendedor las marca como `READY` cuando están listas para entregar. El panel se actualiza automáticamente cada 10s y muestra notificaciones del navegador cuando llegan órdenes nuevas.
+7. **Órdenes entrantes (Admin_Seller)** — Ir a "Órdenes". Podemos ver las ordenes de todos los sellers, marcarlas como `PAID` o `READY`.
+8. **Gestión de vendedores (admin)** — Ir a "Vendedores" para crear, editar, activar/desactivar y eliminar vendedores. Cada vendedor se asocia a un usuario de Clerk existente. Podemos acceder al resumen del vendedor, sus ordenes y productos desde aqui.
+9. **Reseñas** — Las reseñas se consultan en tiempo real desde FeedbackApp y se muestran en el resumen del vendedor y en el detalle de cada vendedor (admin). Tenemos un boton que ridirige a FeedbackApp desde seller si queremos ver todas las reseñas asociadas a nuestro negocio.
 
 ## Descripción del proyecto
 
