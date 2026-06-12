@@ -6,7 +6,7 @@ import React, { Suspense } from 'react'
 import { requireAdminPage } from '@/lib/admin-guard'
 import { listAllOrdersPaginated } from '@/lib/queries/orders'
 import AdminOrdersTable from '@/components/admin/AdminOrdersTable'
-import DashboardTableLoading from '@/components/ui/DashboardTableLoading'
+import AdminOrdersLoading from '@/components/ui/admin-loadings/AdminOrdersLoading'
 
 async function OrdersTable(props: { searchParams: Promise<{ page?: string; q?: string; from?: string; to?: string; status?: string }> }) {
   const searchParams = await props.searchParams
@@ -35,7 +35,7 @@ export default async function AdminOrdersPage(props: { searchParams: Promise<{ p
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Órdenes (global)</h1>
       </div>
-      <Suspense fallback={<DashboardTableLoading />}>
+      <Suspense fallback={<AdminOrdersLoading />}>
         <OrdersTable searchParams={props.searchParams} />
       </Suspense>
     </div>

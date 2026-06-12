@@ -35,7 +35,7 @@ export async function createProduct(data: {
     },
   })
 
-  revalidatePath('/dashboard/products')
+  revalidatePath('/dashboard/vendor/products')
   revalidatePath('/dashboard/overview')
 
   return { success: true, product }
@@ -102,7 +102,7 @@ export async function updateProduct(data: {
     },
   })
 
-  revalidatePath('/dashboard/products')
+  revalidatePath('/dashboard/vendor/products')
   revalidatePath('/dashboard/overview')
 
   return { success: true, product: updatedProduct }
@@ -149,7 +149,7 @@ export async function deleteProduct(productId: string, vendorId?: string) {
     },
   })
 
-  revalidatePath('/dashboard/products')
+  revalidatePath('/dashboard/vendor/products')
   revalidatePath('/dashboard/overview')
 
   return { success: true, product: deletedProduct }
@@ -180,7 +180,7 @@ export async function updateProductStock(productId: string, stock: number) {
     data: { stock },
   })
 
-  revalidatePath('/dashboard/products')
+  revalidatePath('/dashboard/vendor/products')
   revalidatePath('/dashboard/overview')
 
   return { success: true, product: updated }
@@ -200,7 +200,7 @@ export async function toggleProductActiveStatus(productId: string) {
     data: { isActive: !product.isActive },
   })
 
-  await revalidatePath('/dashboard/products')
+  await revalidatePath('/dashboard/vendor/products')
   await revalidatePath('/dashboard/overview')
   await revalidatePath('/dashboard/admin/products')
   await revalidatePath(`/dashboard/admin/vendors/${vendor.id}`)

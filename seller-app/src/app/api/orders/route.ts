@@ -209,7 +209,8 @@ export async function POST(request: Request) {
       })
 
       // 10. Invalidar cache
-      revalidatePath('/dashboard/orders')
+      revalidatePath('/dashboard/vendor/orders')
+      revalidatePath('/dashboard/admin/orders')
       revalidatePath('/dashboard/overview')
 
       // 11. Respuesta exitosa

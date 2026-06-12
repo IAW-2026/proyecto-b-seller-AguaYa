@@ -54,14 +54,16 @@ export default function MobileBottomNav({ roles, feedbackAppUrl }: { roles?: str
             })()}
           </li>
         )}
-        <li>
-          <SignOutButton>
-            <button className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-200" aria-label="Cerrar sesión">
-              <LogOut className="h-5 w-5" aria-hidden="true" />
-              Salir
-            </button>
-          </SignOutButton>
-        </li>
+        {!isAdmin && (
+          <li>
+            <SignOutButton>
+              <button className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-medium text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200" aria-label="Cerrar sesión">
+                <LogOut className="h-5 w-5" aria-hidden="true" />
+                Salir
+              </button>
+            </SignOutButton>
+          </li>
+        )}
       </ul>
     </nav>
   )

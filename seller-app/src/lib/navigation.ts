@@ -30,9 +30,11 @@ export const iconMap: Record<string, LucideIcon> = {
 /** Links del dashboard clasificados por visibilidad según el rol. */
 export const dashboardLinks: NavLinkDef[] = [
   { href: '/dashboard/admin/vendors', label: 'Vendedores', icon: 'Users', showFor: 'admin' },
-  { href: '/dashboard/overview', label: 'Resumen', icon: 'LayoutDashboard', showFor: 'seller' },
-  { href: '/dashboard/products', label: 'Productos', icon: 'Package', showFor: 'all' },
-  { href: '/dashboard/orders', label: 'Órdenes', icon: 'ShoppingCart', showFor: 'all' },
+  { href: '/dashboard/vendor/overview', label: 'Resumen', icon: 'LayoutDashboard', showFor: 'seller' },
+  { href: '/dashboard/admin/products', label: 'Productos', icon: 'Package', showFor: 'admin' },
+  { href: '/dashboard/vendor/products', label: 'Productos', icon: 'Package', showFor: 'seller' },
+  { href: '/dashboard/admin/orders', label: 'Órdenes', icon: 'ShoppingCart', showFor: 'admin' },
+  { href: '/dashboard/vendor/orders', label: 'Órdenes', icon: 'ShoppingCart', showFor: 'seller' },
   { href: '/dashboard/settings', label: 'Ajustes', icon: 'Settings', showFor: 'all' },
 ]
 

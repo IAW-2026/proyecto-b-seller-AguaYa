@@ -51,7 +51,7 @@ export async function createOrUpdateVendor(data: {
     })
 
     revalidatePath('/dashboard/overview')
-    revalidatePath('/dashboard/products')
+    revalidatePath('/dashboard/vendor/products')
 
     return vendor
   }
@@ -74,7 +74,7 @@ export async function createOrUpdateVendor(data: {
   })
 
   revalidatePath('/dashboard/overview')
-  revalidatePath('/dashboard/products')
+  revalidatePath('/dashboard/vendor/products')
 
   return vendor
 }
@@ -93,7 +93,7 @@ export async function toggleMyVendorActiveStatus() {
   })
 
   await revalidatePath('/dashboard/overview')
-  await revalidatePath('/dashboard/products')
+  await revalidatePath('/dashboard/vendor/products')
   await revalidatePath('/dashboard/settings')
   await revalidatePath('/dashboard/admin/vendors')
   await revalidatePath(`/dashboard/admin/vendors/${vendor.id}`)

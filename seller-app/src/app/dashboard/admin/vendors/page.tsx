@@ -3,7 +3,6 @@
  * Permite buscar, filtrar y paginar vendedores, y acceder al formulario de creación.
  */
 import React, { Suspense } from 'react'
-import Link from 'next/link'
 import { requireAdminPage } from '@/lib/admin-guard'
 import { getVendorsWithClerkInfoPaginated } from '@/app/actions/admin-vendor'
 import SearchBar from '@/components/ui/SearchBar'
@@ -32,15 +31,7 @@ export default async function VendorsPage(props: { searchParams: Promise<{ page?
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Vendedores</h1>
-        <Link
-          href="/dashboard/admin/vendors/new"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-slate-700"
-        >
-          Nuevo vendedor
-        </Link>
-      </div>
+      <h1 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Vendedores</h1>
 
       <div className="mb-4">
         <SearchBar placeholder="Buscar por nombre, email o CUIL/CUIT..." />

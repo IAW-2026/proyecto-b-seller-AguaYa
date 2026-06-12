@@ -12,31 +12,9 @@ import { clerkClient } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth-utils'
-import { validateVendorInput, validateVendorUpdateInput } from '@/lib/validation'
+import { validateVendorUpdateInput } from '@/lib/validation'
 import { ADMIN_PAGE_SIZE, CLERK_USERS_FETCH_LIMIT } from '@/lib/constants'
 import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
-
-/** Retorna usuarios de Clerk que aún no tienen perfil de vendedor. */
-export async function getAvailableClerkUsers(): Promise<{ id: string; name: string; email: string }[]> {
-  await requireAdmin()
-
-  const client = await clerkClient()
-  const { data: clerkUsers } = await client.users.getUserList({ limit: CLERK_USERS_FETCH_LIMIT })
-
-  const usedUserIds = (await prisma.vendor.findMany({
-    where: { deletedAt: null },
-    select: { userId: true },
-  })).map((v) => v.userId)
-
-  return clerkUsers
-    .filter((u) => !usedUserIds.includes(u.id))
-    .map((u) => ({
-      id: u.id,
-      name: [u.firstName, u.lastName].filter(Boolean).join(' ') || u.emailAddresses[0]?.emailAddress || u.id,
-      email: u.emailAddresses[0]?.emailAddress || '',
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-}
 
 /** Retorna todos los vendedores con datos de Clerk (sin paginación). */
 export async function getVendorsWithClerkInfo() {
@@ -176,30 +154,6 @@ export async function getVendorWithClerkInfo(vendorId: string) {
   } catch {
     return { ...vendor, clerkName: '', clerkEmail: '' }
   }
-}
-
-/** Crea un vendedor (admin) y asigna rol 'seller' en Clerk. */
-export async function createVendorAsAdmin(data: {
-  userId: string
-  name: string
-  address: string
-  description?: string
-  cuil?: string
-  cuit?: string
-  image?: string
-}) {
-  await requireAdmin()
-
-  const input = validateVendorInput(data)
-  const vendor = await prisma.vendor.create({ data: { ...input, userId: data.userId } })
-
-  const client = await clerkClient()
-  await client.users.updateUser(data.userId, {
-    publicMetadata: { roles: ['seller'] },
-  })
-
-  revalidatePath('/dashboard/admin/vendors')
-  return vendor
 }
 
 /** Actualiza un vendedor (admin). */

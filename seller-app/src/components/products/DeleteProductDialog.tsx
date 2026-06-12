@@ -44,7 +44,7 @@ export default function DeleteProductDialog({ productId, productName, vendorId, 
       if (disableRedirect) {
         router.refresh()
       } else {
-        router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/products')
+        router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/vendor/products')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al eliminar producto')

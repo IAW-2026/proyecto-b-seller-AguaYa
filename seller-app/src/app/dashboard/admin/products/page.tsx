@@ -7,6 +7,8 @@ import { requireAdminPage } from '@/lib/admin-guard'
 import { listAllProductsPaginated } from '@/lib/queries/products'
 import AdminProductsTable from '@/components/admin/AdminProductsTable'
 import DashboardTableLoading from '@/components/ui/DashboardTableLoading'
+import SearchBar from '@/components/ui/SearchBar'
+import AdminProductsLoading from '@/components/ui/admin-loadings/AdminProductsLoading'
 
 async function ProductsTable(props: { searchParams: Promise<{ page?: string; q?: string; isActive?: string; sortBy?: string; sortOrder?: string }> }) {
   const searchParams = await props.searchParams
@@ -30,7 +32,10 @@ export default async function AdminProductsPage(props: { searchParams: Promise<{
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Productos (global)</h1>
       </div>
-      <Suspense fallback={<DashboardTableLoading />}>
+      <div className="mb-4">
+        <SearchBar placeholder="Buscar por producto o vendedor..." />
+      </div>
+      <Suspense fallback={<AdminProductsLoading />}>
         <ProductsTable searchParams={props.searchParams} />
       </Suspense>
     </div>
