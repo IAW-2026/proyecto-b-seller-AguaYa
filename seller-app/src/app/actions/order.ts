@@ -67,7 +67,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     },
   })
 
-  revalidatePath('/dashboard/orders')
+  revalidatePath('/dashboard/vendor/orders')
   revalidatePath('/dashboard/overview')
 
   return updatedOrder

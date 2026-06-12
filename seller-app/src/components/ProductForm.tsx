@@ -81,7 +81,7 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
       if (disableRedirect) {
         router.refresh()
       } else {
-        router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/products')
+        router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/vendor/products')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar producto')

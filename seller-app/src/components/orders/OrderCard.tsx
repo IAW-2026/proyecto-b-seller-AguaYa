@@ -49,8 +49,8 @@ export default function OrderCard({ order, showConfirmButton }: { order: OrderWi
       </div>
 
       {/* Buyer + Total + Address */}
-      <div className="space-y-1 mb-3 text-xs">
-        <p>
+      <div className="space-y-1 mb-3 text-fluid-xs">
+        <p className="truncate">
           <span className="text-slate-500 dark:text-slate-400">Comprador:</span>{' '}
           <span className="font-medium text-slate-700 dark:text-slate-300">{order.buyerName || order.buyerId.slice(0, 16)}</span>
         </p>

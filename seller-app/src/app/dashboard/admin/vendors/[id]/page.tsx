@@ -11,6 +11,8 @@ import { getVendorProductsPaginated } from '@/lib/queries/vendors'
 import { getVendorOrdersByStatus } from '@/lib/queries/orders'
 import { getVendorReviewsWithStats } from '@/lib/queries/reviews'
 import VendorDetailTabs from '@/components/admin/VendorDetailTabs'
+import AdminVendorLoading from '@/components/ui/admin-loadings/AdminVendorLoading'
+
 
 async function VendorDetailContent({
   id,
@@ -122,43 +124,9 @@ export default async function VendorDetailPage({
       >
         &larr; Volver a vendedores
       </Link>
-      <Suspense fallback={<VendorDetailSkeleton />}>
+      <Suspense fallback={<AdminVendorLoading />}>
         <VendorDetailContent id={id} searchParams={sp} />
       </Suspense>
-    </div>
-  )
-}
-
-function VendorDetailSkeleton() {
-  return (
-    <div className="animate-pulse space-y-6">
-      <div className="h-8 w-64 rounded-lg bg-slate-200/70" />
-      <div className="h-4 w-48 rounded bg-slate-200/50" />
-
-      <div className="flex gap-1 rounded-xl bg-slate-100 p-1">
-        <div className="h-9 flex-1 rounded-lg bg-white" />
-        <div className="h-9 flex-1 rounded-lg bg-slate-200/50" />
-        <div className="h-9 flex-1 rounded-lg bg-slate-200/50" />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 p-6">
-          <div className="mb-4 h-5 w-44 rounded bg-slate-200/70" />
-          <div className="space-y-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-4 w-full rounded bg-slate-200/40" />
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-slate-200 p-6">
-          <div className="mb-4 h-5 w-32 rounded bg-slate-200/70" />
-          <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-4 w-full rounded bg-slate-200/40" />
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

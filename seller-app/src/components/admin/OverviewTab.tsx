@@ -45,19 +45,19 @@ export default function OverviewTab({
             <AdminVendorEditDialog vendor={vendor} />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
+        <div className="grid grid-cols-2 gap-4 text-fluid-sm">
+          <div className="min-w-0">
             <span className="text-slate-500 dark:text-slate-400">Nombre</span>
-            <p className="font-medium text-slate-900 dark:text-white">{vendor.name}</p>
+            <p className="truncate font-medium text-slate-900 dark:text-white">{vendor.name}</p>
           </div>
-          <div>
+          <div className="min-w-0">
             <span className="text-slate-500 dark:text-slate-400">Dirección</span>
-            <p className="font-medium text-slate-900 dark:text-white">{vendor.address}</p>
+            <p className="truncate font-medium text-slate-900 dark:text-white">{vendor.address}</p>
           </div>
           {vendor.description && (
             <div className="col-span-2">
               <span className="text-slate-500 dark:text-slate-400">Descripción</span>
-              <p className="font-medium text-slate-900 dark:text-white">{vendor.description}</p>
+              <p className="truncate font-medium text-slate-900 dark:text-white">{vendor.description}</p>
             </div>
           )}
           {vendor.cuil && (
@@ -134,7 +134,7 @@ export default function OverviewTab({
                     </>
                   )}
                   {review.products.length > 0 && (
-                    <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                    <p className="mt-1 truncate text-fluid-xs text-slate-400 dark:text-slate-500">
                       Productos: {review.products.join(', ')}
                     </p>
                   )}

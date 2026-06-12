@@ -75,12 +75,6 @@ export default function AdminProductsTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex-1 min-w-[200px]">
-          <SearchBar placeholder="Buscar por producto o vendedor..." />
-        </div>
-      </div>
-
       <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit dark:bg-slate-800">
         {[
           { key: '', label: 'Todos' },

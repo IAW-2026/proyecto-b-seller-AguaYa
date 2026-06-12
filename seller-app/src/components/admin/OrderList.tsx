@@ -65,11 +65,11 @@ export default function OrderList({ orders, status }: { orders: Paginated<Order>
                 {order.status}
               </span>
             </div>
-            <div className="mb-2 flex flex-wrap gap-x-1 text-xs text-slate-600 dark:text-slate-300">
+            <div className="mb-2 flex flex-wrap gap-x-1 text-fluid-xs text-slate-600 dark:text-slate-300">
               {order.items.map((item, i) => (
                 <span key={i} className="flex items-center gap-1">
                   {i > 0 && <span className="text-slate-300 dark:text-slate-600">|</span>}
-                  <span>{item.productName} x{item.quantity} — ${(item.productPrice * item.quantity).toFixed(2)}</span>
+                  <span className="truncate max-w-[200px]">{item.productName} x{item.quantity} — ${(item.productPrice * item.quantity).toFixed(2)}</span>
                 </span>
               ))}
             </div>
