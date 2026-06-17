@@ -68,17 +68,12 @@ export async function getVendorProductsPaginated(vendorId: string, page: number 
 }
 
 /**
- * Lista todos los vendedores (sin paginar) con búsqueda opcional
- * por nombre, CUIL o CUIT.
+ * Lista todos los vendedores (sin paginar) con filtro opcional por isActive.
  */
-export async function listAllVendors(q?: string) {
+export async function listAllVendors(isActive?: boolean) {
   const where: Prisma.VendorWhereInput = { deletedAt: null }
-  if (q) {
-    where.OR = [
-      { name: { contains: q, mode: 'insensitive' as const } },
-      { cuil: { contains: q, mode: 'insensitive' as const } },
-      { cuit: { contains: q, mode: 'insensitive' as const } },
-    ]
+  if (isActive !== undefined) {
+    where.isActive = isActive
   }
   return prisma.vendor.findMany({
     where,
@@ -91,16 +86,20 @@ const SORTABLE_VENDOR_COLS = ['name', 'isActive', 'createdAt'] as const
 /** Lista vendedores paginados con ordenamiento por columnas configurables. */
 export async function listAllVendorsPaginated(
   page: number = 1,
-  opts?: { limit?: number; sortBy?: string; sortOrder?: string }
+  opts?: { limit?: number; sortBy?: string; sortOrder?: string; isActive?: boolean }
 ) {
   const limit = opts?.limit ?? DEFAULT_PAGE_SIZE
+  const where: Prisma.VendorWhereInput = { deletedAt: null }
+  if (opts?.isActive !== undefined) {
+    where.isActive = opts.isActive
+  }
   let orderBy: Prisma.VendorOrderByWithRelationInput = { createdAt: 'desc' }
   if (opts?.sortBy && (SORTABLE_VENDOR_COLS as readonly string[]).includes(opts.sortBy)) {
     orderBy = { [opts.sortBy]: opts.sortOrder === 'desc' ? 'desc' : 'asc' }
   }
   return paginate<Vendor>(
     prisma.vendor,
-    { deletedAt: null },
+    where,
     { page, limit, orderBy }
   )
 }

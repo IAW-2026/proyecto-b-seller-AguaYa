@@ -109,6 +109,17 @@ export async function getVendorOrdersByDateRange(
   return result
 }
 
+/** Obtiene una orden por ID (solo si no está eliminada), con vendor e items. */
+export async function getOrderById(orderId: string) {
+  return prisma.order.findFirst({
+    where: { id: orderId, deletedAt: null },
+    include: {
+      vendor: { select: { id: true, name: true } },
+      items: { include: { product: true } },
+    },
+  })
+}
+
 /**
  * Lista todas las órdenes del sistema (admin) con paginación.
  * Soporta búsqueda por externalId, buyerName, buyerId, address y nombre de vendedor,

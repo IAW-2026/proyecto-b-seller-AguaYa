@@ -26,8 +26,8 @@ export type PaginatedResult<T> = {
  * @returns Items de la página y metadatos de paginación.
  */
 export async function paginate<T>(
-  delegate: { findMany: (args: any) => any; count: (args: any) => any },
-  where: any,
+  delegate: { findMany: (args: any) => Promise<any[]>; count: (args: any) => Promise<number> },
+  where: Record<string, unknown>,
   options: {
     page?: number
     limit?: number
