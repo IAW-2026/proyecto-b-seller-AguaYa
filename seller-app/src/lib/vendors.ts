@@ -21,6 +21,7 @@ export interface PublicVendor {
   address: string
   image: string | null
   isActive: boolean
+  clerkUserId: string
 }
 
 export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
@@ -31,6 +32,7 @@ export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
     address: vendor.address,
     image: vendor.image ?? null,
     isActive: vendor.isActive,
+    clerkUserId: vendor.userId,
   }
 }
 

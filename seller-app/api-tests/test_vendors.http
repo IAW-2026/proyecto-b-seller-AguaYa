@@ -1,6 +1,6 @@
 ### Variables
 @baseUrl = http://localhost:3000
-@apiKey = buyer-secret-key-12345
+@apiKey = vendor-secret-key-2026
 
 @vendorId = cmpvp75rp0000ugliqx0ksd22
 @vendorId2 = cmpurfqxv0000cslii6aablh3
