@@ -1,5 +1,6 @@
 ### Variables
 @baseUrl = http://localhost:3000
+@baseUrlProd = https://proyecto-b-seller-agua-ya.vercel.app/
 @apiKey = vendor-secret-key-2026
 
 @vendorId = cmpvp75rp0000ugliqx0ksd22
@@ -9,7 +10,7 @@
 ### =====================
 
 ### Test 1: GET todos los vendedores
-GET {{baseUrl}}/api/vendors
+GET {{baseUrlProd}}/api/vendors
 X-API-Key: {{apiKey}}
 
 ### Test 2: GET vendedores por IDs específicos
