@@ -79,7 +79,7 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
  * Flujo:
  *   1. Actualiza el estado de la orden local a READY
  *   2. Notifica a DeliveryApp (PUT /api/ready_orders/:id)
- *   3. Notifica a BuyerApp (PATCH /api/orders/:id/status)
+ *   3. Notifica a BuyerApp (PATCH /api/orders/:id) con { orderStatus: "READY" }
  *
  * Las notificaciones son fire-and-forget: un error externo no bloquea la confirmación local.
  */
@@ -90,16 +90,21 @@ export async function confirmOrderForDelivery(orderId: string) {
   const updatedOrder = await updateOrderStatus(orderId, 'READY')
 
   // 2. Notificar servicios externos (no bloqueante)
-  const body = {
-    orderId,
-    vendorId: vendor.id,
-    status: 'READY',
-    timestamp: new Date().toISOString(),
-  }
+  const cantBidones = updatedOrder.items.reduce((sum, item) => sum + item.quantity, 0)
 
   await Promise.allSettled([
-    notifyExternalService('delivery', `/api/ready_orders/${orderId}`, 'PUT', body),
-    notifyExternalService('buyer', `/api/orders/${orderId}/status`, 'PATCH', body),
+    notifyExternalService('delivery', '/api/ready-orders', 'POST', {
+      pedidos: [{
+        id_pedido_externo: updatedOrder.externalId,
+        id_vendedor: vendor.id,
+        cliente: updatedOrder.buyerName,
+        direccion: updatedOrder.address ?? '',
+        telefono: '',
+        cant_bidones: cantBidones,
+        zona: '',
+      }],
+    }),
+    notifyExternalService('buyer', `/api/orders/${orderId}`, 'PATCH', { orderStatus: 'READY' as const }),
   ])
 
   return updatedOrder

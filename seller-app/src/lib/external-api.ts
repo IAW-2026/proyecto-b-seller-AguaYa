@@ -22,11 +22,19 @@ export interface ServiceConfig {
   apiKey: string
 }
 
+type AuthScheme = 'header' | 'bearer'
+
+interface ServiceMapping {
+  urlEnv: string
+  keyEnv: string
+  authScheme: AuthScheme
+}
+
 const SERVICE_MAP = {
-  delivery: { urlEnv: 'DELIVERY_APP_URL', keyEnv: 'DELIVERY_API_KEY' },
-  buyer: { urlEnv: 'BUYER_APP_URL', keyEnv: 'BUYER_SERVICE_KEY' },
-  feedback: { urlEnv: 'FEEDBACK_APP_URL', keyEnv: 'FEEDBACK_API_KEY' },
-} as const
+  delivery: { urlEnv: 'DELIVERY_APP_URL', keyEnv: 'DELIVERY_API_KEY', authScheme: 'bearer' as const },
+  buyer: { urlEnv: 'BUYER_APP_URL', keyEnv: 'BUYER_SERVICE_KEY', authScheme: 'header' as const },
+  feedback: { urlEnv: 'FEEDBACK_APP_URL', keyEnv: 'FEEDBACK_API_KEY', authScheme: 'header' as const },
+} as const satisfies Record<string, ServiceMapping>
 
 /**
  * Obtiene la configuración (URL base + API key) para un servicio externo.
@@ -65,7 +73,12 @@ export async function notifyExternalService(
   const url = `${config.baseUrl}${path}`
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (config.apiKey) {
-    headers['X-API-Key'] = config.apiKey
+    const authScheme = SERVICE_MAP[service].authScheme
+    if (authScheme === 'bearer') {
+      headers['Authorization'] = `Bearer ${config.apiKey}`
+    } else {
+      headers['X-API-Key'] = config.apiKey
+    }
   }
 
   try {
