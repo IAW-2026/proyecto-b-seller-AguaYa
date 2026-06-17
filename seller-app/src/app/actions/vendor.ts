@@ -69,8 +69,14 @@ export async function createOrUpdateVendor(data: {
   })
 
   const client = await clerkClient()
+  const user = await client.users.getUser(userId)
+  const existingRoles = (user.publicMetadata?.roles as string[]) || []
+  const mergedRoles = existingRoles.includes('seller')
+    ? existingRoles
+    : [...existingRoles, 'seller']
+
   await client.users.updateUser(userId, {
-    publicMetadata: { roles: ['seller'] },
+    publicMetadata: { roles: mergedRoles },
   })
 
   revalidatePath('/dashboard/overview')
