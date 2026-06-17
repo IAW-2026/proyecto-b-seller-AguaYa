@@ -87,7 +87,7 @@ export async function getVendorsWithClerkInfoPaginated(
     return { items, total: dbResult.total, pageCount: dbResult.pageCount }
   }
 
-  const vendors = await listAllVendors(filters.q)
+  const vendors = await listAllVendors()
 
   const { data: clerkUsers } = await client.users.getUserList({ limit: CLERK_USERS_FETCH_LIMIT })
   const clerkMap = new Map(clerkUsers.map((u) => [u.id, u]))
