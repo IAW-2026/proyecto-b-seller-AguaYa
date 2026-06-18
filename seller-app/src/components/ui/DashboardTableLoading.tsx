@@ -1,7 +1,7 @@
 export default function DashboardTableLoading() {
   return (
     <div className="space-y-4 animate-pulse">
-      <div className="overflow-hidden rounded-xl border border-white/30 bg-white/20 shadow-lg shadow-black/5 backdrop-blur-xl">
+      <div className="overflow-hidden rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 shadow-lg shadow-black/5 backdrop-blur-xl">
         <div className="space-y-0.5">
           <div className="flex gap-4 bg-white/10 px-4 py-3">
             <div className="h-4 w-1/4 rounded bg-white/40" />

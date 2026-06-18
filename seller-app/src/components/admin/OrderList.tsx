@@ -6,6 +6,7 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { toast } from 'sonner'
 import { ShoppingBag } from 'lucide-react'
 import type { Order, Paginated } from '@/lib/types'
 import { updateOrderStatusAsAdmin } from '@/app/actions/admin-order'
@@ -28,9 +29,16 @@ export default function OrderList({ orders, status }: { orders: Paginated<Order>
 
   const handleConfirm = async (orderId: string) => {
     setUpdating(orderId)
-    await updateOrderStatusAsAdmin(orderId, 'READY')
-    setUpdating(null)
-    router.refresh()
+    try {
+      await updateOrderStatusAsAdmin(orderId, 'READY')
+      toast.success('Orden confirmada como lista para entregar')
+      router.refresh()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error al confirmar orden'
+      toast.error(msg)
+    } finally {
+      setUpdating(null)
+    }
   }
 
   if (orders.items.length === 0) {
@@ -46,7 +54,7 @@ export default function OrderList({ orders, status }: { orders: Paginated<Order>
     <div>
       <div className="space-y-3">
         {orders.items.map((order) => (
-          <div key={order.id} className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
+          <div key={order.id} className="rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-3 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
             <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-slate-900 dark:text-white">#{order.externalId}</span>

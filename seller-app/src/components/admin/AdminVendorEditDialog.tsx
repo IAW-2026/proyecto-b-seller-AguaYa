@@ -6,6 +6,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { updateVendorAsAdmin } from '@/app/actions/admin-vendor'
 import ImageUpload from '@/components/ui/ImageUpload'
 import { formatCuilCuit } from '@/lib/format'
@@ -62,9 +63,12 @@ export default function AdminVendorEditDialog({
         image: form.image || undefined,
       })
       setOpen(false)
+      toast.success('Vendedor actualizado correctamente')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al guardar')
+      const msg = err instanceof Error ? err.message : 'Error al guardar'
+      setError(msg)
+      toast.error(msg)
       setSubmitting(false)
     }
   }
@@ -83,7 +87,7 @@ export default function AdminVendorEditDialog({
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-10"
         >
           <div
-            className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
+            className="w-full max-w-lg rounded-xl bg-gradient-to-br from-white/50 to-slate-100/50 p-6 shadow-xl shadow-black/5 backdrop-blur-xl border border-white/30 dark:from-slate-900/70 dark:to-slate-800/70 dark:border-slate-700/40"
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-vendor-title"

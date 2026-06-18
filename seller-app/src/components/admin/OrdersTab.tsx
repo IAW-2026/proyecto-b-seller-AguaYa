@@ -20,12 +20,12 @@ export default function OrdersTab({
 
   return (
     <div>
-      <div className="mb-4 flex gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
+      <div className="mb-4 flex gap-1 rounded-lg bg-gradient-to-br from-slate-100/70 to-slate-200/50 p-1 dark:from-slate-800/60 dark:to-slate-800/40">
         <button
           onClick={() => setActiveSubTab('paid')}
           className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
             activeSubTab === 'paid'
-              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+              ? 'bg-gradient-to-br from-white/60 to-slate-100/60 text-slate-900 shadow-sm backdrop-blur-sm dark:from-slate-700 dark:to-slate-600 dark:text-white'
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
@@ -35,7 +35,7 @@ export default function OrdersTab({
           onClick={() => setActiveSubTab('ready')}
           className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${
             activeSubTab === 'ready'
-              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+              ? 'bg-gradient-to-br from-white/60 to-slate-100/60 text-slate-900 shadow-sm backdrop-blur-sm dark:from-slate-700 dark:to-slate-600 dark:text-white'
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >

@@ -6,7 +6,7 @@
 export default function DashboardTableLoading() {
   return (
     <div className="space-y-4 animate-pulse">
-      <div className="flex gap-1 rounded-xl bg-white/10 p-1 w-fit">
+      <div className="flex gap-1 rounded-xl bg-gradient-to-br from-slate-100/70 to-slate-200/50 p-1 w-fit dark:from-slate-800/60 dark:to-slate-800/40">
         <div className="rounded-lg bg-white/30 px-4 py-2">
           <div className="h-4 w-15 rounded bg-white/40" />
         </div>
@@ -19,7 +19,7 @@ export default function DashboardTableLoading() {
       </div>
 
       
-      <div className="overflow-hidden rounded-xl border border-slate-200/60">
+      <div className="overflow-hidden rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 shadow-lg shadow-black/5 backdrop-blur-xl">
         <div className="space-y-0.5">
           <div className="flex gap-4 bg-slate-100/50 px-4 py-3">
             <div className="h-4 w-1/4 rounded bg-slate-200/70" />

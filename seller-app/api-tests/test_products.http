@@ -2,7 +2,7 @@
 @baseUrl = http://localhost:3000
 @apiKey = vendor-secret-key-2026
 
-@vendorId = cmpc2gjz90000ikli1cg4gmsj
+@vendorId = cmpvxr5er000004l51nrtqen5
 @productId = cmp2rw7020001i8lienqogqky
 
 @vendorId2 = cmp21j4xu0001zwli69agxgle

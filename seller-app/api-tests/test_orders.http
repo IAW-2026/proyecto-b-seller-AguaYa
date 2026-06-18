@@ -26,13 +26,13 @@ Content-Type: application/json
 
 {
   "externalId": "buyer-order-{{$timestamp}}",
-  "vendorId": "cmpc2gjz90000ikli1cg4gmsj",
-  "buyerId": "hjdkas",
-  "address": "avenida siempre viva 123 depto 12",
+  "vendorId": "cmpvxr5er000004l51nrtqen5",
+  "buyerId": "Amargo Marolio",
+  "address": "La vuelta de la esquina 123",
   "items": [
-    {"productId": "cmpvrwuot0000ssliml3ldvqg", "quantity": 1}
+    {"productId": "cmpvxs2i3000004l757yjdyph", "quantity": 1}
   ],
-  "total": 12
+  "total": 110
 }
 
 ### Test 5-2: POST crear orden exitosa con muchos productos

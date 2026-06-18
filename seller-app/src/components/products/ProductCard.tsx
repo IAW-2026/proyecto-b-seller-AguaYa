@@ -11,7 +11,7 @@ import ProductFormDialog from './ProductFormDialog'
 /** Renderiza la tarjeta de un producto con imagen, precio, stock y botones de edición. */
 export default function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="flex flex-col rounded-xl border border-slate-200/80 bg-white/80 dark:border-slate-700/80 dark:bg-slate-900/80 p-3 shadow-sm">
+    <div className="flex flex-col rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-3 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
       {product.image ? (
         <div className="mb-3 aspect-[4/3] overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
           {/* eslint-disable-next-line @next/next/no-img-element */}

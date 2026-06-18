@@ -22,7 +22,7 @@ export default function MobileBottomNav({ roles, feedbackAppUrl }: { roles?: str
   const visibleLinks = dashboardLinks.filter((l) => l.showFor === 'all' || (l.showFor === 'admin') === isAdmin)
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 xl:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 xl:hidden">
       <ul className="flex justify-around py-2">
         {visibleLinks.map((l) => {
           const LinkIcon = iconMap[l.icon]

@@ -6,6 +6,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { toggleVendorActiveStatus } from '@/app/actions/admin-vendor'
 import { toggleMyVendorActiveStatus } from '@/app/actions/vendor'
 import ToggleStatusButton from '@/components/ui/ToggleStatusButton'
@@ -28,6 +29,7 @@ export default function ToggleVendorButton({ vendorId, isActive, vendorName, rol
     } else {
       await toggleMyVendorActiveStatus()
     }
+    toast.success(isActive ? 'Vendedor desactivado correctamente' : 'Vendedor activado correctamente')
     router.refresh()
   }
 

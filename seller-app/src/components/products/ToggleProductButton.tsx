@@ -6,6 +6,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { toggleProductActiveStatus } from '@/app/actions/product'
 import ToggleStatusButton from '@/components/ui/ToggleStatusButton'
 
@@ -22,6 +23,7 @@ export default function ToggleProductButton({ productId, isActive, productName, 
 
   const handleToggle = async () => {
     await toggleProductActiveStatus(productId)
+    toast.success(isActive ? 'Producto desactivado correctamente' : 'Producto activado correctamente')
     router.refresh()
   }
 

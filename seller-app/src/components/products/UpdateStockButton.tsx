@@ -7,6 +7,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { updateProductStock } from '@/app/actions/product'
 import { Pencil } from 'lucide-react'
 
@@ -49,9 +50,11 @@ export default function UpdateStockButton({
       await updateProductStock(productId, value)
       setSaving(false)
       setIsOpen(false)
+      toast.success('Stock actualizado correctamente')
       router.refresh()
     } catch {
       setSaving(false)
+      toast.error('Error al actualizar el stock')
     }
   }
 

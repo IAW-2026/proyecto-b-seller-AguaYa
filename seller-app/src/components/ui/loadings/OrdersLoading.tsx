@@ -1,13 +1,13 @@
 export default function OrdersLoading() {
   return (
     <div className="space-y-6 animate-pulse">
-      <div className="h-5 rounded-xl border border-white/30 bg-white/20 p-6 shadow-lg shadow-black/5 backdrop-blur-xl">
+      <div className="rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-6 shadow-lg shadow-black/5 backdrop-blur-xl">
         <div className="h-2 w-15 rounded bg-white/40" />
       </div>
 
-      <div className="h-10 w-full rounded-xl border border-white/30 bg-white/20 shadow-lg shadow-black/5 backdrop-blur-xl" />
+      <div className="h-10 w-full rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 shadow-lg shadow-black/5 backdrop-blur-xl" />
 
-      <div className="flex gap-1 rounded-xl bg-white/10 p-1 w-fit">
+      <div className="flex gap-1 rounded-xl bg-gradient-to-br from-slate-100/70 to-slate-200/50 p-1 w-fit dark:from-slate-800/60 dark:to-slate-800/40">
         <div className="rounded-lg bg-white/30 px-4 py-2">
           <div className="h-4 w-28 rounded bg-white/40" />
         </div>
@@ -18,7 +18,7 @@ export default function OrdersLoading() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="flex flex-col rounded-xl border border-white/30 bg-white/20 p-4 shadow-lg shadow-black/5 backdrop-blur-xl">
+          <div key={i} className="flex flex-col rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-4 shadow-lg shadow-black/5 backdrop-blur-xl">
             <div className="mb-3 flex items-start justify-between gap-2">
               <div className="min-w-0 space-y-1">
                 <div className="h-4 w-28 rounded bg-white/40" />

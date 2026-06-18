@@ -13,7 +13,7 @@ export default function DashboardTableLoading() {
             <div className="h-8 w-20 rounded-lg bg-slate-200/50" />
         </div>
       
-      <div className="overflow-hidden rounded-xl border border-slate-200/60">
+      <div className="overflow-hidden rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 shadow-lg shadow-black/5 backdrop-blur-xl">
         <div className="space-y-0.5">
           <div className="flex gap-4 bg-slate-100/50 px-4 py-3">
             <div className="h-4 w-1/4 rounded bg-slate-200/70" />

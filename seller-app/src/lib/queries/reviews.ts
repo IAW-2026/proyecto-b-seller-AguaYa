@@ -57,7 +57,7 @@ export async function getVendorReviewsWithStats(userId: string): Promise<ReviewS
     const data: {
       promedio: number
       total: number
-      ultimasResenas: { id_pedido: string; estrellas: number; descripcion?: string; fecha: string }[]
+      ultimasResenas: { id_pedido: string; estrellas: number; comentario?: string; fecha: string }[]
     } = await res.json()
 
     console.warn(`[reviews] Respuesta recibida — promedio: ${data.promedio}, total: ${data.total}, reseñas: ${data.ultimasResenas?.length ?? 0}`)
@@ -76,7 +76,7 @@ export async function getVendorReviewsWithStats(userId: string): Promise<ReviewS
     const reviews: Review[] = data.ultimasResenas.map((r) => ({
       orderId: r.id_pedido,
       rating: r.estrellas,
-      description: r.descripcion,
+      description: r.comentario,
       createdAt: r.fecha,
       products: productMap.get(r.id_pedido) ?? [],
     }))

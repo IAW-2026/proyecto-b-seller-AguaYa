@@ -22,7 +22,7 @@ async function VendorSettingsContent() {
 
   return (
     <>
-      <div className="flex items-center gap-5 rounded-xl border border-slate-200/80 bg-white/80 p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80 xl:hidden">
+      <div className="flex items-center gap-5 rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-5 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 xl:hidden">
         {vendor.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -40,7 +40,7 @@ async function VendorSettingsContent() {
           {!isAdmin && <p className="truncate text-fluid-sm text-slate-500 dark:text-slate-400">{vendor.address}</p>}
         </div>
       </div>
-      <div className="bg-white rounded-lg border border-gray-200 p-6 dark:bg-slate-900 dark:border-slate-700">
+      <div className="rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-6 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
         <VendorForm initialData={{
           name: vendor.name,
           address: vendor.address,
@@ -52,7 +52,7 @@ async function VendorSettingsContent() {
       </div>
 
       {/* Theme toggle — solo visible en mobile/tablet */}
-      <div className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-white/80 p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80 xl:hidden">
+      <div className="flex items-center justify-between rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-5 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 xl:hidden">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
             <Moon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -66,7 +66,7 @@ async function VendorSettingsContent() {
       </div>
 
       {/* Logout — solo visible en mobile/tablet */}
-      <div className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-white/80 p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80 xl:hidden">
+      <div className="flex items-center justify-between rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-5 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 xl:hidden">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-red-100 p-2 dark:bg-red-900/50">
             <LogOut className="h-5 w-5 text-red-600 dark:text-red-400" />

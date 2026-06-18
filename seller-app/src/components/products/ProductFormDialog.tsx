@@ -38,7 +38,7 @@ export default function ProductFormDialog({ children, mode = 'create', productId
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-10"
         >
           <div
-            className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
+            className="w-full max-w-lg rounded-xl bg-gradient-to-br from-white/50 to-slate-100/50 p-6 shadow-xl shadow-black/5 backdrop-blur-xl border border-white/30 dark:from-slate-900/70 dark:to-slate-800/70 dark:border-slate-700/40"
             role="dialog"
             aria-modal="true"
             aria-labelledby="product-form-title"

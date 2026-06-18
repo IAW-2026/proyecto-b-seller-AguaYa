@@ -47,7 +47,7 @@ export default function OrdersChart({ vendorId }: { vendorId: string }) {
   }
 
   return (
-    <div className="rounded-xl border border-slate-200/80 bg-white/80 dark:border-slate-700/80 dark:bg-slate-900/80">
+    <div className="rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
       <button
         type="button"
         onClick={handleToggle}

@@ -7,6 +7,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { deleteProduct } from '@/app/actions/product'
 import { deleteProductAsAdmin } from '@/app/actions/admin-product'
 import Button from '@/components/ui/Button'
@@ -41,13 +42,16 @@ export default function DeleteProductDialog({ productId, productName, vendorId, 
         await deleteProduct(productId)
       }
       setOpen(false)
+      toast.success('Producto eliminado correctamente')
       if (disableRedirect) {
         router.refresh()
       } else {
         router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/vendor/products')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al eliminar producto')
+      const msg = err instanceof Error ? err.message : 'Error al eliminar producto'
+      setError(msg)
+      toast.error(msg)
       setSubmitting(false)
     }
   }
@@ -64,7 +68,7 @@ export default function DeleteProductDialog({ productId, productName, vendorId, 
           role="presentation"
         >
           <div
-            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
+            className="w-full max-w-md rounded-xl bg-gradient-to-br from-white/50 to-slate-100/50 p-6 shadow-xl shadow-black/5 backdrop-blur-xl border border-white/30 dark:from-slate-900/70 dark:to-slate-800/70 dark:border-slate-700/40"
             role="dialog"
             aria-modal="true"
             aria-labelledby={`delete-product-title-${productId}`}

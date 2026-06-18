@@ -7,6 +7,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { createOrUpdateVendor } from '@/app/actions/vendor'
 import Button from '@/components/ui/Button'
 import ImageUpload from '@/components/ui/ImageUpload'
@@ -55,34 +56,27 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
 
   const handleConfirm = async () => {
     setConfirmOpen(false)
-    setError('')
-    setLoading(true)
-
-    try {
-      const payload = validateVendorInput(formData)
-
-      await createOrUpdateVendor(payload)
       setError('')
-      setLoading(false)
+      setLoading(true)
 
-      if (typeof window !== 'undefined' && 'Notification' in window) {
-        if (Notification.permission === 'granted') {
-          new Notification('AguaYa', { body: 'Cambios guardados exitosamente.', icon: '/icon.svg' })
-        } else if (Notification.permission !== 'denied') {
-          const permission = await Notification.requestPermission()
-          if (permission === 'granted') {
-            new Notification('AguaYa', { body: 'Cambios guardados exitosamente.', icon: '/icon.svg' })
-          }
+      try {
+        const payload = validateVendorInput(formData)
+
+        await createOrUpdateVendor(payload)
+        setError('')
+        setLoading(false)
+
+        toast.success('Cambios guardados exitosamente')
+
+        if (redirectTo) {
+          router.push(redirectTo)
         }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Error al guardar'
+        setError(msg)
+        toast.error(msg)
+        setLoading(false)
       }
-
-      if (redirectTo) {
-        router.push(redirectTo)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al guardar')
-      setLoading(false)
-    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -195,7 +189,7 @@ export default function VendorForm({ initialData, redirectTo, simple }: VendorFo
           role="presentation"
         >
           <div
-            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
+            className="w-full max-w-md rounded-xl bg-gradient-to-br from-white/50 to-slate-100/50 p-6 shadow-xl shadow-black/5 backdrop-blur-xl border border-white/30 dark:from-slate-900/70 dark:to-slate-800/70 dark:border-slate-700/40"
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-vendor-title"

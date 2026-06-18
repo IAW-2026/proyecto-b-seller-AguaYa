@@ -30,7 +30,7 @@ export default async function SetupVendorPage() {
         <p className="mt-3 text-base leading-7 text-slate-600 dark:text-slate-400">Completá los datos principales de tu negocio para comenzar a vender desde el panel de AguaYa.</p>
       </div>
 
-      <div className="mt-8 rounded-[1.75rem] border border-slate-200/80 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/80 sm:p-8">
+      <div className="mt-8 rounded-[1.75rem] border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-6 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 sm:p-8">
         <VendorForm redirectTo="/dashboard/overview" />
       </div>
     </div>

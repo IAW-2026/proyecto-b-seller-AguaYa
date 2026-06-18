@@ -7,6 +7,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { createProduct, updateProduct } from '@/app/actions/product'
 import { updateProductAsAdmin } from '@/app/actions/admin-product'
 import Button from './ui/Button'
@@ -77,6 +78,7 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
       }
 
       setLoading(false)
+      toast.success(mode === 'edit' ? 'Producto actualizado correctamente' : 'Producto creado correctamente')
       onSuccess?.()
       if (disableRedirect) {
         router.refresh()
@@ -84,7 +86,9 @@ export default function ProductForm({ mode = 'create', productId, initialData, o
         router.push(vendorId ? `/dashboard/admin/vendors/${vendorId}` : '/dashboard/vendor/products')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al guardar producto')
+      const msg = err instanceof Error ? err.message : 'Error al guardar producto'
+      setError(msg)
+      toast.error(msg)
       setLoading(false)
     }
   }

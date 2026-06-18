@@ -6,6 +6,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { deleteVendorAsAdmin } from '@/app/actions/admin-vendor'
 
 /** Botón con diálogo de confirmación para eliminar un vendedor. */
@@ -21,9 +22,12 @@ export default function DeleteVendorButton({ vendorId, vendorName }: { vendorId:
     try {
       await deleteVendorAsAdmin(vendorId)
       setOpen(false)
+      toast.success('Vendedor desactivado correctamente')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al eliminar vendedor')
+      const msg = err instanceof Error ? err.message : 'Error al eliminar vendedor'
+      setError(msg)
+      toast.error(msg)
       setSubmitting(false)
     }
   }
@@ -40,7 +44,7 @@ export default function DeleteVendorButton({ vendorId, vendorName }: { vendorId:
           role="presentation"
         >
           <div
-            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:border dark:border-slate-700"
+            className="w-full max-w-md rounded-xl bg-gradient-to-br from-white/50 to-slate-100/50 p-6 shadow-xl shadow-black/5 backdrop-blur-xl border border-white/30 dark:from-slate-900/70 dark:to-slate-800/70 dark:border-slate-700/40"
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-vendor-title"

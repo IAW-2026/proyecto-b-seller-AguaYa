@@ -25,7 +25,7 @@ export default function OrderCard({ order, showConfirmButton }: { order: OrderWi
   const StatusIcon = config.icon
 
   return (
-    <div className="flex flex-col rounded-xl border border-slate-200/80 bg-white/80 p-4 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80">
+    <div className="flex flex-col rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-4 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
       {/* Header: ID + Status */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="min-w-0">

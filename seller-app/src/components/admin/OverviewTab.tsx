@@ -37,7 +37,7 @@ export default function OverviewTab({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+      <div className="rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-6 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Información del vendedor</h3>
           <div className="flex items-center gap-2">
@@ -88,7 +88,7 @@ export default function OverviewTab({
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+      <div className="rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-6 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Reseñas</h3>
           {totalReviews > 0 && (
@@ -106,7 +106,7 @@ export default function OverviewTab({
             {reviews.map((review) => {
               const isExpanded = expandedReviews.has(review.orderId)
               return (
-                <div key={review.orderId} className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-600 dark:bg-slate-700/50">
+                <div key={review.orderId} className="rounded-xl border border-white/20 bg-gradient-to-br from-white/20 to-slate-100/20 p-4 backdrop-blur-md dark:border-slate-700/30 dark:from-slate-800/30 dark:to-slate-800/20">
                   <div className="mb-1 flex items-center justify-between">
                     <span className="font-medium text-slate-900 dark:text-white">Orden {review.orderId.slice(0, 8)}</span>
                     <span className="text-sm text-slate-400 dark:text-slate-500">{new Date(review.createdAt).toLocaleDateString()}</span>

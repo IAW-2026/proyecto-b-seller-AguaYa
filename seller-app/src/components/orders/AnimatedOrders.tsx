@@ -14,7 +14,7 @@ type Order = {
 
 function OrderCard({ order }: { order: Order }) {
   return (
-    <div className="rounded-xl border border-white/20 bg-white/20 p-4 shadow-sm backdrop-blur-md dark:border-slate-700/30 dark:bg-slate-900/40">
+    <div className="rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-4 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
       <div className="flex items-center justify-between gap-2 min-w-0">
         <span className="truncate text-fluid-sm font-semibold text-slate-900 dark:text-slate-100">
           {order.buyerName || `Orden ${order.id.slice(0, 8)}`}
@@ -49,13 +49,11 @@ export default function AnimatedOrders({ orders }: { orders: Order[] }) {
   }
 
   return (
-    <div className="flex flex-col justify-center h-full">
-      <div className="overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md dark:border-slate-700/30 dark:bg-slate-800/20" style={{ height: '340px' }}>
-        <div className="animate-scroll-orders space-y-3 p-3">
-          {[...orders, ...orders].map((order, i) => (
-            <OrderCard key={`${order.id}-${i}`} order={order} />
-          ))}
-        </div>
+    <div className="overflow-hidden" style={{ height: '340px' }}>
+      <div className="animate-scroll-orders space-y-3">
+        {[...orders, ...orders].map((order, i) => (
+          <OrderCard key={`${order.id}-${i}`} order={order} />
+        ))}
       </div>
 
       <style>{`

@@ -75,7 +75,7 @@ export default function AdminProductsTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit dark:bg-slate-800">
+      <div className="flex gap-1 bg-gradient-to-br from-slate-100/70 to-slate-200/50 p-1 rounded-xl w-fit dark:from-slate-800/60 dark:to-slate-800/40">
         {[
           { key: '', label: 'Todos' },
           { key: 'true', label: 'Activos' },
@@ -89,7 +89,7 @@ export default function AdminProductsTable({
               onClick={() => pushParams({ isActive: opt.key })}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 active
-                  ? 'bg-white text-gray-900 shadow-sm dark:bg-slate-900 dark:text-white'
+                  ? 'bg-gradient-to-br from-white/60 to-slate-100/60 text-gray-900 shadow-sm backdrop-blur-sm dark:from-slate-700 dark:to-slate-600 dark:text-white'
                   : 'text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white'
               }`}
             >
@@ -99,9 +99,9 @@ export default function AdminProductsTable({
         })}
       </div>
 
-      <div className="overflow-x-auto overflow-y-auto max-h-[70vh] rounded-xl border border-slate-200 dark:border-slate-700">
+      <div className="overflow-x-auto overflow-y-auto max-h-[70vh] rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+          <thead className="bg-gradient-to-r from-slate-100/70 to-slate-200/50 text-left text-slate-500 dark:from-slate-800/50 dark:to-slate-800/30 dark:text-slate-400">
             <tr>
               <th onClick={() => handleSort('name')} className={`${thClass} ${sortBy === 'name' ? activeSortClass : ''}`}>
                 Producto<SortIcon col="name" sortBy={sortBy} sortOrder={sortOrder} />

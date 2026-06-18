@@ -35,9 +35,9 @@ export default function ProductsTab({ vendorId, products }: { vendorId: string; 
           <p>No hay productos.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="overflow-hidden rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+            <thead className="bg-gradient-to-r from-slate-100/70 to-slate-200/50 text-left text-slate-500 dark:from-slate-800/50 dark:to-slate-800/30 dark:text-slate-400">
               <tr>
                 <th className="px-4 py-3 font-medium">Nombre</th>
                 <th className="px-4 py-3 font-medium">Precio</th>

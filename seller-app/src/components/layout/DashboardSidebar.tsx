@@ -30,7 +30,7 @@ export default function DashboardSidebar({
   const Icon = iconMap[feedbackLink.icon]
 
   return (
-    <aside className="hidden w-72 shrink-0 overflow-y-auto border-r border-slate-200/80 bg-white/75 px-4 py-6 backdrop-blur dark:border-slate-800 dark:bg-slate-950/75 xl:block">
+    <aside className="hidden w-72 shrink-0 overflow-y-auto border-r border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 px-4 py-6 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 xl:block">
       <div className="mb-6 rounded-2xl bg-slate-900 px-4 py-5 text-white shadow-sm">
         <p className="text-xs uppercase tracking-[0.24em] text-sky-200">AguaYa</p>
         <h2 className="mt-2 text-xl font-semibold">Panel de Control</h2>
