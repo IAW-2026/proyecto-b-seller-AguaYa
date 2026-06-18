@@ -37,7 +37,7 @@ async function VendorDetailContent({
   ])
 
   try {
-    reviewStats = await getVendorReviewsWithStats(vendor.userId)
+    reviewStats = await getVendorReviewsWithStats(vendor.id)
   } catch {
     console.warn('[VendorDetail] Error al cargar reseñas desde FeedbackApp')
   }

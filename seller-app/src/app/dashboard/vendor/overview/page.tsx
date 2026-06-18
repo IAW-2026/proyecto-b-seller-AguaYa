@@ -16,12 +16,7 @@ async function OverviewContent() {
     return null
   }
 
-  const [overview, reviewStats] = await Promise.all([
-    getVendorOverview(userId),
-    getVendorReviewsWithStats(userId),
-  ])
-  const reviews = reviewStats.reviews
-
+  const overview = await getVendorOverview(userId)
   if (!overview) {
     return (
       <div className="max-w-2xl space-y-3">
@@ -31,6 +26,9 @@ async function OverviewContent() {
       </div>
     )
   }
+
+  const reviewStats = await getVendorReviewsWithStats(overview.id)
+  const reviews = reviewStats.reviews
 
   return (
     <div className="flex flex-col gap-6 xl:gap-8 xl:h-full">

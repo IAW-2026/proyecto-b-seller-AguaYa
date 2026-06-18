@@ -35,7 +35,7 @@ export async function getVendorReviewsWithStats(userId: string): Promise<ReviewS
   if (!config) return { promedio: 0, total: 0, reviews: [] }
 
   try {
-    const url = `${config.baseUrl}/api/reviews/${userId}`
+    const url = `${config.baseUrl}/api/feedback/reviews/${userId}`
     const res = await fetch(url, {
       headers: config.apiKey ? { 'X-API-Key': config.apiKey } : {},
       signal: AbortSignal.timeout(5000),
