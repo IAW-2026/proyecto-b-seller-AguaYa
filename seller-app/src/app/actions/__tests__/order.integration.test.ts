@@ -69,7 +69,10 @@ beforeEach(() => {
     address: 'Calle 123',
     createdAt: new Date('2026-06-01'),
     deletedAt: null,
-    items: [],
+    items: [
+      { id: 'item-1', quantity: 1, productId: 'p-1', product: { id: 'p-1' } },
+      { id: 'item-2', quantity: 2, productId: 'p-2', product: { id: 'p-2' } },
+    ],
   })
   mockUpdate.mockResolvedValue({
     id: 'order-1',
@@ -82,7 +85,10 @@ beforeEach(() => {
     address: 'Calle 123',
     createdAt: new Date('2026-06-01'),
     deletedAt: null,
-    items: [],
+    items: [
+      { id: 'item-1', quantity: 1, productId: 'p-1', product: { id: 'p-1' } },
+      { id: 'item-2', quantity: 2, productId: 'p-2', product: { id: 'p-2' } },
+    ],
   })
 })
 
@@ -112,44 +118,58 @@ describe('confirmOrderForDelivery (integración)', () => {
     const result = await confirmOrderForDelivery('order-1')
 
     // Verificar que la orden se actualizó localmente
-    expect(result.status).toBe('READY')
+    expect(result.order.status).toBe('READY')
 
-    // Delivery recibió PUT
+    // Delivery recibió POST
     expect(delivery.requests).toHaveLength(1)
     expect(delivery.requests[0]).toMatchObject({
-      method: 'PUT',
-      url: '/api/ready_orders/order-1',
-      body: { orderId: 'order-1', vendorId: 'vendor-1', status: 'READY' },
+      method: 'POST',
+      url: '/api/ready-orders',
+      body: {
+        pedidos: [{
+          id_pedido_externo: expect.any(String),
+          id_vendedor: 'vendor-1',
+          cliente: expect.any(String),
+          direccion: expect.any(String),
+          telefono: '',
+          cant_bidones: 3,
+          zona: '',
+        }],
+      },
     })
-    expect(delivery.requests[0].headers['x-api-key']).toBe('delivery-key')
+    expect(delivery.requests[0].headers['authorization']).toBe('Bearer delivery-key')
 
     // Buyer recibió PATCH
     expect(buyer.requests).toHaveLength(1)
     expect(buyer.requests[0]).toMatchObject({
       method: 'PATCH',
-      url: '/api/orders/order-1/status',
-      body: { orderId: 'order-1', vendorId: 'vendor-1', status: 'READY' },
+      url: '/api/orders/order-1',
+      body: { orderStatus: 'READY' },
     })
     expect(buyer.requests[0].headers['x-api-key']).toBe('buyer-key')
   })
 
-  it('incluye timestamp ISO en el body de ambos servicios', async () => {
+  it('incluye los campos requeridos por DeliveryApp en el body', async () => {
     const delivery = await createEchoServer()
-    const buyer = await createEchoServer()
-    servers.push(delivery, buyer)
+    servers.push(delivery)
 
     process.env.DELIVERY_APP_URL = `http://localhost:${delivery.port}`
     process.env.DELIVERY_API_KEY = 'key'
-    process.env.BUYER_APP_URL = `http://localhost:${buyer.port}`
-    process.env.BUYER_SERVICE_KEY = 'key'
 
     const { confirmOrderForDelivery } = await importOrderModule()
     await confirmOrderForDelivery('order-1')
 
-    const ts1 = delivery.requests[0].body.timestamp as string
-    const ts2 = buyer.requests[0].body.timestamp as string
-    expect(new Date(ts1).toISOString()).toBe(ts1)
-    expect(new Date(ts2).toISOString()).toBe(ts2)
+    const body = delivery.requests[0].body
+    expect(body.pedidos).toHaveLength(1)
+    expect(body.pedidos[0]).toMatchObject({
+      id_pedido_externo: expect.any(String),
+      id_vendedor: expect.any(String),
+      cliente: expect.any(String),
+      direccion: expect.any(String),
+      telefono: '',
+      cant_bidones: expect.any(Number),
+      zona: '',
+    })
   })
 
   it('no bloquea si un servicio externo no está disponible (fire-and-forget)', async () => {
@@ -167,7 +187,7 @@ describe('confirmOrderForDelivery (integración)', () => {
     const result = await confirmOrderForDelivery('order-1')
 
     // La orden se actualizó igual
-    expect(result.status).toBe('READY')
+    expect(result.order.status).toBe('READY')
 
     // Buyer sí recibió el request
     expect(buyer.requests).toHaveLength(1)

@@ -92,7 +92,7 @@ export async function confirmOrderForDelivery(orderId: string) {
   // 2. Notificar servicios externos (no bloqueante)
   const cantBidones = updatedOrder.items.reduce((sum, item) => sum + item.quantity, 0)
 
-  await Promise.allSettled([
+  const results = await Promise.allSettled([
     notifyExternalService('delivery', '/api/ready-orders', 'POST', {
       pedidos: [{
         id_pedido_externo: updatedOrder.externalId,
@@ -107,7 +107,15 @@ export async function confirmOrderForDelivery(orderId: string) {
     notifyExternalService('buyer', `/api/orders/${orderId}`, 'PATCH', { orderStatus: 'READY' as const }),
   ])
 
-  return updatedOrder
+  const deliveryResult = results[0].status === 'fulfilled'
+    ? results[0].value
+    : { success: false, error: results[0].reason?.message ?? 'Error desconocido' }
+
+  const buyerResult = results[1].status === 'fulfilled'
+    ? results[1].value
+    : { success: false, error: results[1].reason?.message ?? 'Error desconocido' }
+
+  return { order: updatedOrder, notifications: { delivery: deliveryResult, buyer: buyerResult } }
 }
 
 export async function getOrderChartData(vendorId: string, from: string, to: string) {

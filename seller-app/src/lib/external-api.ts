@@ -63,11 +63,12 @@ export async function notifyExternalService(
   path: string,
   method: HttpMethod,
   body: Record<string, unknown>,
-) {
+): Promise<{ success: boolean; error?: string }> {
   const config = getServiceConfig(service)
   if (!config) {
-    console.warn(`[external-api] ${service}: URL no configurada (${SERVICE_MAP[service].urlEnv})`)
-    return
+    const msg = `URL no configurada (${SERVICE_MAP[service].urlEnv})`
+    console.warn(`[external-api] ${service}: ${msg}`)
+    return { success: false, error: msg }
   }
 
   const url = `${config.baseUrl}${path}`
@@ -85,10 +86,14 @@ export async function notifyExternalService(
     const response = await fetch(url, { method, headers, body: JSON.stringify(body) })
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${await response.text().catch(() => 'sin cuerpo')}`)
+      const text = await response.text().catch(() => 'sin cuerpo')
+      throw new Error(`HTTP ${response.status}: ${text}`)
     }
+
+    return { success: true }
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Error desconocido'
     console.warn(`[external-api] Falló ${method} ${url}: ${errorMsg}`)
+    return { success: false, error: errorMsg }
   }
 }

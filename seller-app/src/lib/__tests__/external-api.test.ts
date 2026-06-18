@@ -88,7 +88,7 @@ describe('notifyExternalService', () => {
       'http://delivery:3000/api/ready_orders/abc',
       {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': 'delivery-key' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer delivery-key' },
         body: JSON.stringify({ orderId: 'abc' }),
       },
     )
@@ -118,23 +118,21 @@ describe('notifyExternalService', () => {
     expect(fetchSpy).not.toHaveBeenCalled()
   })
 
-  it('no lanza error si el servicio responde HTTP error', async () => {
+  it('retorna error si el servicio responde HTTP error', async () => {
     vi.stubEnv('DELIVERY_APP_URL', 'http://delivery:3000')
     fetchSpy.mockResolvedValue({ ok: false, status: 500, text: () => Promise.resolve('Internal Server Error') } as Response)
 
     const { notifyExternalService } = await importModule()
-    await expect(
-      notifyExternalService('delivery', '/api/ready_orders/abc', 'PUT', {}),
-    ).resolves.toBeUndefined()
+    const result = await notifyExternalService('delivery', '/api/ready_orders/abc', 'PUT', {})
+    expect(result).toEqual({ success: false, error: 'HTTP 500: Internal Server Error' })
   })
 
-  it('no lanza error si hay network error', async () => {
+  it('retorna error si hay network error', async () => {
     vi.stubEnv('DELIVERY_APP_URL', 'http://delivery:3000')
     fetchSpy.mockRejectedValue(new Error('ECONNREFUSED'))
 
     const { notifyExternalService } = await importModule()
-    await expect(
-      notifyExternalService('delivery', '/api/ready_orders/abc', 'PUT', {}),
-    ).resolves.toBeUndefined()
+    const result = await notifyExternalService('delivery', '/api/ready_orders/abc', 'PUT', {})
+    expect(result).toEqual({ success: false, error: 'ECONNREFUSED' })
   })
 })

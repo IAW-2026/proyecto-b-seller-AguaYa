@@ -65,7 +65,10 @@ function makeOrder(overrides: Record<string, unknown> = {}) {
     address: 'Calle 123',
     createdAt: new Date('2026-06-01'),
     deletedAt: null,
-    items: [],
+    items: [
+      { id: 'item-1', quantity: 1, productId: 'p-1', product: { id: 'p-1' } },
+      { id: 'item-2', quantity: 2, productId: 'p-2', product: { id: 'p-2' } },
+    ],
     ...overrides,
   }
 }
@@ -130,37 +133,48 @@ describe('confirmOrderForDelivery', () => {
     expect(mockNotify).toHaveBeenCalledTimes(2)
     expect(mockNotify).toHaveBeenCalledWith(
       'delivery',
-      '/api/ready_orders/order-1',
-      'PUT',
-      expect.objectContaining({ orderId: 'order-1', vendorId: 'vendor-1', status: 'READY' }),
+      '/api/ready-orders',
+      'POST',
+      {
+        pedidos: [{
+          id_pedido_externo: 'EXT-001',
+          id_vendedor: 'vendor-1',
+          cliente: 'Test Buyer',
+          direccion: 'Calle 123',
+          telefono: '',
+          cant_bidones: 3,
+          zona: '',
+        }],
+      },
     )
     expect(mockNotify).toHaveBeenCalledWith(
       'buyer',
-      '/api/orders/order-1/status',
+      '/api/orders/order-1',
       'PATCH',
-      expect.objectContaining({ orderId: 'order-1', vendorId: 'vendor-1', status: 'READY' }),
+      { orderStatus: 'READY' },
     )
-    expect(result.status).toBe('READY')
+    expect(result.order.status).toBe('READY')
   })
 
-  it('incluye timestamp ISO en el payload', async () => {
+  it('incluye cant_bidones basado en la suma de items', async () => {
     const { confirmOrderForDelivery } = await importModule()
     await confirmOrderForDelivery('order-1')
 
     const deliveryCall = mockNotify.mock.calls.find(
       (c: unknown[]) => c[0] === 'delivery',
     )
-    expect(deliveryCall[3].timestamp).toEqual(expect.any(String))
-    expect(new Date(deliveryCall[3].timestamp).toISOString()).toBe(deliveryCall[3].timestamp)
+    expect(deliveryCall[3].pedidos[0].cant_bidones).toBe(3) // item qty=1 + qty=2
   })
 
   it('retorna la orden actualizada incluso si las notificaciones fallan (fire-and-forget)', async () => {
-    mockNotify.mockRejectedValue(new Error('Service unavailable'))
+    mockNotify.mockResolvedValue({ success: false, error: 'Service unavailable' })
 
     const { confirmOrderForDelivery } = await importModule()
     const result = await confirmOrderForDelivery('order-1')
 
-    expect(result.status).toBe('READY')
+    expect(result.order.status).toBe('READY')
+    expect(result.notifications.delivery.success).toBe(false)
+    expect(result.notifications.buyer.success).toBe(false)
     expect(mockNotify).toHaveBeenCalledTimes(2)
   })
 

@@ -23,7 +23,7 @@ afterEach(async () => {
 })
 
 describe('notifyExternalService (integración)', () => {
-  it('envía PUT a delivery con X-API-Key y body JSON', async () => {
+  it('envía PUT a delivery con Authorization Bearer y body JSON', async () => {
     const echo = await createEchoServer()
     servers.push(echo)
 
@@ -43,7 +43,7 @@ describe('notifyExternalService (integración)', () => {
       url: '/api/ready_orders/order-42',
       body: { orderId: 'order-42', status: 'READY' },
     })
-    expect(echo.requests[0].headers['x-api-key']).toBe('delivery-secret-456')
+    expect(echo.requests[0].headers['authorization']).toBe('Bearer delivery-secret-456')
     expect(echo.requests[0].headers['content-type']).toBe('application/json')
   })
 
