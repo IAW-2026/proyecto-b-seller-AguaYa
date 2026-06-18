@@ -1,9 +1,9 @@
 ### Variables
 @baseUrl = http://localhost:3000
-@apiKey = buyer-secret-key-12345
+@apiKey = vendor-secret-key-2026
 
 @vendorId = cmpc2gjz90000ikli1cg4gmsj
-@prodictId = cmp2rw7020001i8lienqogqky
+@productId = cmp2rw7020001i8lienqogqky
 
 @vendorId2 = cmp21j4xu0001zwli69agxgle
 
@@ -18,7 +18,7 @@ GET {{baseUrl}}/api/products
 X-API-Key: {{apiKey}}
 
 ### Test 2: GET productos de un vendedor específico
-GET {{baseUrl}}/api/products?vendorId={{andy}}
+GET {{baseUrl}}/api/products?vendorId={{vendorId}}
 X-API-Key: {{apiKey}}
 
 ### Test 3: GET productos de múltiples vendedores
