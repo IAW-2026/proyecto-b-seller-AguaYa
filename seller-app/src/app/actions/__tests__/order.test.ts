@@ -141,9 +141,9 @@ describe('confirmOrderForDelivery', () => {
           id_vendedor: 'vendor-1',
           cliente: 'Test Buyer',
           direccion: 'Calle 123',
-          telefono: '',
+          telefono: null,
           cant_bidones: 3,
-          zona: '',
+          zona: null,
         }],
       },
     )

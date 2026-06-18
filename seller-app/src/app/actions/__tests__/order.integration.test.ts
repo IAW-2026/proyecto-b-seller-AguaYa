@@ -131,9 +131,9 @@ describe('confirmOrderForDelivery (integración)', () => {
           id_vendedor: 'vendor-1',
           cliente: expect.any(String),
           direccion: expect.any(String),
-          telefono: '',
+          telefono: null,
           cant_bidones: 3,
-          zona: '',
+          zona: null,
         }],
       },
     })
@@ -166,9 +166,9 @@ describe('confirmOrderForDelivery (integración)', () => {
       id_vendedor: expect.any(String),
       cliente: expect.any(String),
       direccion: expect.any(String),
-      telefono: '',
+      telefono: null,
       cant_bidones: expect.any(Number),
-      zona: '',
+      zona: null,
     })
   })
 

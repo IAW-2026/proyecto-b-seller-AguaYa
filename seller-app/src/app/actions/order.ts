@@ -101,7 +101,7 @@ export async function confirmOrderForDelivery(orderId: string) {
         direccion: updatedOrder.address ?? '',
         telefono: null,
         cant_bidones: cantBidones,
-        zona: '',
+        zona: null,
       }],
     }),
     notifyExternalService('buyer', `/api/orders/${orderId}`, 'PATCH', { orderStatus: 'READY' as const }),
