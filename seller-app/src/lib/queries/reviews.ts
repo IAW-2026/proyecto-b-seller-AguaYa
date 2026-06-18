@@ -32,21 +32,35 @@ export type ReviewStats = {
  */
 export async function getVendorReviewsWithStats(userId: string): Promise<ReviewStats> {
   const config = getServiceConfig('feedback')
-  if (!config) return { promedio: 0, total: 0, reviews: [] }
+  if (!config) {
+    console.warn(`[reviews] FEEDBACK_APP_URL no configurada — no se pueden obtener reseñas`)
+    return { promedio: 0, total: 0, reviews: [] }
+  }
+
+  const url = `${config.baseUrl}/api/feedback/reviews/${userId}`
+  console.warn(`[reviews] GET ${url}`)
 
   try {
-    const url = `${config.baseUrl}/api/feedback/reviews/${userId}`
     const res = await fetch(url, {
       headers: config.apiKey ? { 'X-API-Key': config.apiKey } : {},
       signal: AbortSignal.timeout(5000),
     })
-    if (!res.ok) return { promedio: 0, total: 0, reviews: [] }
+
+    console.warn(`[reviews] Status: ${res.status} ${res.statusText}`)
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => 'sin cuerpo')
+      console.warn(`[reviews] Error body: ${body}`)
+      return { promedio: 0, total: 0, reviews: [] }
+    }
 
     const data: {
       promedio: number
       total: number
       ultimasResenas: { id_pedido: string; estrellas: number; descripcion?: string; fecha: string }[]
     } = await res.json()
+
+    console.warn(`[reviews] Respuesta recibida — promedio: ${data.promedio}, total: ${data.total}, reseñas: ${data.ultimasResenas?.length ?? 0}`)
 
     if (!data.ultimasResenas?.length) {
       return { promedio: data.promedio ?? 0, total: data.total ?? 0, reviews: [] }
@@ -67,8 +81,12 @@ export async function getVendorReviewsWithStats(userId: string): Promise<ReviewS
       products: productMap.get(r.id_pedido) ?? [],
     }))
 
+    console.warn(`[reviews] OK — ${reviews.length} reseñas mapeadas para el vendedor ${userId}`)
+
     return { promedio: data.promedio, total: data.total, reviews }
-  } catch {
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error)
+    console.warn(`[reviews] Error fetching: ${msg}`)
     return { promedio: 0, total: 0, reviews: [] }
   }
 }

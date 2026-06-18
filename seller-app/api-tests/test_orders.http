@@ -26,13 +26,13 @@ Content-Type: application/json
 
 {
   "externalId": "buyer-order-{{$timestamp}}",
-  "vendorId": "{{andy}}",
-  "buyerId": "Abu Sador el comprador",
+  "vendorId": "cmpc2gjz90000ikli1cg4gmsj",
+  "buyerId": "hjdkas",
   "address": "avenida siempre viva 123 depto 12",
   "items": [
-    {"productId": "{{productAndy}}", "quantity": 1}
+    {"productId": "cmpvrwuot0000ssliml3ldvqg", "quantity": 1}
   ],
-  "total": 100
+  "total": 12
 }
 
 ### Test 5-2: POST crear orden exitosa con muchos productos
