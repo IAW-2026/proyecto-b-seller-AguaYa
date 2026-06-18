@@ -99,7 +99,7 @@ export async function confirmOrderForDelivery(orderId: string) {
         id_vendedor: vendor.id,
         cliente: updatedOrder.buyerName,
         direccion: updatedOrder.address ?? '',
-        telefono: '',
+        telefono: null,
         cant_bidones: cantBidones,
         zona: '',
       }],
