@@ -10,7 +10,7 @@ import OrderNotifier from '@/components/orders/OrderNotifier'
 import OrdersLoading from '@/components/ui/loadings/OrdersLoading'
 import { Package } from 'lucide-react'
 
-export default function VendorOrdersPage() {
+export default function VendorOrdersPage(props: { searchParams: Promise<{ paid_page?: string; ready_page?: string }> }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-6">
@@ -27,7 +27,7 @@ export default function VendorOrdersPage() {
       </div>
 
       <Suspense fallback={<OrdersLoading />}>
-        <VendorOrdersContent />
+        <VendorOrdersContent searchParams={props.searchParams} />
       </Suspense>
       <AutoRefresh interval={10000} />
       <OrderNotifier interval={10000} />
@@ -35,12 +35,16 @@ export default function VendorOrdersPage() {
   )
 }
 
-async function VendorOrdersContent() {
+async function VendorOrdersContent({ searchParams }: { searchParams: Promise<{ paid_page?: string; ready_page?: string }> }) {
   const { userId } = await auth()
   if (!userId) return null
 
   const vendor = await getVendorByUserId(userId)
   if (!vendor) redirect('/setup-vendor')
+
+  const params = await searchParams
+  const paidPage = Math.max(1, parseInt(params.paid_page || '1', 10))
+  const readyPage = Math.max(1, parseInt(params.ready_page || '1', 10))
 
   let paidResult: Awaited<ReturnType<typeof getVendorOrdersByStatus>> | null = null
   let readyResult: Awaited<ReturnType<typeof getVendorOrdersByStatus>> | null = null
@@ -48,8 +52,8 @@ async function VendorOrdersContent() {
 
   try {
     const [pr, rr] = await Promise.all([
-      getVendorOrdersByStatus(vendor.id, 'PAID', 1),
-      getVendorOrdersByStatus(vendor.id, 'READY', 1),
+      getVendorOrdersByStatus(vendor.id, 'PAID', paidPage),
+      getVendorOrdersByStatus(vendor.id, 'READY', readyPage),
     ])
     paidResult = pr
     readyResult = rr
@@ -79,11 +83,11 @@ async function VendorOrdersContent() {
     <OrdersTabs
       vendorId={vendor.id}
       paidOrders={paidResult.items}
-      paidPage={1}
+      paidPage={paidPage}
       paidPageCount={paidResult.pageCount}
       paidTotal={paidResult.total}
       readyOrders={readyResult.items}
-      readyPage={1}
+      readyPage={readyPage}
       readyPageCount={readyResult.pageCount}
       readyTotal={readyResult.total}
     />
