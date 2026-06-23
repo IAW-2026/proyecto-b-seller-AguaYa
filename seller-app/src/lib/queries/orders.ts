@@ -84,7 +84,7 @@ export async function getVendorOrdersByDateRange(
   const rows = await prisma.$queryRaw<{ date: string; status: string; count: bigint }[]>`
     SELECT DATE("createdAt")::text as date, status, COUNT(*)::int as count
     FROM "Order"
-    WHERE "vendorId" = ${vendorId} AND "createdAt" >= ${fromDate}::date AND "createdAt" <= ${toDate}::date AND "deletedAt" IS NULL
+    WHERE "vendorId" = ${vendorId} AND "createdAt" >= ${fromDate}::date AND "createdAt" <= ${toDate} AND "deletedAt" IS NULL
     GROUP BY DATE("createdAt"), status
     ORDER BY DATE("createdAt")
   `

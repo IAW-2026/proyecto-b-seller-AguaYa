@@ -110,3 +110,75 @@ export async function getVendorById(vendorId: string) {
     where: { id: vendorId, deletedAt: null },
   })
 }
+
+function parseDateSafe(value: string | undefined): Date | null {
+  if (!value) return null
+  const d = new Date(value)
+  return isNaN(d.getTime()) ? null : d
+}
+
+/**
+ * Obtiene el total de órdenes y vendedores activos por día en un rango de fechas.
+ */
+export async function getVendorActivityByDateRange(
+  from: string,
+  to: string
+): Promise<{ date: string; totalOrders: number; activeVendors: number }[]> {
+  const fromDate = parseDateSafe(from)
+  const toDate = parseDateSafe(to ? to + 'T23:59:59.999Z' : undefined)
+  if (!fromDate || !toDate) return []
+
+  const rows = await prisma.$queryRaw<
+    { date: string; totalOrders: bigint; activeVendors: bigint }[]
+  >`
+    SELECT DATE("createdAt")::text as date,
+      COUNT(*)::int as "totalOrders",
+      COUNT(DISTINCT "vendorId")::int as "activeVendors"
+    FROM "Order"
+    WHERE "createdAt" >= ${fromDate}::date AND "createdAt" <= ${toDate} AND "deletedAt" IS NULL
+    GROUP BY DATE("createdAt")
+    ORDER BY DATE("createdAt")
+  `
+
+  const map = new Map<string, { totalOrders: number; activeVendors: number }>()
+  for (const row of rows) {
+    map.set(row.date, {
+      totalOrders: Number(row.totalOrders),
+      activeVendors: Number(row.activeVendors),
+    })
+  }
+
+  const result: { date: string; totalOrders: number; activeVendors: number }[] = []
+  for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+    const key = d.toISOString().slice(0, 10)
+    const entry = map.get(key) || { totalOrders: 0, activeVendors: 0 }
+    result.push({ date: key, ...entry })
+  }
+  return result
+}
+
+/**
+ * Obtiene el ranking de vendedores con más órdenes en un rango de fechas.
+ */
+export async function getTopVendorsByOrders(
+  from: string,
+  to: string,
+  limit: number = 10
+): Promise<{ vendorId: string; vendorName: string; totalOrders: number }[]> {
+  const fromDate = parseDateSafe(from)
+  const toDate = parseDateSafe(to ? to + 'T23:59:59.999Z' : undefined)
+  if (!fromDate || !toDate) return []
+
+  return prisma.$queryRaw<
+    { vendorId: string; vendorName: string; totalOrders: bigint }[]
+  >`
+    SELECT o."vendorId" as "vendorId", v.name as "vendorName", COUNT(*)::int as "totalOrders"
+    FROM "Order" o
+    JOIN "Vendor" v ON v.id = o."vendorId"
+    WHERE o."createdAt" >= ${fromDate}::date AND o."createdAt" <= ${toDate}
+      AND o."deletedAt" IS NULL AND v."deletedAt" IS NULL
+    GROUP BY o."vendorId", v.name
+    ORDER BY COUNT(*) DESC
+    LIMIT ${limit}
+  `.then((rows) => rows.map((r) => ({ ...r, totalOrders: Number(r.totalOrders) })))
+}
