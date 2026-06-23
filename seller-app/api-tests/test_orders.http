@@ -27,7 +27,7 @@ Content-Type: application/json
 {
   "externalId": "buyer-order-{{$timestamp}}",
   "vendorId": "cmpvxr5er000004l51nrtqen5",
-  "buyerId": "Amargo Marolio",
+  "buyerId": "Patroclio5",
   "address": "La vuelta de la esquina 123",
   "items": [
     {"productId": "cmpvxs2i3000004l757yjdyph", "quantity": 1}
