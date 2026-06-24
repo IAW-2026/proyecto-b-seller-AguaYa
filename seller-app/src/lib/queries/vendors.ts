@@ -183,6 +183,18 @@ export async function getTopVendorsByOrders(
   `.then((rows) => rows.map((r) => ({ ...r, totalOrders: Number(r.totalOrders) })))
 }
 
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function periodBoundary(d: Date, isWeekly: boolean): string {
+  if (!isWeekly) return localDateStr(d)
+  const c = new Date(d)
+  const day = c.getDay()
+  c.setDate(c.getDate() + (day === 0 ? -6 : 1 - day))
+  return localDateStr(c)
+}
+
 function fillTrendPeriods(
   data: { period: string; orders: bigint }[],
   start: Date,
@@ -192,9 +204,12 @@ function fillTrendPeriods(
   const map = new Map(data.map((r) => [r.period, Number(r.orders)]))
   const result: number[] = []
   const cursor = new Date(start)
-  if (isWeekly) cursor.setDate(cursor.getDate() + ((7 - cursor.getDay()) % 7))
+  if (isWeekly) {
+    const day = cursor.getDay()
+    cursor.setDate(cursor.getDate() + (day === 0 ? -6 : 1 - day))
+  }
   while (cursor < end) {
-    const key = cursor.toISOString().slice(0, 10)
+    const key = localDateStr(cursor)
     result.push(map.get(key) ?? 0)
     cursor.setDate(cursor.getDate() + (isWeekly ? 7 : 1))
   }
@@ -239,7 +254,7 @@ export async function getVendorGrowth(days: number) {
       WHERE o."vendorId" = ANY(${vendorIds})
         AND o."createdAt" >= ${midDate} AND o."createdAt" <= ${now}
         AND o."deletedAt" IS NULL
-      GROUP BY o."vendorId", DATE_TRUNC(${trunc}, o."createdAt")
+      GROUP BY 1, 2
       ORDER BY o."vendorId", period
     `
   }
@@ -281,4 +296,61 @@ export async function getVendorGrowth(days: number) {
       stable,
     },
   }
+}
+
+export async function getVendorRegistrations(days: number) {
+  const now = new Date()
+  now.setHours(23, 59, 59, 999)
+  const midDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000)
+  midDate.setHours(0, 0, 0, 0)
+  const fromDate = new Date(midDate.getTime() - days * 24 * 60 * 60 * 1000)
+  fromDate.setHours(0, 0, 0, 0)
+
+  const isWeekly = days > 7
+  const trunc = isWeekly ? 'week' : 'day'
+
+  const rows = await prisma.$queryRaw<{ period: string; count: bigint }[]>`
+    SELECT DATE_TRUNC(${trunc}, "createdAt")::date::text as period,
+      COUNT(*)::int as count
+    FROM "Vendor"
+    WHERE "createdAt" >= ${fromDate} AND "createdAt" <= ${now}
+      AND "deletedAt" IS NULL
+    GROUP BY 1
+    ORDER BY period
+  `
+
+  const periodMap = new Map(rows.map((r) => [r.period, Number(r.count)]))
+  const daily: { date: string; count: number }[] = []
+  const cursor = new Date(fromDate)
+  if (isWeekly) {
+    const day = cursor.getDay()
+    cursor.setDate(cursor.getDate() + (day === 0 ? -6 : 1 - day))
+  }
+  while (cursor < now) {
+    const key = localDateStr(cursor)
+    daily.push({ date: key, count: periodMap.get(key) ?? 0 })
+    cursor.setDate(cursor.getDate() + (isWeekly ? 7 : 1))
+  }
+
+  const midBoundary = periodBoundary(midDate, isWeekly)
+  const fromBoundary = periodBoundary(fromDate, isWeekly)
+
+  const currentPeriod = rows
+    .filter((r) => r.period >= midBoundary)
+    .reduce((s, r) => s + Number(r.count), 0)
+  const previousPeriod = rows
+    .filter((r) => r.period >= fromBoundary && r.period < midBoundary)
+    .reduce((s, r) => s + Number(r.count), 0)
+  const growth = previousPeriod > 0
+    ? Math.round(((currentPeriod - previousPeriod) / previousPeriod) * 100)
+    : currentPeriod > 0 ? 100 : 0
+
+  const recentVendors = await prisma.vendor.findMany({
+    where: { deletedAt: null },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+    select: { id: true, name: true, createdAt: true },
+  })
+
+  return { daily, currentPeriod, previousPeriod, growth, days, recentVendors }
 }
