@@ -6,6 +6,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import ProductForm from '../ProductForm'
 
 interface ProductFormDialogProps {
@@ -33,7 +34,7 @@ export default function ProductFormDialog({ children, mode = 'create', productId
         {children}
       </div>
 
-      {open ? (
+      {open ? createPortal(
         <div
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 px-4 py-10"
         >
@@ -60,7 +61,8 @@ export default function ProductFormDialog({ children, mode = 'create', productId
             </div>
             <ProductForm mode={mode} productId={productId} vendorId={vendorId} initialData={initialData} disableRedirect={disableRedirect} onSuccess={() => setOpen(false)} />
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </>
   )
