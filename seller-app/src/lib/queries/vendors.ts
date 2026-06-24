@@ -182,3 +182,103 @@ export async function getTopVendorsByOrders(
     LIMIT ${limit}
   `.then((rows) => rows.map((r) => ({ ...r, totalOrders: Number(r.totalOrders) })))
 }
+
+function fillTrendPeriods(
+  data: { period: string; orders: bigint }[],
+  start: Date,
+  end: Date,
+  isWeekly: boolean
+): number[] {
+  const map = new Map(data.map((r) => [r.period, Number(r.orders)]))
+  const result: number[] = []
+  const cursor = new Date(start)
+  if (isWeekly) cursor.setDate(cursor.getDate() + ((7 - cursor.getDay()) % 7))
+  while (cursor < end) {
+    const key = cursor.toISOString().slice(0, 10)
+    result.push(map.get(key) ?? 0)
+    cursor.setDate(cursor.getDate() + (isWeekly ? 7 : 1))
+  }
+  return result
+}
+
+export async function getVendorGrowth(days: number) {
+  const now = new Date()
+  now.setHours(23, 59, 59, 999)
+  const midDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000)
+  midDate.setHours(0, 0, 0, 0)
+  const fromDate = new Date(midDate.getTime() - days * 24 * 60 * 60 * 1000)
+  fromDate.setHours(0, 0, 0, 0)
+
+  const isWeekly = days > 7
+
+  const growthRows = await prisma.$queryRaw<
+    { vendorId: string; vendorName: string; currentOrders: bigint; previousOrders: bigint }[]
+  >`
+    SELECT v.id as "vendorId", v.name as "vendorName",
+      COUNT(CASE WHEN o."createdAt" >= ${midDate} AND o."createdAt" <= ${now} THEN 1 END)::int as "currentOrders",
+      COUNT(CASE WHEN o."createdAt" >= ${fromDate} AND o."createdAt" < ${midDate} THEN 1 END)::int as "previousOrders"
+    FROM "Vendor" v
+    LEFT JOIN "Order" o ON o."vendorId" = v.id AND o."deletedAt" IS NULL
+    WHERE v."deletedAt" IS NULL
+    GROUP BY v.id, v.name
+    ORDER BY "currentOrders" DESC
+  `
+
+  const vendorIds = growthRows.map((r) => r.vendorId)
+
+  let trendRows: { vendorId: string; period: string; orders: bigint }[] = []
+  if (vendorIds.length > 0) {
+    const trunc = isWeekly ? 'week' : 'day'
+    trendRows = await prisma.$queryRaw<
+      { vendorId: string; period: string; orders: bigint }[]
+    >`
+      SELECT o."vendorId" as "vendorId",
+        DATE_TRUNC(${trunc}, o."createdAt")::date::text as period,
+        COUNT(*)::int as orders
+      FROM "Order" o
+      WHERE o."vendorId" = ANY(${vendorIds})
+        AND o."createdAt" >= ${midDate} AND o."createdAt" <= ${now}
+        AND o."deletedAt" IS NULL
+      GROUP BY o."vendorId", DATE_TRUNC(${trunc}, o."createdAt")
+      ORDER BY o."vendorId", period
+    `
+  }
+
+  const trendMap = new Map<string, { period: string; orders: bigint }[]>()
+  for (const row of trendRows) {
+    if (!trendMap.has(row.vendorId)) trendMap.set(row.vendorId, [])
+    trendMap.get(row.vendorId)!.push(row)
+  }
+
+  let growing = 0
+  let declining = 0
+  let stable = 0
+  let growthSum = 0
+
+  const vendors = growthRows.map((r) => {
+    const prev = Number(r.previousOrders)
+    const curr = Number(r.currentOrders)
+    const growth = prev > 0 ? Math.round(((curr - prev) / prev) * 100) : curr > 0 ? 100 : 0
+    trendMap.get(r.vendorId)
+    const rawTrend = trendMap.get(r.vendorId) ?? []
+    const trend = fillTrendPeriods(rawTrend, midDate, now, isWeekly)
+
+    if (growth > 5) growing++
+    else if (growth < -5) declining++
+    else stable++
+    growthSum += growth
+
+    return { vendorId: r.vendorId, vendorName: r.vendorName, currentOrders: curr, previousOrders: prev, growth, trend }
+  })
+
+  return {
+    vendors,
+    days,
+    summary: {
+      avgGrowth: vendors.length > 0 ? Math.round(growthSum / vendors.length) : 0,
+      growing,
+      declining,
+      stable,
+    },
+  }
+}
