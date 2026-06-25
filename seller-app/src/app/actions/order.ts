@@ -93,18 +93,15 @@ export async function confirmOrderForDelivery(orderId: string) {
   const cantBidones = updatedOrder.items.reduce((sum, item) => sum + item.quantity, 0)
 
   const results = await Promise.allSettled([
-    notifyExternalService('delivery', '/api/ready-orders', 'POST', {
-      pedidos: [{
-        id_pedido_externo: updatedOrder.externalId,
-        id_vendedor: vendor.id,
-        cliente: updatedOrder.buyerName || updatedOrder.buyerId,
-        direccion: updatedOrder.address ?? '',
-        telefono: null,
-        cant_bidones: cantBidones,
-        zona: null,
-      }],
+    notifyExternalService('delivery', `/api/ready-orders/${updatedOrder.externalId}`, 'PUT', {
+      id_vendedor: vendor.id,
+      cliente: updatedOrder.buyerName || updatedOrder.buyerId,
+      direccion: updatedOrder.address ?? '',
+      telefono: null,
+      cant_bidones: cantBidones,
+      zona: null,
     }),
-    notifyExternalService('buyer', `/api/orders/${orderId}`, 'PATCH', { orderStatus: 'READY' as const }),
+    notifyExternalService('buyer', `/api/orders/${updatedOrder.externalId}`, 'PATCH', { orderStatus: 'READY' as const }),
   ])
 
   const deliveryResult = results[0].status === 'fulfilled'
