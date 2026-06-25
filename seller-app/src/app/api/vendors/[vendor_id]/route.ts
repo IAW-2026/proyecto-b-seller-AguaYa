@@ -63,10 +63,16 @@ export async function GET(
       )
     }
 
-    // 3. Buscar vendedor por ID
-    const vendor = await prisma.vendor.findUnique({
+    // 3. Buscar vendedor por ID (Prisma ID o Clerk user ID)
+    let vendor = await prisma.vendor.findUnique({
       where: { id: vendorId },
     })
+
+    if (!vendor) {
+      vendor = await prisma.vendor.findUnique({
+        where: { userId: vendorId },
+      })
+    }
 
     // 4. Si no existe o está inactivo, retornar 404
     if (!vendor || !vendor.isActive) {
