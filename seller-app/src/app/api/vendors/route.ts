@@ -75,7 +75,7 @@ export async function GET(request: Request): Promise<Response> {
           {
             status: 200,
             headers: {
-              'Cache-Control': 'public, max-age=600, stale-while-revalidate=86400',
+              'Cache-Control': 'public, max-age=30, stale-while-revalidate=86400',
             },
           }
         )
@@ -107,7 +107,7 @@ export async function GET(request: Request): Promise<Response> {
       {
         status: 200,
         headers: {
-          'Cache-Control': 'public, max-age=600, stale-while-revalidate=86400',
+          'Cache-Control': 'public, max-age=30, stale-while-revalidate=86400',
         },
       }
     )
