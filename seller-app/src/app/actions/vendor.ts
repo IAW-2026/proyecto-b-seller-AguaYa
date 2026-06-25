@@ -50,7 +50,7 @@ export async function createOrUpdateVendor(data: {
       },
     })
 
-    revalidatePath('/dashboard/overview')
+    revalidatePath('/dashboard/vendor/overview')
     revalidatePath('/dashboard/vendor/products')
 
     return vendor
@@ -79,7 +79,7 @@ export async function createOrUpdateVendor(data: {
     publicMetadata: { roles: mergedRoles },
   })
 
-  revalidatePath('/dashboard/overview')
+  revalidatePath('/dashboard/vendor/overview')
   revalidatePath('/dashboard/vendor/products')
 
   return vendor
@@ -98,7 +98,7 @@ export async function toggleMyVendorActiveStatus() {
     data: { isActive: !vendor.isActive },
   })
 
-  await revalidatePath('/dashboard/overview')
+  await revalidatePath('/dashboard/vendor/overview')
   await revalidatePath('/dashboard/vendor/products')
   await revalidatePath('/dashboard/settings')
   await revalidatePath('/dashboard/admin/vendors')

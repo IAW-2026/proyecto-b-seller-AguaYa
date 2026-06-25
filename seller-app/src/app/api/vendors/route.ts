@@ -14,9 +14,9 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { validateApiKey } from '@/lib/auth'
 import { validateVendorIds } from '@/lib/validation'
-import { toPublicVendors } from '@/lib/vendors'
+import { toPublicVendor, toPublicVendors } from '@/lib/vendors'
 import type { ErrorResponse } from '@/lib/api-types'
-import type { VendorsListResponse } from '@/lib/vendors'
+import type { VendorDetailResponse, VendorsListResponse } from '@/lib/vendors'
 
 /**
  * GET /api/vendors
@@ -25,6 +25,8 @@ import type { VendorsListResponse } from '@/lib/vendors'
  * 
  * Query Parameters:
  * - ids (opcional): IDs separados por comas. Ej: ?ids=vendor-1,vendor-2,vendor-3
+ * - clerkUserId (opcional): Clerk user ID para buscar un vendedor específico. Ej: ?clerkUserId=user_2abc123
+ *   Cuando se usa este parámetro se ignoran los demás filtros y se retorna un único resultado.
  * 
  * Headers:
  * - X-API-Key (requerido): API key compartida entre aplicaciones
@@ -47,9 +49,37 @@ export async function GET(request: Request): Promise<Response> {
 
     // 2. Parsear URL y obtener query parameters
     const { searchParams } = new URL(request.url)
+    const clerkUserId = searchParams.get('clerkUserId')
     const idsParam = searchParams.get('ids')
 
-    // 3. Si hay filtro de IDs, validar y buscar solo esos vendors
+    // 3. Si se busca por Clerk user ID, retornar el vendedor específico
+    if (clerkUserId) {
+      const vendor = await prisma.vendor.findUnique({
+        where: { userId: clerkUserId },
+      })
+
+      if (!vendor) {
+        return NextResponse.json<ErrorResponse>(
+          { error: 'Vendedor no encontrado' },
+          { status: 404 }
+        )
+      }
+
+      return NextResponse.json<VendorDetailResponse>(
+        {
+          success: true,
+          vendor: toPublicVendor(vendor),
+        },
+        {
+          status: 200,
+          headers: {
+            'Cache-Control': 'public, max-age=30',
+          },
+        }
+      )
+    }
+
+    // 4. Si hay filtro de IDs, validar y buscar solo esos vendors
     if (idsParam) {
       try {
         const validIds = validateVendorIds(idsParam)
@@ -88,7 +118,7 @@ export async function GET(request: Request): Promise<Response> {
       }
     }
 
-    // 4. Si no hay filtro, retornar todos los vendedores
+    // 5. Si no hay filtro, retornar todos los vendedores
     const allVendors = await prisma.vendor.findMany({
       where: {
         deletedAt: null,

@@ -6,6 +6,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 
 interface ToggleStatusButtonProps {
@@ -61,7 +62,7 @@ export default function ToggleStatusButton({ isActive, entityType, entityName, o
         {isActive ? 'Desactivar' : 'Activar'}
       </button>
 
-      {open && (
+      {open ? createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
         >
@@ -114,8 +115,9 @@ export default function ToggleStatusButton({ isActive, entityType, entityName, o
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>,
+        document.body
+      ) : null}
     </>
   )
 }

@@ -19,7 +19,7 @@ export default async function SetupVendorPage() {
   const vendor = await getVendorByUserId(userId)
 
   if (vendor) {
-    redirect('/dashboard/overview')
+    redirect('/dashboard/vendor/overview')
   }
 
   return (
@@ -31,7 +31,7 @@ export default async function SetupVendorPage() {
       </div>
 
       <div className="mt-8 rounded-[1.75rem] border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-6 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 sm:p-8">
-        <VendorForm redirectTo="/dashboard/overview" />
+        <VendorForm redirectTo="/dashboard/vendor/overview" />
       </div>
     </div>
   )
