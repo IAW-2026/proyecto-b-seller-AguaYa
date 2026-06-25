@@ -5,10 +5,6 @@
 
 import type { Vendor } from '@prisma/client'
 
-type VendorWithImage = Vendor & {
-  image?: string | null
-}
-
 /**
  * Interfaz de Vendedor Público
  * Contiene solo los datos que deben ser expuestos a través de la API
@@ -22,9 +18,15 @@ export interface PublicVendor {
   image: string | null
   isActive: boolean
   clerkUserId: string
+  productCount: number
 }
 
-export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
+type VendorWithProducts = Vendor & {
+  image?: string | null
+  _count?: { products: number }
+}
+
+export function toPublicVendor(vendor: VendorWithProducts): PublicVendor {
   return {
     id: vendor.id,
     name: vendor.name,
@@ -33,6 +35,7 @@ export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
     image: vendor.image ?? null,
     isActive: vendor.isActive,
     clerkUserId: vendor.userId,
+    productCount: vendor._count?.products ?? 0,
   }
 }
 
@@ -42,7 +45,7 @@ export function toPublicVendor(vendor: VendorWithImage): PublicVendor {
  * @param vendors - Array de Vendor objects
  * @returns Array de PublicVendor
  */
-export function toPublicVendors(vendors: Vendor[]): PublicVendor[] {
+export function toPublicVendors(vendors: VendorWithProducts[]): PublicVendor[] {
   return vendors.map(toPublicVendor)
 }
 
@@ -61,5 +64,3 @@ export interface VendorDetailResponse {
   success: boolean
   vendor: PublicVendor
 }
-
-

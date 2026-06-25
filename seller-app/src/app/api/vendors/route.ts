@@ -56,6 +56,7 @@ export async function GET(request: Request): Promise<Response> {
     if (clerkUserId) {
       const vendor = await prisma.vendor.findUnique({
         where: { userId: clerkUserId },
+        include: { _count: { select: { products: true } } },
       })
 
       if (!vendor) {
@@ -92,6 +93,7 @@ export async function GET(request: Request): Promise<Response> {
             deletedAt: null,
             isActive: true,
           },
+          include: { _count: { select: { products: true } } },
           orderBy: {
             createdAt: 'desc',
           },
@@ -124,6 +126,7 @@ export async function GET(request: Request): Promise<Response> {
         deletedAt: null,
         isActive: true,
       },
+      include: { _count: { select: { products: true } } },
       orderBy: {
         createdAt: 'desc',
       },
