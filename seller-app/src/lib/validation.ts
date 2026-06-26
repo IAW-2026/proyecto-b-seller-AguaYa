@@ -242,7 +242,7 @@ export function validateCreateOrderInput(data: unknown): CreateOrderInput {
     throw new Error('total es requerido y debe ser un número positivo')
   }
 
-  const phone = typeof d.phone === 'string' ? d.phone.trim() || undefined : undefined
+  const phone = typeof d.buyerPhone === 'string' ? d.buyerPhone.trim() || undefined : undefined
 
   return {
     externalId: d.externalId.trim(),
