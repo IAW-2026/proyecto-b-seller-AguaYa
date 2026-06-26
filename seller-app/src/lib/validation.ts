@@ -28,6 +28,7 @@ export interface CreateOrderInput {
   vendorId: string
   buyerId: string
   buyerName?: string
+  phone?: string
   items: Array<{ productId: string; quantity: number }>
   total: number
   address: string
@@ -241,10 +242,13 @@ export function validateCreateOrderInput(data: unknown): CreateOrderInput {
     throw new Error('total es requerido y debe ser un número positivo')
   }
 
+  const phone = typeof d.phone === 'string' ? d.phone.trim() || undefined : undefined
+
   return {
     externalId: d.externalId.trim(),
     vendorId: d.vendorId.trim(),
     buyerId: d.buyerId.trim(),
+    phone,
     address: d.address.trim(),
     items: d.items.map((item: { productId: string; quantity: number }) => ({
       productId: item.productId.trim(),

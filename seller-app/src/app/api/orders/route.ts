@@ -179,6 +179,7 @@ export async function POST(request: Request) {
             vendorId: input.vendorId,
             buyerId: input.buyerId,
             buyerName,
+            phone: input.phone ?? null,
             status: 'PAID',
             address: input.address,
             total: computedTotal,
