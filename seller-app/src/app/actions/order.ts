@@ -92,6 +92,8 @@ export async function confirmOrderForDelivery(orderId: string) {
   // 2. Notificar servicios externos (no bloqueante)
   const cantBidones = updatedOrder.items.reduce((sum, item) => sum + item.quantity, 0)
 
+  console.log('[Delivery POST vendor] phone:', updatedOrder.phone, 'externalId:', updatedOrder.externalId)
+
   const results = await Promise.allSettled([
     notifyExternalService('delivery', '/api/ready-orders', 'POST', {
       pedidos: [{

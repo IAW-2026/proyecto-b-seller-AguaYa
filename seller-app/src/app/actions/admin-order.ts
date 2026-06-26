@@ -25,6 +25,8 @@ export async function updateOrderStatusAsAdmin(orderId: string, status: 'PAID' |
   if (status === 'READY') {
     const cantBidones = order.items.reduce((sum, item) => sum + item.quantity, 0)
 
+    console.log('[Delivery POST admin] phone:', order.phone, 'externalId:', order.externalId)
+
     await Promise.allSettled([
       notifyExternalService('delivery', '/api/ready-orders', 'POST', {
         pedidos: [{
