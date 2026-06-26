@@ -1,0 +1,78 @@
+/**
+ * Contenedor de tabs para la vista detallada de un vendedor.
+ * Permite alternar entre las vistas de resumen, productos y pedidos.
+ */
+'use client'
+
+import { useState } from 'react'
+import type { Vendor, Product, Order, Review, Paginated } from '@/lib/types'
+import OverviewTab from './OverviewTab'
+import ProductsTab from './ProductsTab'
+import OrdersTab from './OrdersTab'
+
+export type { Vendor, Product, Order, Review, Paginated, OrderItem } from '@/lib/types'
+
+/** Tabs de navegación entre resumen, productos y pedidos del vendedor. */
+export default function VendorDetailTabs({
+  vendor,
+  products,
+  paidOrders,
+  readyOrders,
+  reviews,
+  promedio,
+  totalReviews,
+}: {
+  vendor: Vendor
+  products: Paginated<Product>
+  paidOrders: Paginated<Order>
+  readyOrders: Paginated<Order>
+  reviews: Review[]
+  promedio: number
+  totalReviews: number
+}) {
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders'>('overview')
+
+  return (
+    <div>
+      <h1 className="mb-1 text-2xl font-bold text-slate-900 dark:text-white">{vendor.name}</h1>
+      <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">{vendor.clerkName}</p>
+
+      <div className="mb-6 flex gap-1 rounded-xl bg-gradient-to-br from-slate-100/70 to-slate-200/50 p-1 dark:from-slate-800/60 dark:to-slate-800/40">
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
+            activeTab === 'overview'
+              ? 'bg-gradient-to-br from-white/60 to-slate-100/60 text-slate-900 shadow-sm backdrop-blur-sm dark:from-slate-700 dark:to-slate-600 dark:text-white'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+          }`}
+        >
+          Resumen
+        </button>
+        <button
+          onClick={() => setActiveTab('products')}
+          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
+            activeTab === 'products'
+              ? 'bg-gradient-to-br from-white/60 to-slate-100/60 text-slate-900 shadow-sm backdrop-blur-sm dark:from-slate-700 dark:to-slate-600 dark:text-white'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+          }`}
+        >
+          Productos
+        </button>
+        <button
+          onClick={() => setActiveTab('orders')}
+          className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
+            activeTab === 'orders'
+              ? 'bg-gradient-to-br from-white/60 to-slate-100/60 text-slate-900 shadow-sm backdrop-blur-sm dark:from-slate-700 dark:to-slate-600 dark:text-white'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+          }`}
+        >
+          Pedidos
+        </button>
+      </div>
+
+      {activeTab === 'overview' && <OverviewTab vendor={vendor} reviews={reviews} promedio={promedio} totalReviews={totalReviews} />}
+      {activeTab === 'products' && <ProductsTab vendorId={vendor.id} products={products} />}
+      {activeTab === 'orders' && <OrdersTab paidOrders={paidOrders} readyOrders={readyOrders} />}
+    </div>
+  )
+}

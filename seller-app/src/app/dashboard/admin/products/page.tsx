@@ -1,0 +1,43 @@
+/**
+ * Página de productos globales del panel de administración.
+ * Lista paginada y filtrable de todos los productos del sistema.
+ */
+import React, { Suspense } from 'react'
+import { requireAdminPage } from '@/lib/admin-guard'
+import { listAllProductsPaginated } from '@/lib/queries/products'
+import AdminProductsTable from '@/components/admin/AdminProductsTable'
+import DashboardTableLoading from '@/components/ui/DashboardTableLoading'
+import SearchBar from '@/components/ui/SearchBar'
+import AdminProductsLoading from '@/components/ui/admin-loadings/AdminProductsLoading'
+
+async function ProductsTable(props: { searchParams: Promise<{ page?: string; q?: string; isActive?: string; sortBy?: string; sortOrder?: string }> }) {
+  const searchParams = await props.searchParams
+  const page = parseInt(searchParams.page || '1', 10)
+  const q = searchParams.q || ''
+  const isActive = searchParams.isActive === 'true' ? true : searchParams.isActive === 'false' ? false : undefined
+  const sortBy = searchParams.sortBy || ''
+  const sortOrder = searchParams.sortOrder || ''
+
+  const result = await listAllProductsPaginated(page, { q, isActive, sortBy: sortBy || undefined, sortOrder: sortOrder || undefined })
+
+  return <AdminProductsTable products={result.items} page={page} pageCount={result.pageCount} />
+}
+
+/** Página de productos globales del panel de administración. */
+export default async function AdminProductsPage(props: { searchParams: Promise<{ page?: string; q?: string; isActive?: string; sortBy?: string; sortOrder?: string }> }) {
+  await requireAdminPage()
+
+  return (
+    <div>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Productos (global)</h1>
+      </div>
+      <div className="mb-4">
+        <SearchBar placeholder="Buscar por producto o vendedor..." />
+      </div>
+      <Suspense fallback={<AdminProductsLoading />}>
+        <ProductsTable searchParams={props.searchParams} />
+      </Suspense>
+    </div>
+  )
+}

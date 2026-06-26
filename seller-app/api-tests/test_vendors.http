@@ -1,0 +1,31 @@
+### Variables
+@baseUrl = http://localhost:3000
+@baseUrlProd = https://proyecto-b-seller-agua-ya.vercel.app/
+@apiKey = vendor-secret-key-2026
+
+@vendorId = cmpvp75rp0000ugliqx0ksd22
+@vendorId2 = cmpurfqxv0000cslii6aablh3
+### =====================
+### TESTS DE VENDEDORES
+### =====================
+
+### Test 1: GET todos los vendedores
+GET {{baseUrlProd}}/api/vendors
+X-API-Key: {{apiKey}}
+
+### Test 2: GET vendedores por IDs específicos
+GET {{baseUrl}}/api/vendors?ids={{vendorId}},{{vendorId2}}
+X-API-Key: {{apiKey}}
+
+### Test 3: GET un vendedor específico
+GET {{baseUrl}}/api/vendors/{{vendorId}}
+X-API-Key: {{apiKey}}
+
+### Test 4: GET vendedor que no existe (404)
+GET {{baseUrl}}/api/vendors/inexistente
+X-API-Key: {{apiKey}}
+
+
+
+
+

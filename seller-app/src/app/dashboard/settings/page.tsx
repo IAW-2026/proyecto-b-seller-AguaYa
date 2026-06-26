@@ -1,0 +1,106 @@
+/**
+ * Página de configuración del vendedor (`/dashboard/settings`). Permite editar perfil y cambiar tema en mobile.
+ */
+import React, { Suspense } from 'react'
+import { auth } from '@clerk/nextjs/server'
+import { getVendorByUserId } from '@/lib/queries/vendors'
+import { getAuthRoles } from '@/lib/auth-utils'
+import VendorForm from '@/components/VendorForm'
+import ThemeToggle from '@/components/layout/ThemeToggle'
+import { Settings, Store, Moon, LogOut } from 'lucide-react'
+import SettingsLoading from '@/components/ui/loadings/settingsLoading'
+import SettingsLogoutButton from '@/components/layout/SettingsLogoutButton'
+async function VendorSettingsContent() {
+  const { userId } = await auth()
+  const vendor = userId ? await getVendorByUserId(userId) : null
+  const roles = await getAuthRoles()
+  const isAdmin = roles.includes('admin_seller')
+
+  if (!vendor) {
+    return <p className="text-gray-500 dark:text-slate-400">No hay un vendedor asociado a esta cuenta.</p>
+  }
+
+  return (
+    <>
+      <div className="flex items-center gap-5 rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-5 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 xl:hidden">
+        {vendor.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={vendor.image}
+            alt={vendor.name}
+            className="h-16 w-16 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-200">
+            <Store className="h-7 w-7 text-slate-500" />
+          </div>
+        )}
+        <div className="min-w-0">
+          <h2 className="truncate text-fluid-lg font-semibold text-slate-950 dark:text-slate-100">{vendor.name}</h2>
+          {!isAdmin && <p className="truncate text-fluid-sm text-slate-500 dark:text-slate-400">{vendor.address}</p>}
+        </div>
+      </div>
+      <div className="rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-6 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40">
+        <VendorForm initialData={{
+          name: vendor.name,
+          address: vendor.address,
+          description: vendor.description ?? undefined,
+          image: vendor.image ?? undefined,
+          cuil: vendor.cuil ?? undefined,
+          cuit: vendor.cuit ?? undefined,
+        }} redirectTo="/dashboard/settings" simple={isAdmin} />
+      </div>
+
+      {/* Theme toggle — solo visible en mobile/tablet */}
+      <div className="flex items-center justify-between rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-5 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 xl:hidden">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
+            <Moon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Apariencia</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Cambiar entre modo claro y oscuro</p>
+          </div>
+        </div>
+        <ThemeToggle />
+      </div>
+
+      {/* Logout — solo visible en mobile/tablet */}
+      <div className="flex items-center justify-between rounded-xl border border-white/30 bg-gradient-to-br from-white/30 to-slate-100/30 p-5 shadow-lg shadow-black/5 backdrop-blur-xl dark:border-slate-700/40 dark:from-slate-900/40 dark:to-slate-800/40 xl:hidden">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-red-100 p-2 dark:bg-red-900/50">
+            <LogOut className="h-5 w-5 text-red-600 dark:text-red-400" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Cerrar sesión</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Salir de tu cuenta</p>
+          </div>
+        </div>
+        <SettingsLogoutButton />
+      </div>
+    </>
+  )
+}
+
+/**
+ * Renderiza el formulario de edición del vendedor y el toggle de tema (solo en mobile/tablet).
+ */
+export default function SettingsPage() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+          <Settings className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Ajustes</h1>
+          <p className="text-gray-600 dark:text-slate-400">Configuración del perfil del vendedor</p>
+        </div>
+      </div>
+
+      <Suspense fallback={<SettingsLoading />}>
+        <VendorSettingsContent />
+      </Suspense>
+    </div>
+  )
+}
